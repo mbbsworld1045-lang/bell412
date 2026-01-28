@@ -1,0 +1,444 @@
+-- =============================================================================
+-- BELL 412 - FUEL SYSTEM LOGIC
+-- Platform: Air Manager + Arduino Mega 2560
+-- Hardware: Arduino Channel B (Pedestal Panel)
+-- Logic: Buttons Only (Active Low)
+-- =============================================================================
+
+-- =============================================================================
+-- 1. HARDWARE CONFIGURATION HEADER
+-- =============================================================================
+-- INPUTS (Switches converted to Buttons) D2..D12
+local PIN_FUEL_TRANS1   = "ARDUINO_MEGA2560_B_D2"
+local PIN_FUEL_TRANS2   = "ARDUINO_MEGA2560_B_D3"
+local PIN_BOOST1        = "ARDUINO_MEGA2560_B_D4"
+local PIN_BOOST2        = "ARDUINO_MEGA2560_B_D5"
+local PIN_INTCON        = "ARDUINO_MEGA2560_B_D6"
+local PIN_XFEED         = "ARDUINO_MEGA2560_B_D7"
+local PIN_VALVE1        = "ARDUINO_MEGA2560_B_D8"
+local PIN_VALVE2        = "ARDUINO_MEGA2560_B_D9"
+local PIN_FUEL_QUANTITY_POS1 = "ARDUINO_MEGA2560_B_D12"  -- Fuel Quantity Position 1 (State = 1)
+local PIN_FUEL_QUANTITY_POS2 = "ARDUINO_MEGA2560_B_D10"  -- Fuel Quantity Position 2 (State = -1)
+local PIN_FUEL_DIGIT_TEST = "ARDUINO_MEGA2560_B_D11"
+
+-- OUTPUTS (LEDs) D30..D38
+local PIN_TRANS1_LED       = "ARDUINO_MEGA2560_B_D30"
+local PIN_TRANS2_LED       = "ARDUINO_MEGA2560_B_D31"
+local PIN_BOOST1_LED       = "ARDUINO_MEGA2560_B_D32"
+local PIN_BOOST2_LED       = "ARDUINO_MEGA2560_B_D33"
+local PIN_INTCON_LED       = "ARDUINO_MEGA2560_B_D34"
+local PIN_XFEED_LED        = "ARDUINO_MEGA2560_B_D35"
+local PIN_VALVE1_TRANS_LED = "ARDUINO_MEGA2560_B_D36"
+local PIN_VALVE2_TRANS_LED = "ARDUINO_MEGA2560_B_D37"
+local PIN_XFEED_LVAR_LED  = "ARDUINO_MEGA2560_B_D38"  -- LED for L:SwFuelxfeed state
+
+-- =============================================================================
+-- 2. INITIALIZE HARDWARE LEDS
+-- =============================================================================
+local led_trans1_h  = hw_led_add(PIN_TRANS1_LED, 1.0)
+local led_trans2_h  = hw_led_add(PIN_TRANS2_LED, 1.0)
+local led_boost1_h  = hw_led_add(PIN_BOOST1_LED, 1.0)
+local led_boost2_h  = hw_led_add(PIN_BOOST2_LED, 1.0)
+local led_intcon_h  = hw_led_add(PIN_INTCON_LED, 0.0)
+local led_xfeed_h   = hw_led_add(PIN_XFEED_LED, 0.0)
+local led_v1_trans_h = hw_led_add(PIN_VALVE1_TRANS_LED, 0.0)
+local led_v2_trans_h = hw_led_add(PIN_VALVE2_TRANS_LED, 0.0)
+local led_xfeed_lvar_h = hw_led_add(PIN_XFEED_LVAR_LED, 0.0)  -- LED for L:SwFuelxfeed subscription
+
+-- =============================================================================
+-- 3. INTERNAL VARIABLES & CONSTANTS
+-- =============================================================================
+-- Physics Constants
+local FUEL_PRESS_NOMINAL = 25.0
+local FUEL_VALVE_TIME_S  = 2.0
+local UPDATE_DT_MS       = 50
+local FLASH_RATE_MS      = 250
+
+-- Local State (Switch Positions)
+local sw_trans1  = 0
+local sw_trans2  = 0
+local sw_boost1  = 0
+local sw_boost2  = 0
+local sw_intcon  = 0
+local sw_xfeed   = 0
+local sw_valve1  = 0
+local sw_valve2  = 0
+
+-- Fuel Quantity Switch State (3-position: 0=OFF, 1=Position 1, -1=Position 2)
+local fuel_quantity_pos1_pressed = false
+local fuel_quantity_pos2_pressed = false
+local fuel_quantity_state = 0
+
+-- Sim Feedback / Computed Values
+local dc_bus = 0
+
+-- Valve Motion State
+local valve1_pos    = 0.0
+local valve2_pos    = 0.0
+local valve1_moving = false
+local valve2_moving = false
+local valve1_t0     = 0.0
+local valve2_t0     = 0.0
+local valve1_start  = 0.0
+local valve2_start  = 0.0
+local valve1_target = 0.0
+local valve2_target = 0.0
+
+-- Flash State for Transit LEDs
+local flash_state = false
+local flash_timer = nil
+
+-- =============================================================================
+-- 4. SYSTEM LOGIC FUNCTIONS
+-- =============================================================================
+
+-- HELPER: Clamp value
+local function clamp(x, lo, hi)
+    if x < lo then return lo end
+    if x > hi then return hi end
+    return x
+end
+
+-- FUEL QUANTITY SWITCH: Update state based on two position pins (3-position: 0=OFF, 1=Position 1, -1=Position 2)
+local function update_fuel_quantity_state()
+    local new_state = 0
+    
+    if fuel_quantity_pos1_pressed then
+        new_state = 1  -- Position 1 (D12)
+    elseif fuel_quantity_pos2_pressed then
+        new_state = -1  -- Position 2 (D10)
+    else
+        new_state = 0  -- OFF (both released)
+    end
+    
+    if fuel_quantity_state ~= new_state then
+        fuel_quantity_state = new_state
+        fsx_variable_write("L:FuelQuantity", "Number", fuel_quantity_state)
+        print("FUEL QUANTITY: State changed to " .. tostring(fuel_quantity_state))
+    end
+end
+
+-- LED UPDATE: Based on switch states and valve positions
+local function update_led_states()
+    -- Trans/Boost LEDs: ON when switch OFF (warning)
+    hw_led_set(led_trans1_h, (sw_trans1 == 0) and 1.0 or 0.0)
+    hw_led_set(led_trans2_h, (sw_trans2 == 0) and 1.0 or 0.0)
+    hw_led_set(led_boost1_h, (sw_boost1 == 0) and 1.0 or 0.0)
+    hw_led_set(led_boost2_h, (sw_boost2 == 0) and 1.0 or 0.0)
+
+    -- Intcon/Xfeed LEDs: ON when active
+    hw_led_set(led_intcon_h, (sw_intcon == 1) and 1.0 or 0.0)
+    hw_led_set(led_xfeed_h, (sw_xfeed == 1) and 1.0 or 0.0)
+
+    -- Valve Transit LEDs: Flash when valve in transit (0.01 < pos < 0.99)
+    local v1_transit = (valve1_pos > 0.01) and (valve1_pos < 0.99)
+    local v2_transit = (valve2_pos > 0.01) and (valve2_pos < 0.99)
+
+    if v1_transit then
+        hw_led_set(led_v1_trans_h, flash_state and 1.0 or 0.0)
+    else
+        hw_led_set(led_v1_trans_h, 0.0)
+    end
+
+    if v2_transit then
+        hw_led_set(led_v2_trans_h, flash_state and 1.0 or 0.0)
+    else
+        hw_led_set(led_v2_trans_h, 0.0)
+    end
+end
+
+-- FUEL PRESSURE: Calculate based on boost pumps and xfeed
+local function update_fuel_pressure()
+    local p1 = 0.0
+    local p2 = 0.0
+
+    if dc_bus == 1 then
+        local p1_raw = (sw_boost1 == 1) and FUEL_PRESS_NOMINAL or 0.0
+        local p2_raw = (sw_boost2 == 1) and FUEL_PRESS_NOMINAL or 0.0
+
+        if sw_xfeed == 1 then
+            local p_max = (p1_raw > p2_raw) and p1_raw or p2_raw
+            p1 = p_max
+            p2 = p_max
+        else
+            p1 = p1_raw
+            p2 = p2_raw
+        end
+    end
+
+    fsx_variable_write("L:FuelPressure1", "Number", p1)
+    fsx_variable_write("L:FuelPressure2", "Number", p2)
+end
+
+-- VALVE MOTION: Command valve to open/close
+local function command_valve_1(cmd)
+    sw_valve1 = cmd
+    fsx_variable_write("L:SwvalveEng1", "Number", cmd)
+    fsx_variable_write("L:MvalveEng1", "Number", cmd)
+
+    if dc_bus == 0 then return end
+
+    valve1_start  = valve1_pos
+    valve1_target = (cmd == 1) and 1.0 or 0.0
+    valve1_t0     = os.clock()
+    valve1_moving = true
+end
+
+local function command_valve_2(cmd)
+    sw_valve2 = cmd
+    fsx_variable_write("L:SwvalveEng2", "Number", cmd)
+    fsx_variable_write("L:MvalveEng2", "Number", cmd)
+
+    if dc_bus == 0 then return end
+
+    valve2_start  = valve2_pos
+    valve2_target = (cmd == 1) and 1.0 or 0.0
+    valve2_t0     = os.clock()
+    valve2_moving = true
+end
+
+-- VALVE TICK: Update valve positions over time
+local function update_valves_tick()
+    if dc_bus == 0 then return end
+
+    local t = os.clock()
+
+    if valve1_moving then
+        local u = clamp((t - valve1_t0) / FUEL_VALVE_TIME_S, 0.0, 1.0)
+        valve1_pos = valve1_start + (valve1_target - valve1_start) * u
+        fsx_variable_write("L:FuelValve1Pos", "Number", valve1_pos)
+        if u >= 1.0 then valve1_moving = false end
+    end
+
+    if valve2_moving then
+        local u = clamp((t - valve2_t0) / FUEL_VALVE_TIME_S, 0.0, 1.0)
+        valve2_pos = valve2_start + (valve2_target - valve2_start) * u
+        fsx_variable_write("L:FuelValve2Pos", "Number", valve2_pos)
+        if u >= 1.0 then valve2_moving = false end
+    end
+
+    update_led_states()
+end
+
+-- FLASH TIMER: For transit LED blinking
+local function start_flash_timer()
+    if flash_timer ~= nil then return end
+    if timer_start ~= nil then
+        flash_timer = timer_start(0, FLASH_RATE_MS, function()
+            flash_state = not flash_state
+            update_led_states()
+        end)
+    end
+end
+
+-- =============================================================================
+-- 5. HARDWARE INPUTS (BUTTONS)
+-- =============================================================================
+
+-- FUEL TRANSFER 1
+hw_button_add(PIN_FUEL_TRANS1,
+    function() -- PRESSED (ON)
+        print("ACTION: Fuel Trans 1 ON")
+        sw_trans1 = 1
+        fsx_variable_write("L:SwfueltransengA", "Number", 1)
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Fuel Trans 1 OFF")
+        sw_trans1 = 0
+        fsx_variable_write("L:SwfueltransengA", "Number", 0)
+        update_led_states()
+    end
+)
+
+-- FUEL TRANSFER 2
+hw_button_add(PIN_FUEL_TRANS2,
+    function() -- PRESSED (ON)
+        print("ACTION: Fuel Trans 2 ON")
+        sw_trans2 = 1
+        fsx_variable_write("L:SwfueltransengB", "Number", 1)
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Fuel Trans 2 OFF")
+        sw_trans2 = 0
+        fsx_variable_write("L:SwfueltransengB", "Number", 0)
+        update_led_states()
+    end
+)
+
+-- BOOST PUMP 1
+hw_button_add(PIN_BOOST1,
+    function() -- PRESSED (ON)
+        print("ACTION: Boost Pump 1 ON")
+        sw_boost1 = 1
+        fsx_variable_write("L:SwboostpuEng1", "Number", 1)
+        update_fuel_pressure()
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Boost Pump 1 OFF")
+        sw_boost1 = 0
+        fsx_variable_write("L:SwboostpuEng1", "Number", 0)
+        update_fuel_pressure()
+        update_led_states()
+    end
+)
+
+-- BOOST PUMP 2
+hw_button_add(PIN_BOOST2,
+    function() -- PRESSED (ON)
+        print("ACTION: Boost Pump 2 ON")
+        sw_boost2 = 1
+        fsx_variable_write("L:SwboostpuEng2", "Number", 1)
+        update_fuel_pressure()
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Boost Pump 2 OFF")
+        sw_boost2 = 0
+        fsx_variable_write("L:SwboostpuEng2", "Number", 0)
+        update_fuel_pressure()
+        update_led_states()
+    end
+)
+
+-- INTERCONNECT
+hw_button_add(PIN_INTCON,
+    function() -- PRESSED (ON)
+        print("ACTION: Fuel Intcon ON")
+        sw_intcon = 1
+        fsx_variable_write("L:Swfuelintcon", "Number", 1)
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Fuel Intcon OFF")
+        sw_intcon = 0
+        fsx_variable_write("L:Swfuelintcon", "Number", 0)
+        update_led_states()
+    end
+)
+
+-- CROSSFEED
+hw_button_add(PIN_XFEED,
+    function() -- PRESSED (ON)
+        print("ACTION: Fuel Xfeed ON")
+        sw_xfeed = 1
+        fsx_variable_write("L:SwFuelxfeed", "Number", 1)
+        update_fuel_pressure()
+        update_led_states()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Fuel Xfeed OFF")
+        sw_xfeed = 0
+        fsx_variable_write("L:SwFuelxfeed", "Number", 0)
+        update_fuel_pressure()
+        update_led_states()
+    end
+)
+
+-- FUEL VALVE 1
+hw_button_add(PIN_VALVE1,
+    function() -- PRESSED (Open)
+        print("ACTION: Fuel Valve 1 OPEN")
+        command_valve_1(1)
+    end,
+    function() -- RELEASED (Close)
+        print("ACTION: Fuel Valve 1 CLOSE")
+        command_valve_1(0)
+    end
+)
+
+-- FUEL VALVE 2
+hw_button_add(PIN_VALVE2,
+    function() -- PRESSED (Open)
+        print("ACTION: Fuel Valve 2 OPEN")
+        command_valve_2(1)
+    end,
+    function() -- RELEASED (Close)
+        print("ACTION: Fuel Valve 2 CLOSE")
+        command_valve_2(0)
+    end
+)
+
+-- FUEL QUANTITY SWITCH (3-Position: 0=OFF, 1=Position 1 (D12), -1=Position 2 (D10))
+-- Position 1 Button (D12 -> State = 1)
+hw_button_add(PIN_FUEL_QUANTITY_POS1,
+    function() -- PRESSED (Position 1)
+        print("ACTION: Fuel Quantity -> Position 1 (State = 1)")
+        fuel_quantity_pos1_pressed = true
+        update_fuel_quantity_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Fuel Quantity Position 1 RELEASED")
+        fuel_quantity_pos1_pressed = false
+        update_fuel_quantity_state()
+    end
+)
+
+-- Position 2 Button (D10 -> State = -1)
+hw_button_add(PIN_FUEL_QUANTITY_POS2,
+    function() -- PRESSED (Position 2)
+        print("ACTION: Fuel Quantity -> Position 2 (State = -1)")
+        fuel_quantity_pos2_pressed = true
+        update_fuel_quantity_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Fuel Quantity Position 2 RELEASED")
+        fuel_quantity_pos2_pressed = false
+        update_fuel_quantity_state()
+    end
+)
+
+-- FUEL DIGIT TEST (Momentary)
+hw_button_add(PIN_FUEL_DIGIT_TEST,
+    function() -- PRESSED
+        print("ACTION: Fuel Digit Test PRESSED")
+        fsx_variable_write("L:Digitstest", "Number", 1)
+    end,
+    function() -- RELEASED
+        print("ACTION: Fuel Digit Test RELEASED")
+        fsx_variable_write("L:Digitstest", "Number", 0)
+    end
+)
+
+-- =============================================================================
+-- 6. SIMULATOR SUBSCRIPTIONS (Data In -> Logic Update)
+-- =============================================================================
+
+-- Listen for DC Bus state
+fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
+    dc_bus = (val ~= 0) and 1 or 0
+    update_fuel_pressure()
+end)
+
+-- Listen for L:SwFuelxfeed state (for LED feedback)
+fsx_variable_subscribe("L:SwFuelxfeed", "Number", function(val)
+    local led_state = (val ~= 0) and 1.0 or 0.0
+    hw_led_set(led_xfeed_lvar_h, led_state)
+    print("SUBSCRIBE: L:SwFuelxfeed = " .. tostring(val))
+end)
+
+-- =============================================================================
+-- 7. STARTUP INITIALIZATION
+-- =============================================================================
+fsx_variable_write("L:FuelPressure1", "Number", 0.0)
+fsx_variable_write("L:FuelPressure2", "Number", 0.0)
+fsx_variable_write("L:FuelValve1Pos", "Number", 0.0)
+fsx_variable_write("L:FuelValve2Pos", "Number", 0.0)
+fsx_variable_write("L:FuelQuantity", "Number", 0)
+fsx_variable_write("L:Digitstest", "Number", 0)
+
+-- Initialize fuel quantity state
+update_fuel_quantity_state()
+
+-- Start periodic tick for valve motion
+if timer_start ~= nil then
+    timer_start(0, UPDATE_DT_MS, update_valves_tick)
+end
+
+-- Start flash timer for transit LEDs
+start_flash_timer()
+
+-- Initial LED state
+update_led_states()

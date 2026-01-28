@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Vsi" Version="1.0">
+ <Image Name="Vsi_background.bmp"/>
+ 
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="vsi_needle.bmp" PointsTo="West">
+      <Axis X="93" Y="6"/>
+    </Image>
+    <Rotate>
+      <Value>(L:pitotcovers,bool) 0 == if{ (A:Vertical speed,feet per minute) }</Value>
+       <Failures>
+        <SYSTEM_PITOT_STATIC Action="Freeze"/>
+      </Failures>
+      <Nonlinearity>
+	      <Item Value="-4000" X="221" Y="140"/>
+          <Item Value="-3000" X="201" Y="184"/>
+          <Item Value="-2000" X="158" Y="215"/>
+          <Item Value="-1000" X="84" Y="213"/>
+          <Item Value="-500" X="45" Y="182"/>
+          <Item Value="0" X="25" Y="122"/>
+          <Item Value="500" X="45" Y="64"/>
+          <Item Value="1000" X="84" Y="33"/>
+          <Item Value="2000" X="158" Y="31"/>
+          <Item Value="3000" X="201" Y="62"/>
+ 	      <Item Value="4000" X="221" Y="106"/>
+         </Nonlinearity>
+    </Rotate>
+  </Element>
+  
+   <Mouse>
+     <Help ID="HELPID_GAUGE_VSI"/>
+      <Tooltip ID="TOOLTIPTEXT_VSI_FEET_PER_MIN" MetricID="TOOLTIPTEXT_VSI_METERS_PER_SEC"/>
+  </Mouse>
+</Gauge>

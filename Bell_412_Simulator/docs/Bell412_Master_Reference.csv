@@ -1,0 +1,241 @@
+Category,Function,Pin Variable,Arduino ID,Pin,L-Var,Type,Values,Input Method,LED Handle,File,Notes
+Electrical,Battery 1 Switch,PIN_BATT1_SW,ARDUINO_MEGA2560_A,D2,L:Swbatta,Number,"0, 1",hw_button_add,,electrical_logic.lua,Battery 1 ON/OFF
+Electrical,Battery 2 Switch,PIN_BATT2_SW,ARDUINO_MEGA2560_A,D3,L:Swbattb,Number,"0, 1",hw_button_add,,electrical_logic.lua,Battery 2 ON/OFF
+Electrical,Generator 1 Switch,PIN_GEN1_SW,ARDUINO_MEGA2560_A,D4,L:Genel,Number,"0, 1",hw_button_add,,electrical_logic.lua,Gen 1 + TOGGLE_ALTERNATOR1 event
+Electrical,Generator 2 Switch,PIN_GEN2_SW,ARDUINO_MEGA2560_A,D5,L:Gener,Number,"0, 1",hw_button_add,,electrical_logic.lua,Gen 2 + TOGGLE_ALTERNATOR2 event
+Electrical,Inverter 1 Switch,PIN_INV1_SW,ARDUINO_MEGA2560_A,D6,L:Swinva,Number,"0, 1",hw_button_add,,electrical_logic.lua,Also writes L:ACBus
+Electrical,Inverter 2 Switch,PIN_INV2_SW,ARDUINO_MEGA2560_A,D7,L:Swinvb,Number,"0, 1",hw_button_add,,electrical_logic.lua,Also writes L:ACBus
+Electrical,Non-Essential Bus,PIN_NONESNTL_SW,ARDUINO_MEGA2560_A,D8,L:Swnonbus,Number,"0, 1",hw_button_add,,electrical_logic.lua,Also writes L:SwNonEsntl
+Electrical,Emergency Load,PIN_EMERGLOAD_SW,ARDUINO_MEGA2560_A,D9,L:Swemerload,Number,"0, 1",hw_button_add,,electrical_logic.lua,Emergency load switch
+Electrical,Standby Attitude,PIN_STBYATT_SW,ARDUINO_MEGA2560_A,D10,L:stbatt,Number,"0, 1",hw_button_add,,electrical_logic.lua,Standby attitude power
+Electrical,Gen 1 Fail LED,PIN_GEN1_FAIL_LED,ARDUINO_MEGA2560_A,D30,,,LED Output,led_gen1_h,electrical_logic.lua,ON when gen not producing
+Electrical,Gen 2 Fail LED,PIN_GEN2_FAIL_LED,ARDUINO_MEGA2560_A,D31,,,LED Output,led_gen2_h,electrical_logic.lua,ON when gen not producing
+Electrical,Inv 1 Fail LED,PIN_INV1_FAIL_LED,ARDUINO_MEGA2560_A,D32,,,LED Output,led_inv1_h,electrical_logic.lua,ON when switch OFF
+Electrical,Inv 2 Fail LED,PIN_INV2_FAIL_LED,ARDUINO_MEGA2560_A,D33,,,LED Output,led_inv2_h,electrical_logic.lua,ON when switch OFF
+Electrical,Battery Caution LED,PIN_BATT_CAUT_LED,ARDUINO_MEGA2560_A,D34,,,LED Output,led_batt_h,electrical_logic.lua,ON when batts ON but no gen
+Electrical,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Logic Output,,electrical_logic.lua,DC power available flag
+Electrical,Generator Master,,,L:Genmast,Number,"0, 1",Logic Output,,electrical_logic.lua,Gen power available
+Electrical,DC Essential Voltage,,,L:VoltDC_Essential,Volts,"0, 18, 24, 28",Logic Output,,electrical_logic.lua,Essential bus voltage
+Electrical,DC Non-Essential Voltage,,,L:VoltDC_NonEssential,Volts,"0, 18, 24, 28",Logic Output,,electrical_logic.lua,Non-essential bus voltage
+Electrical,AC Bus,,,L:ACBus,Number,"0, 1",Logic Output,,electrical_logic.lua,AC power (Inv ON)
+Electrical,Gen 1 Producing,,,L:CGenel,Number,"0, 1",Subscribe,,electrical_logic.lua,Generator 1 output status
+Electrical,Gen 2 Producing,,,L:CGener,Number,"0, 1",Subscribe,,electrical_logic.lua,Generator 2 output status
+Electrical,External Power,,,L:ExternalPower,Number,"0, 1",Subscribe,,electrical_logic.lua,GPU connected
+Electrical,Start Switch,,,L:StartSwitch,Number,"0, 1",Subscribe,,electrical_logic.lua,Start cycle active (voltage drop)
+Ancillary,Pitot Heat,PIN_PITOT_HEAT,ARDUINO_MEGA2560_A,D14,L:pitotcovers,Number,"0, 1",hw_button_add,,systems_ancillary.lua,0=Heat ON + PITOT_HEAT events
+Ancillary,Nav Lights,PIN_NAV_LIGHTS,ARDUINO_MEGA2560_A,D15,L:Swposition,Number,"0, 1",hw_button_add,,systems_ancillary.lua,NAV_LIGHTS events
+Ancillary,Anti-Collision,PIN_ANTICOLL,ARDUINO_MEGA2560_A,D16,L:Swanticoll,Number,"0, 1",hw_button_add,,systems_ancillary.lua,BEACON_LIGHTS events
+Ancillary,Pilot Wiper,PIN_WIPER_PI,ARDUINO_MEGA2560_A,D17,L:SwPiWiper,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Also L:Swpiwiper
+Ancillary,Copilot Wiper,PIN_WIPER_CO,ARDUINO_MEGA2560_A,D18,L:SwCoWiper,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Also L:Swcowiper
+Ancillary,Heater,PIN_HEATER,ARDUINO_MEGA2560_A,D19,L:SwHeater,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Cabin heater
+Ancillary,Vent Blower,PIN_VENT_BLOWER,ARDUINO_MEGA2560_A,D20,L:SwVentBlower,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Ventilation blower
+Ancillary,Aft Outlet,PIN_AFT_OUTLET,ARDUINO_MEGA2560_A,D21,L:SwAftOutlet,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Aft air outlet
+Ancillary,Dome Light Pos1,PIN_DOME_LIGHT_POS1,ARDUINO_MEGA2560_A,D13,L:Swredwhite,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=Pos1 2=Pos2
+Ancillary,Dome Light Pos2,PIN_DOME_LIGHT_POS2,ARDUINO_MEGA2560_A,D22,L:Swredwhite,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=Pos1 2=Pos2
+Ancillary,Utility Light,PIN_UTILITY_LT,ARDUINO_MEGA2560_A,D23,L:SwUtilityLight,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Utility light
+Ancillary,Fire Handle 1,PIN_FIRE_PULL1,ARDUINO_MEGA2560_A,D24,L:firethandl,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Left engine fire handle
+Ancillary,Fire Handle 2,PIN_FIRE_PULL2,ARDUINO_MEGA2560_A,D25,L:firethandr,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Right engine fire handle
+Ancillary,Fire Handle 1 Status LED,PIN_FIRE_HANDLE1_LED,ARDUINO_MEGA2560_A,D30,,,LED Output,led_fire_handle1_h,systems_ancillary.lua,ON when handle pulled
+Ancillary,Fire Handle 2 Status LED,PIN_FIRE_HANDLE2_LED,ARDUINO_MEGA2560_A,D31,,,LED Output,led_fire_handle2_h,systems_ancillary.lua,ON when handle pulled
+Ancillary,Fire Test,PIN_FIRE_TEST,ARDUINO_MEGA2560_A,D26,L:Swfiretest,Bool,"true, false",hw_button_add,,systems_ancillary.lua,Fire detection test + all fire LEDs
+Ancillary,Compass Mag/Slave,PIN_COMPASS_SLAVE,ARDUINO_MEGA2560_A,D27,L:CompassControl,Number,"0, 1",hw_button_add,,systems_ancillary.lua,0=Slave 1=Mag
+Ancillary,Fire Extinguisher Pos1,PIN_EXTINGUISHER_POS1,ARDUINO_MEGA2560_A,D28,L:Extinguisher,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=Pos1 2=Pos2
+Ancillary,Fire Extinguisher Pos2,PIN_EXTINGUISHER_POS2,ARDUINO_MEGA2560_A,D29,L:Extinguisher,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=Pos1 2=Pos2
+Ancillary,Fire Eng 1 LED,PIN_FIRE_ENG1_LED,ARDUINO_MEGA2560_A,D35,,,LED Output,led_fire_eng1_h,systems_ancillary.lua,Fire warning inside handle 1
+Ancillary,Fire Eng 2 LED,PIN_FIRE_ENG2_LED,ARDUINO_MEGA2560_A,D36,,,LED Output,led_fire_eng2_h,systems_ancillary.lua,Fire warning inside handle 2
+Ancillary,Bag Fire LED,PIN_BAG_FIRE_LED,ARDUINO_MEGA2560_A,D37,,,LED Output,led_bag_fire_h,systems_ancillary.lua,Baggage compartment fire
+Ancillary,Force Trim,PIN_FORCE_TRIM,ARDUINO_MEGA2560_B,D20,L:Sw forcetrim,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Force trim + ROTOR_TRIM_RESET event
+Ancillary,Compass,PIN_COMPASS,ARDUINO_MEGA2560_B,D21,L:SwCompass,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Compass light/power
+Ancillary,Static Source,PIN_STATIC_SRC,ARDUINO_MEGA2560_B,D22,L:SwStaticSource,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Alternate static source
+Ancillary,AFCS HP1,PIN_AFCS_HP1,ARDUINO_MEGA2560_B,D23,L:HP1,Number,"0, 1",hw_button_add (toggle),,systems_ancillary.lua,Toggle on press
+Ancillary,AFCS HP2,PIN_AFCS_HP2,ARDUINO_MEGA2560_B,D24,L:HP2,Number,"0, 1",hw_button_add (toggle),,systems_ancillary.lua,Toggle on press
+Ancillary,AFCS SAS,PIN_AFCS_SAS,ARDUINO_MEGA2560_B,D25,L:SASATT,Number,"0, 1",hw_button_add (toggle),,systems_ancillary.lua,Toggle on press
+Ancillary,AFCS ATT,PIN_AFCS_ATT,ARDUINO_MEGA2560_B,D26,L:AP_ATT,Number,"0, 1",hw_button_add (toggle),,systems_ancillary.lua,Toggle on press
+Ancillary,Standby Att Test,PIN_STBY_ATT_TEST,ARDUINO_MEGA2560_B,D27,L:Masterstbatt,Number,"0, 1",hw_button_add (timer),,systems_ancillary.lua,2-second timer logic
+Ancillary,Cargo Release,PIN_CARGO_REL,ARDUINO_MEGA2560_B,D28,L:Swcargorel,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Cargo release switch
+Ancillary,Cargo Test,PIN_CARGO_TEST,ARDUINO_MEGA2560_B,D29,L:CRTest,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Momentary test
+Ancillary,Cargo Test LED,PIN_CARGO_TEST_LED,ARDUINO_MEGA2560_B,D49,,,LED Output,led_cargo_test_h,systems_ancillary.lua,ON when test active
+Ancillary,Bambi Release,PIN_BAMBI_REL,ARDUINO_MEGA2560_B,D39,L:SwBambiRelease,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Bambi release switch
+Ancillary,Bambi Release 2,PIN_BAMBI_REL2,ARDUINO_MEGA2560_B,D50,L:SwBambiRelease,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Bambi release switch 2
+Ancillary,Plate/Maplight Dimmer,PIN_PLATE_MAPLIGHT,ARDUINO_MEGA2560_A,A0,L:platepilolight,Number,0-50,hw_adc_input_add,,systems_ancillary.lua,Analog dimmer 0-50
+Ancillary,Plate/Maplight Dimmer Button,PIN_PLATE_MAPLIGHT_BTN,ARDUINO_MEGA2560_A,D11,L:platepilolight,Number,"0, 25",hw_button_add,,systems_ancillary.lua,Button control 0/25
+Ancillary,Course Set Switch,PIN_COURSE_SET,ARDUINO_MEGA2560_C,D14,L:SwCourseset,Number,"0, 1",hw_button_add,,systems_ancillary.lua,0=Nav1 1=Nav2
+Ancillary,BRG PTR Switch,PIN_BRG_PTR,ARDUINO_MEGA2560_C,D15,L:SwBrgPtr,Number,"0, 1",hw_button_add,,systems_ancillary.lua,0=Pilot 1=Co-Pilot
+Ancillary,BRG PTR Switch 2,PIN_BRG_PTR2,ARDUINO_MEGA2560_C,D57,L:SwBrgPtr,Number,"0, 1",hw_button_add,,systems_ancillary.lua,0=Pilot 1=Co-Pilot (2nd button)
+Ancillary,Over Torque Test,PIN_OVERTQ_TEST,ARDUINO_MEGA2560_C,D16,L:Overtq,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Over torque test button
+Ancillary,Over Torque Test 2,PIN_OVERTQ_TEST2,ARDUINO_MEGA2560_C,D47,L:Overtq,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Over torque test button 2
+Ancillary,Over Torque Test LED,PIN_OVERTQ_LED,ARDUINO_MEGA2560_C,D39,,,LED Output,led_overtq_h,systems_ancillary.lua,ON when test active
+Ancillary,Over Torque Test LED 2,PIN_OVERTQ_LED2,ARDUINO_MEGA2560_C,D54,,,LED Output,led_overtq_h2,systems_ancillary.lua,ON when test active (2nd LED)
+Ancillary,AFT Call,PIN_AFT_CALL,ARDUINO_MEGA2560_C,D17,L:AFTcall,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,AFT call button
+Ancillary,AFT Call 2,PIN_AFT_CALL2,ARDUINO_MEGA2560_C,D48,L:AFTcall,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,AFT call button 2
+Ancillary,AFT Call LED,PIN_AFT_CALL_LED,ARDUINO_MEGA2560_C,D44,,,LED Output,led_aft_call_h,systems_ancillary.lua,ON when call active
+Ancillary,AFT Call LED 2,PIN_AFT_CALL_LED2,ARDUINO_MEGA2560_C,D55,,,LED Output,led_aft_call_h2,systems_ancillary.lua,ON when call active (2nd LED)
+Ancillary,AFT Test,PIN_AFT_TEST,ARDUINO_MEGA2560_C,D18,L:Testaft,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,AFT test button
+Ancillary,AFT Test 2,PIN_AFT_TEST2,ARDUINO_MEGA2560_C,D49,L:Testaft,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,AFT test button 2
+Ancillary,AFT Test LED,PIN_AFT_TEST_LED,ARDUINO_MEGA2560_C,D45,,,LED Output,led_aft_test_h,systems_ancillary.lua,ON when test active
+Ancillary,AFT Test LED 2,PIN_AFT_TEST_LED2,ARDUINO_MEGA2560_C,D56,,,LED Output,led_aft_test_h2,systems_ancillary.lua,ON when test active (2nd LED)
+Ancillary,DME Select Pos1,PIN_DME_SEL_POS1,ARDUINO_MEGA2560_C,D19,L:Swdme,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=N1 2=N2
+Ancillary,DME Select Pos2,PIN_DME_SEL_POS2,ARDUINO_MEGA2560_C,D28,L:Swdme,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=OFF 1=N1 2=N2 (priority)
+Ancillary,AFCS Selector,PIN_DAFCSEL,ARDUINO_MEGA2560_C,D27,L:Dafcssel,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,AFCS selector button
+Ancillary,Baggage Fire Test,PIN_BAG_FIRE_TEST,ARDUINO_MEGA2560_C,D29,L:firetestbag,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Baggage fire test button
+Ancillary,Baggage Fire Test LED,PIN_BAG_FIRE_TEST_LED,ARDUINO_MEGA2560_C,D46,,,LED Output,led_bag_fire_test_h,systems_ancillary.lua,ON when test active
+Ancillary,Marker Test,PIN_MARKER_TEST,ARDUINO_MEGA2560_C,D26,L:TestMarker,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Marker test button
+Ancillary,Marker Test 2,PIN_MARKER_TEST2,ARDUINO_MEGA2560_C,D58,L:TestMarker,Number,"0, 1",hw_button_add (momentary),,systems_ancillary.lua,Marker test button 2
+Ancillary,Marker Outer LED,PIN_MARKER_OUTER_LED,ARDUINO_MEGA2560_C,D36,,,LED Output,led_marker_outer_h,systems_ancillary.lua,Marker Outer (Blue)
+Ancillary,Marker Middle LED,PIN_MARKER_MIDDLE_LED,ARDUINO_MEGA2560_C,D37,,,LED Output,led_marker_middle_h,systems_ancillary.lua,Marker Middle (Amber)
+Ancillary,Marker Inner LED,PIN_MARKER_INNER_LED,ARDUINO_MEGA2560_C,D38,,,LED Output,led_marker_inner_h,systems_ancillary.lua,Marker Inner (White)
+Ancillary,Marker Test LED 2,PIN_MARKER_TEST_LED2,ARDUINO_MEGA2560_C,D59,,,LED Output,led_marker_test_h2,systems_ancillary.lua,Marker test status LED 2
+Ancillary,Mag/Dg Switch Mag Button 1,PIN_MAG_DG_MAG1,ARDUINO_MEGA2560_B,D51,L:SwMagDg,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=Norm 1=Mag 2=Dg
+Ancillary,Mag/Dg Switch Mag Button 2,PIN_MAG_DG_MAG2,ARDUINO_MEGA2560_B,D52,L:SwMagDg,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=Norm 1=Mag 2=Dg
+Ancillary,Mag/Dg Switch Dg Button 1,PIN_MAG_DG_DG1,ARDUINO_MEGA2560_B,D53,L:SwMagDg,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=Norm 1=Mag 2=Dg (priority)
+Ancillary,Mag/Dg Switch Dg Button 2,PIN_MAG_DG_DG2,ARDUINO_MEGA2560_B,D54,L:SwMagDg,Number,"0, 1, 2",hw_button_add (3-pos),,systems_ancillary.lua,3-position: 0=Norm 1=Mag 2=Dg (priority)
+Fuel,Fuel XFEED/INTCON Pos1,PIN_XFEED_INTCON_POS1,ARDUINO_MEGA2560_B,D13,L:Swxfeedbus,Number,"0, 1, 2",hw_button_add (3-pos),,fuel_logic.lua,3-position: 0=Norm 1=Test Bus 1 2=Test Bus 2
+Fuel,Fuel XFEED/INTCON Pos2,PIN_XFEED_INTCON_POS2,ARDUINO_MEGA2560_B,D14,L:Swxfeedbus,Number,"0, 1, 2",hw_button_add (3-pos),,fuel_logic.lua,3-position: 0=Norm 1=Test Bus 1 2=Test Bus 2 (priority)
+XMSN/Governor,Rotor RPM Audio,PIN_RPM_AUDIO,ARDUINO_MEGA2560_C,D62,L:RPMAudio,Number,"0, 1",hw_button_add,,xmsn_governor_logic.lua,Rotor RPM Audio ON/OFF
+Ancillary,AFCS SYS 2,PIN_AFCS_SYS2,ARDUINO_MEGA2560_B,D15,L:AFCSSys2,Number,"0, 1",hw_button_add,,systems_ancillary.lua,AFCS System 2 ON/OFF
+Ancillary,Auto Pilot Button,PIN_AUTO_PILOT,ARDUINO_MEGA2560_B,D16,L:AutoPilot,Number,"0, 1",hw_button_add,,systems_ancillary.lua,Auto Pilot ON/OFF
+Ancillary,Auto Pilot LED,PIN_AUTO_PILOT_LED,ARDUINO_MEGA2560_B,D55,,,LED Output,led_auto_pilot_h,systems_ancillary.lua,ON when auto pilot active
+Ancillary,YAW Servo Motor,PIN_YAW_SERVO,ARDUINO_MEGA2560_B,D18,,,Servo Output,servo_yaw_h,systems_ancillary.lua,Servo motor for YAW control
+Ancillary,ROLL Servo Motor,PIN_ROLL_SERVO,ARDUINO_MEGA2560_B,D19,,,Servo Output,servo_roll_h,systems_ancillary.lua,Servo motor for ROLL control
+Ancillary,PITCH Servo Motor,PIN_PITCH_SERVO,ARDUINO_MEGA2560_B,D57,,,Servo Output,servo_pitch_h,systems_ancillary.lua,Servo motor for PITCH control
+Ancillary,AHRS Servo Motor,PIN_AHRS_SERVO,ARDUINO_MEGA2560_B,D56,,,Servo Output,servo_ahrs_h,systems_ancillary.lua,Servo motor for AHRS heading indicator
+Ancillary,AHRS Test,PIN_AHRS_TEST,ARDUINO_MEGA2560_B,D17,L:AHRSTest,Number,"0, 1",hw_button_add,,systems_ancillary.lua,AHRS Test button
+Ancillary,Standby Att Flag,,,L:StbyAttFlag,Number,"0, 1",Logic Output,,systems_ancillary.lua,Standby attitude flag
+Ancillary,Standby Att Power,,,L:stbatt,Number,"0, 1",Subscribe,,systems_ancillary.lua,Standby attitude power switch state
+Ancillary,Fire Warn Eng 1,,,L:FireWarn1,Number,"0, 1",Subscribe,,systems_ancillary.lua,Engine 1 fire detection
+Ancillary,Fire Warn Eng 2,,,L:FireWarn2,Number,"0, 1",Subscribe,,systems_ancillary.lua,Engine 2 fire detection
+Ancillary,Baggage Fire,,,L:BagFire,Number,"0, 1",Subscribe,,systems_ancillary.lua,Baggage compartment fire detection
+Fuel,Fuel Transfer 1,PIN_FUEL_TRANS1,ARDUINO_MEGA2560_B,D2,L:SwfueltransengA,Number,"0, 1",hw_button_add,,fuel_logic.lua,Fuel transfer engine 1
+Fuel,Fuel Transfer 2,PIN_FUEL_TRANS2,ARDUINO_MEGA2560_B,D3,L:SwfueltransengB,Number,"0, 1",hw_button_add,,fuel_logic.lua,Fuel transfer engine 2
+Fuel,Boost Pump 1,PIN_BOOST1,ARDUINO_MEGA2560_B,D4,L:SwboostpuEng1,Number,"0, 1",hw_button_add,,fuel_logic.lua,Boost pump engine 1
+Fuel,Boost Pump 2,PIN_BOOST2,ARDUINO_MEGA2560_B,D5,L:SwboostpuEng2,Number,"0, 1",hw_button_add,,fuel_logic.lua,Boost pump engine 2
+Fuel,Fuel Interconnect,PIN_INTCON,ARDUINO_MEGA2560_B,D6,L:Swfuelintcon,Number,"0, 1",hw_button_add,,fuel_logic.lua,Fuel interconnect valve
+Fuel,Fuel Crossfeed,PIN_XFEED,ARDUINO_MEGA2560_B,D7,L:SwFuelxfeed,Number,"0, 1",hw_button_add,,fuel_logic.lua,Fuel crossfeed valve
+Fuel,Fuel Valve 1,PIN_VALVE1,ARDUINO_MEGA2560_B,D8,L:SwvalveEng1,Number,"0, 1",hw_button_add,,fuel_logic.lua,Also L:MvalveEng1
+Fuel,Fuel Valve 2,PIN_VALVE2,ARDUINO_MEGA2560_B,D9,L:SwvalveEng2,Number,"0, 1",hw_button_add,,fuel_logic.lua,Also L:MvalveEng2
+Fuel,Fuel Sys Test,PIN_FUEL_SYS_TEST,ARDUINO_MEGA2560_B,D10,L:FuelQuantity,Enum,"-1, 0",hw_button_add (momentary),,fuel_logic.lua,-1=Test FWD 0=Norm
+Fuel,Fuel Digit Test,PIN_FUEL_DIGIT_TEST,ARDUINO_MEGA2560_B,D11,L:Digitstest,Number,"0, 1",hw_button_add (momentary),,fuel_logic.lua,Digit display test
+Fuel,Trans 1 Warn LED,PIN_TRANS1_LED,ARDUINO_MEGA2560_B,D30,,,LED Output,led_trans1_h,fuel_logic.lua,ON when switch OFF
+Fuel,Trans 2 Warn LED,PIN_TRANS2_LED,ARDUINO_MEGA2560_B,D31,,,LED Output,led_trans2_h,fuel_logic.lua,ON when switch OFF
+Fuel,Boost 1 Warn LED,PIN_BOOST1_LED,ARDUINO_MEGA2560_B,D32,,,LED Output,led_boost1_h,fuel_logic.lua,ON when switch OFF
+Fuel,Boost 2 Warn LED,PIN_BOOST2_LED,ARDUINO_MEGA2560_B,D33,,,LED Output,led_boost2_h,fuel_logic.lua,ON when switch OFF
+Fuel,Intcon Active LED,PIN_INTCON_LED,ARDUINO_MEGA2560_B,D34,,,LED Output,led_intcon_h,fuel_logic.lua,ON when active
+Fuel,Xfeed Active LED,PIN_XFEED_LED,ARDUINO_MEGA2560_B,D35,,,LED Output,led_xfeed_h,fuel_logic.lua,ON when active
+Fuel,Xfeed L-Var LED,PIN_XFEED_LVAR_LED,ARDUINO_MEGA2560_B,D38,,,LED Output,led_xfeed_lvar_h,fuel_logic.lua,LED for L:SwFuelxfeed state
+Fuel,Valve 1 Transit LED,PIN_VALVE1_TRANS_LED,ARDUINO_MEGA2560_B,D36,,,LED Output,led_v1_trans_h,fuel_logic.lua,Flashes during transit
+Fuel,Valve 2 Transit LED,PIN_VALVE2_TRANS_LED,ARDUINO_MEGA2560_B,D37,,,LED Output,led_v2_trans_h,fuel_logic.lua,Flashes during transit
+Fuel,Fuel Pressure 1,,,L:FuelPressure1,Number,0-25,Logic Output,,fuel_logic.lua,Fuel pressure PSI
+Fuel,Fuel Pressure 2,,,L:FuelPressure2,Number,0-25,Logic Output,,fuel_logic.lua,Fuel pressure PSI
+Fuel,Fuel Valve 1 Pos,,,L:FuelValve1Pos,Number,0.0-1.0,Logic Output,,fuel_logic.lua,Valve position
+Fuel,Fuel Valve 2 Pos,,,L:FuelValve2Pos,Number,0.0-1.0,Logic Output,,fuel_logic.lua,Valve position
+Fuel,Fuel Quantity,,,L:FuelQuantity,Number,"0, 1, -1",Logic Output,,fuel_logic.lua,3-position switch state
+Fuel,Digit Test,,,L:Digitstest,Number,"0, 1",Logic Output,,fuel_logic.lua,Digit display test
+Fuel,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Subscribe,,fuel_logic.lua,DC power for valve/pump operation
+Hydraulics,Hydraulic Sys 1,PIN_HYD1_SW,ARDUINO_MEGA2560_B,D40,L:Sw hydsysA,Number,"0, 1",hw_button_add,,hydraulics_logic.lua,Hydraulic system 1
+Hydraulics,Hydraulic Sys 2,PIN_HYD2_SW,ARDUINO_MEGA2560_B,D41,L:Sw hydsysB,Number,"0, 1",hw_button_add,,hydraulics_logic.lua,Hydraulic system 2
+Hydraulics,Cyclic Center Test,PIN_CYC_CTR_TEST,ARDUINO_MEGA2560_B,D42,L:Cyctest,Number,"0, 1",hw_button_add (momentary),,hydraulics_logic.lua,Stick centering test
+Hydraulics,Hyd 1 Fail LED,PIN_HYD1_FAIL_LED,ARDUINO_MEGA2560_B,D46,,,LED Output,led_hyd1_h,hydraulics_logic.lua,ON if OFF or <600 PSI
+Hydraulics,Hyd 2 Fail LED,PIN_HYD2_FAIL_LED,ARDUINO_MEGA2560_B,D47,,,LED Output,led_hyd2_h,hydraulics_logic.lua,ON if OFF or <600 PSI
+Hydraulics,Cyclic Center LED,PIN_CYC_CTR_LED,ARDUINO_MEGA2560_B,D48,,,LED Output,led_cyc_ctr_h,hydraulics_logic.lua,ON if off-center AND RPM<95%
+Hydraulics,Hyd Pressure 1,,,L:HydPressure1,Number,0-2800,Logic Output,,hydraulics_logic.lua,Hydraulic PSI sys 1
+Hydraulics,Hyd Pressure 2,,,L:HydPressure2,Number,0-2800,Logic Output,,hydraulics_logic.lua,Hydraulic PSI sys 2
+Hydraulics,Cyclic Test,,,L:Cyctest,Number,"0, 1",Logic Output,,hydraulics_logic.lua,Cyclic centering test active
+Hydraulics,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Subscribe,,hydraulics_logic.lua,DC power check
+Hydraulics,Eng Rotor RPM,,,A:Eng Rotor Rpm,Percent,0-100,Subscribe,,hydraulics_logic.lua,Rotor RPM for pressure calc
+Hydraulics,Yoke X Position,,,A:YOKE X POSITION,Percent,-100 to 100,Subscribe,,hydraulics_logic.lua,Cyclic X position
+Hydraulics,Yoke Y Position,,,A:YOKE Y POSITION,Percent,-100 to 100,Subscribe,,hydraulics_logic.lua,Cyclic Y position
+Hydraulics,Rotor RPM PCT,,,ROTOR RPM PCT:1,Percent,0-100,Subscribe,,hydraulics_logic.lua,Rotor RPM for centering LED
+Startup,Start Engine Switch Pos1,PIN_START_ENG_POS1,ARDUINO_MEGA2560_C,D2,L:starteng,Number,"0, 1, -1",hw_button_add (3-pos),,startup.lua,3-position: 0=OFF 1=Eng1 -1=Eng2
+Startup,Start Engine Switch Pos2,PIN_START_ENG_POS2,ARDUINO_MEGA2560_C,D3,L:starteng,Number,"0, 1, -1",hw_button_add (3-pos),,startup.lua,3-position: 0=OFF 1=Eng1 -1=Eng2
+Startup,Idle Stop Switch Pos1,PIN_IDLE_STOP_POS1,ARDUINO_MEGA2560_C,D4,L:idle eng,Number,"0, 1, -1",hw_button_add (3-pos),,startup.lua,3-position: 0=OFF 1=Eng1 -1=Eng2 + L:IdleStopRel
+Startup,Idle Stop Switch Pos2,PIN_IDLE_STOP_POS2,ARDUINO_MEGA2560_C,D7,L:idle eng,Number,"0, 1, -1",hw_button_add (3-pos),,startup.lua,3-position: 0=OFF 1=Eng1 -1=Eng2 + L:IdleStopRel
+Startup,Particle Sep 1,PIN_PARTSEP1,ARDUINO_MEGA2560_C,D5,L:SwpartsepA,Number,"0, 1",hw_button_add,,startup.lua,Particle separator 1
+Startup,Particle Sep 2,PIN_PARTSEP2,ARDUINO_MEGA2560_C,D6,L:SwpartsepB,Number,"0, 1",hw_button_add,,startup.lua,Particle separator 2
+Startup,Rotor Brake Switch,PIN_ROTOR_BRAKE_SW,ARDUINO_MEGA2560_C,D24,ROTOR_BRAKE,Event,"0, 100",hw_button_add,,startup.lua,fsx_event + 40% RPM warning
+Startup,Throttle 1,PIN_THROTTLE1,ARDUINO_MEGA2560_C,A0,L:throgas1,Number,0.0-1.0,hw_adc_input_add,,startup.lua,Analog throttle + idle clamp
+Startup,Throttle 2,PIN_THROTTLE2,ARDUINO_MEGA2560_C,A1,L:throgas2,Number,0.0-1.0,hw_adc_input_add,,startup.lua,Analog throttle + idle clamp
+Startup,Start Active LED,PIN_START_LED,ARDUINO_MEGA2560_C,D30,,,LED Output,led_start_h,startup.lua,ON during start
+Startup,Rotor Brake LED,PIN_ROTOR_BRAKE_LED,ARDUINO_MEGA2560_C,D31,,,LED Output,led_rotor_brake_h,startup.lua,ON when brake active
+Startup,Start Switch,,,L:StartSwitch,Number,"0, 1",Logic Output,,startup.lua,Start cycle active
+Startup,Idle Eng,,,L:idle eng,Number,"0, 1, -1",Logic Output,,startup.lua,3-position idle stop switch state
+Startup,Eng 1 Start Flag,,,L:Eng1StartFlag,Number,"0, 1",Logic Output,,startup.lua,Start permission
+Startup,Eng 2 Start Flag,,,L:Eng2StartFlag,Number,"0, 1",Logic Output,,startup.lua,Start permission
+Startup,Throttle Lever 1,,,GENERAL ENG THROTTLE LEVER POSITION:1,Percent,0-100,Logic Output,,startup.lua,Sim throttle position 1
+Startup,Throttle Lever 2,,,GENERAL ENG THROTTLE LEVER POSITION:2,Percent,0-100,Logic Output,,startup.lua,Sim throttle position 2
+Startup,Fuel Pressure 1,,,L:FuelPressure1,Number,0-25,Subscribe,,startup.lua,Fuel pressure check
+Startup,Fuel Pressure 2,,,L:FuelPressure2,Number,0-25,Subscribe,,startup.lua,Fuel pressure check
+Startup,Fuel Valve 1 Pos,,,L:FuelValve1Pos,Number,0.0-1.0,Subscribe,,startup.lua,Valve position check
+Startup,Fuel Valve 2 Pos,,,L:FuelValve2Pos,Number,0.0-1.0,Subscribe,,startup.lua,Valve position check
+Startup,Fuel Transfer 1,,,L:SwfueltransengA,Number,"0, 1",Subscribe,,startup.lua,Fuel transfer switch state
+Startup,Fuel Transfer 2,,,L:SwfueltransengB,Number,"0, 1",Subscribe,,startup.lua,Fuel transfer switch state
+Startup,Battery 1,,,L:Swbatta,Number,"0, 1",Subscribe,,startup.lua,Battery switch state
+Startup,Battery 2,,,L:Swbattb,Number,"0, 1",Subscribe,,startup.lua,Battery switch state
+Startup,Rotor RPM PCT,,,ROTOR RPM PCT:1,Percent,0-100,Subscribe,,startup.lua,Rotor RPM for brake warning
+Startup,Rotor Brake Handle Pos,,,A:ROTOR BRAKE HANDLE POS,Percent,0-100,Subscribe,,startup.lua,Brake position for start interlock
+Startup,Rotor Brake Active,,,A:Rotor Brake Active,Bool,"true, false",Subscribe,,startup.lua,Brake active status for LED
+CWP,Test Panel Pos1,PIN_TEST_PNL_POS1,ARDUINO_MEGA2560_C,D10,L:TestMC,Number,"0, 1, -1",hw_button_add (3-pos),,cwp_master_caution.lua,3-position: 0=OFF 1=Pos1 -1=Pos2 (priority)
+CWP,Test Panel Pos2,PIN_TEST_PNL_POS2,ARDUINO_MEGA2560_C,D13,L:TestMC,Number,"0, 1, -1",hw_button_add (3-pos),,cwp_master_caution.lua,3-position: 0=OFF 1=Pos1 -1=Pos2 (priority)
+CWP,Test Lights,PIN_TEST_LT,ARDUINO_MEGA2560_C,D11,L:TestMC,Number,2,hw_button_add (momentary),,cwp_master_caution.lua,Lights test
+CWP,MC Reset,PIN_RESET,ARDUINO_MEGA2560_C,D12,L:ResetMC,Number,"0, 1",hw_button_add (momentary),,cwp_master_caution.lua,Master caution reset
+CWP,Master Caution LED,PIN_MC_LED,ARDUINO_MEGA2560_C,D40,,,LED Output,led_mc_h,cwp_master_caution.lua,Master caution indicator
+CWP,Gov A Warn LED,PIN_GOV_A_WARN_LED,ARDUINO_MEGA2560_C,D41,L:SwGovA,Bool,"true, false",LED Output,led_gov_a_warn_h,xmsn_governor_logic.lua,Governor A warning light
+CWP,Gov B Warn LED,PIN_GOV_B_WARN_LED,ARDUINO_MEGA2560_C,D42,L:SwGovB,Bool,"true, false",LED Output,led_gov_b_warn_h,xmsn_governor_logic.lua,Governor B warning light
+CWP,Chip Detector LED,PIN_CHIP_DET_LED,ARDUINO_MEGA2560_C,D43,L:XMSN CHIP,Bool,"true, false",LED Output,led_chip_det_h,xmsn_governor_logic.lua,XMSN chip detector light
+CWP,Test MC,,,L:TestMC,Number,"0, 1, -1, 2",Logic Output,,cwp_master_caution.lua,Test mode (0=Norm 1=Panel -1=Panel2 2=Lights)
+CWP,Reset MC,,,L:ResetMC,Number,"0, 1",Logic Output,,cwp_master_caution.lua,Master caution reset
+CWP,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Subscribe,,cwp_master_caution.lua,DC power check
+CWP,Test MC (from Sim),,,L:TestMC,Number,"0, 1, 2",Subscribe,,cwp_master_caution.lua,Test mode from sim
+CWP,Battery 1 Switch,,,L:Swbatta,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Battery switch state
+CWP,Battery 2 Switch,,,L:Swbattb,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Battery switch state
+CWP,Gen 1 Producing,,,L:CGenel,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Generator 1 status
+CWP,Gen 2 Producing,,,L:CGener,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Generator 2 status
+CWP,Generator Master,,,L:Genmast,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Generator master
+CWP,Hyd Pressure 1,,,L:HydPressure1,Number,0-2800,Subscribe,,cwp_master_caution.lua,Hydraulic pressure sys 1
+CWP,Hyd Pressure 2,,,L:HydPressure2,Number,0-2800,Subscribe,,cwp_master_caution.lua,Hydraulic pressure sys 2
+CWP,Hyd Switch 1,,,L:Sw hydsysA,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Hydraulic switch 1
+CWP,Hyd Switch 2,,,L:Sw hydsysB,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Hydraulic switch 2
+CWP,Oil Eng 1,,,L:OILE1,Number,0-100,Subscribe,,cwp_master_caution.lua,Engine 1 oil pressure
+CWP,Oil Eng 2,,,L:OILE2,Number,0-100,Subscribe,,cwp_master_caution.lua,Engine 2 oil pressure
+CWP,Rotor RPM PCT,,,ROTOR RPM PCT:1,Percent,0-100,Subscribe,,cwp_master_caution.lua,Rotor RPM
+CWP,Fuel Tank Center Level,,,FUEL TANK CENTER LEVEL,Percent,0-100,Subscribe,,cwp_master_caution.lua,Fuel level
+CWP,XMSN Press Warn,,,L:XmsnPressWarn,Number,"0, 1",Subscribe,,cwp_master_caution.lua,XMSN pressure warning
+CWP,XMSN Temp Warn,,,L:XmsnTempWarn,Number,"0, 1",Subscribe,,cwp_master_caution.lua,XMSN temp warning
+CWP,CBOX Press Warn,,,L:CboxPressWarn,Number,"0, 1",Subscribe,,cwp_master_caution.lua,CBOX warning
+CWP,Rotor Brake Active,,,A:Rotor Brake Active,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Brake status
+CWP,Fire Handle L,,,L:firethandl,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Left fire handle
+CWP,Fire Handle R,,,L:firethandr,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Right fire handle
+CWP,Fire Test,,,L:Swfiretest,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Fire test switch
+CWP,Governor A Warn,,,L:SwGovA,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Governor A warning
+CWP,Governor B Warn,,,L:SwGovB,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Governor B warning
+CWP,XMSN Chip,,,L:XMSN CHIP,Bool,"true, false",Subscribe,,cwp_master_caution.lua,XMSN chip detected
+CWP,Inverter 1 Switch,,,L:Swinva,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Inverter 1 switch
+CWP,Inverter 2 Switch,,,L:Swinvb,Bool,"true, false",Subscribe,,cwp_master_caution.lua,Inverter 2 switch
+CWP,Fuel Valve 1 Pos,,,L:FuelValve1Pos,Number,0.0-1.0,Subscribe,,cwp_master_caution.lua,Valve position
+CWP,Fuel Valve 2 Pos,,,L:FuelValve2Pos,Number,0.0-1.0,Subscribe,,cwp_master_caution.lua,Valve position
+CWP,Fuel Valve 1 Cmd,,,L:SwvalveEng1,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Valve command
+CWP,Fuel Valve 2 Cmd,,,L:SwvalveEng2,Number,"0, 1",Subscribe,,cwp_master_caution.lua,Valve command
+XMSN/Governor,Governor Mode,PIN_GOV_MODE,ARDUINO_MEGA2560_C,D20,L:GovMode,Number,"0, 1",hw_button_add,,xmsn_governor_logic.lua,0=Auto 1=Manual
+XMSN/Governor,RPM Switch Pos1,PIN_RPM_SWITCH_POS1,ARDUINO_MEGA2560_C,D21,L:GOVERNOR RPM SWITCH,Number,"0, 1, -1",hw_button_add (3-pos),,xmsn_governor_logic.lua,3-position: 0=OFF 1=Inc -1=Dec + events
+XMSN/Governor,RPM Switch Pos2,PIN_RPM_SWITCH_POS2,ARDUINO_MEGA2560_C,D22,L:GOVERNOR RPM SWITCH,Number,"0, 1, -1",hw_button_add (3-pos),,xmsn_governor_logic.lua,3-position: 0=OFF 1=Inc -1=Dec + events
+XMSN/Governor,RPM Switch Pos1 Button 2,PIN_RPM_SWITCH_POS1_2,ARDUINO_MEGA2560_C,D60,L:GOVERNOR RPM SWITCH,Number,"0, 1, -1",hw_button_add (3-pos),,xmsn_governor_logic.lua,3-position: 0=OFF 1=Inc -1=Dec + events (2nd set)
+XMSN/Governor,RPM Switch Pos2 Button 2,PIN_RPM_SWITCH_POS2_2,ARDUINO_MEGA2560_C,D61,L:GOVERNOR RPM SWITCH,Number,"0, 1, -1",hw_button_add (3-pos),,xmsn_governor_logic.lua,3-position: 0=OFF 1=Inc -1=Dec + events (2nd set)
+XMSN/Governor,Governor Engine 1 Switch,PIN_GOV_ENG1,ARDUINO_MEGA2560_C,D23,L:SwGovA,Number,"0, 1",hw_button_add,,xmsn_governor_logic.lua,Governor Engine 1 ON/OFF
+XMSN/Governor,Governor Engine 2 Switch,PIN_GOV_ENG2,ARDUINO_MEGA2560_C,D25,L:SwGovB,Number,"0, 1",hw_button_add,,xmsn_governor_logic.lua,Governor Engine 2 ON/OFF
+XMSN/Governor,Governor Eng 1 Status LED,PIN_GOV_ENG1_LED,ARDUINO_MEGA2560_C,D32,,,LED Output,led_gov_eng1_h,xmsn_governor_logic.lua,ON when switch ON
+XMSN/Governor,Governor Eng 2 Status LED,PIN_GOV_ENG2_LED,ARDUINO_MEGA2560_C,D33,,,LED Output,led_gov_eng2_h,xmsn_governor_logic.lua,ON when switch ON
+XMSN/Governor,Gov Manual LED,PIN_GOV_MAN_LED,ARDUINO_MEGA2560_C,D50,,,LED Output,led_gov_man_h,xmsn_governor_logic.lua,ON in manual mode
+XMSN/Governor,XMSN Press Warn LED,PIN_XMSN_PRESS_LED,ARDUINO_MEGA2560_C,D51,,,LED Output,led_xmsn_press_h,xmsn_governor_logic.lua,ON if <30 PSI
+XMSN/Governor,XMSN Temp Warn LED,PIN_XMSN_TEMP_LED,ARDUINO_MEGA2560_C,D52,,,LED Output,led_xmsn_temp_h,xmsn_governor_logic.lua,ON if >120C
+XMSN/Governor,CBOX Press Warn LED,PIN_CBOX_PRESS_LED,ARDUINO_MEGA2560_C,D53,,,LED Output,led_cbox_press_h,xmsn_governor_logic.lua,ON if <25 PSI
+XMSN/Governor,XMSN Press Warn,,,L:XmsnPressWarn,Number,"0, 1",Logic Output,,xmsn_governor_logic.lua,Pressure warning flag
+XMSN/Governor,XMSN Temp Warn,,,L:XmsnTempWarn,Number,"0, 1",Logic Output,,xmsn_governor_logic.lua,Temp warning flag
+XMSN/Governor,CBOX Press Warn,,,L:CboxPressWarn,Number,"0, 1",Logic Output,,xmsn_governor_logic.lua,CBOX warning flag
+XMSN/Governor,Governor Mode,,,L:GovMode,Number,"0, 1",Logic Output,,xmsn_governor_logic.lua,Governor mode state
+XMSN/Governor,Governor RPM Switch,,,L:GOVERNOR RPM SWITCH,Number,"0, 1, -1",Logic Output,,xmsn_governor_logic.lua,3-position RPM switch state
+XMSN/Governor,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Subscribe,,xmsn_governor_logic.lua,DC power check
+XMSN/Governor,XMSN Oil Press,,,L:XmsnOilPress,Number,0-100,Subscribe,,xmsn_governor_logic.lua,XMSN oil pressure
+XMSN/Governor,XMSN Oil Temp,,,L:XmsnOilTemp,Number,0-150,Subscribe,,xmsn_governor_logic.lua,XMSN oil temperature
+XMSN/Governor,CBOX Oil Press,,,L:CboxOilPress,Number,0-100,Subscribe,,xmsn_governor_logic.lua,CBOX oil pressure
+XMSN/Governor,Governor A Warn,,,L:SwGovA,Number,"0, 1",Subscribe,,xmsn_governor_logic.lua,Governor A warning (CWP LED)
+XMSN/Governor,Governor B Warn,,,L:SwGovB,Number,"0, 1",Subscribe,,xmsn_governor_logic.lua,Governor B warning (CWP LED)
+XMSN/Governor,XMSN Chip Detector,,,L:XMSN CHIP,Bool,"true, false",Subscribe,,xmsn_governor_logic.lua,Chip detector (CWP LED)

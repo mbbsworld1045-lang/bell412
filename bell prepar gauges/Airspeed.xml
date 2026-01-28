@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Airspeed" Version="1.0">
+ <Image Name="airspeed_background.bmp"/>
+ 
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="airspeed_needle.bmp">
+      <Axis X="45" Y="7"/>
+    </Image>
+    <Rotate>
+      <Value>(L:EngineCovers,bool) 0 == if{ (A:AIRSPEED INDICATED,Knots) }</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="122" Y="30"/>
+          <Item Value="20" X="137" Y="30"/>
+          <Item Value="30" X="179" Y="47"/>
+          <Item Value="40" X="219" Y="113"/>
+          <Item Value="50" X="206" Y="176"/>
+          <Item Value="60" X="180" Y="203"/>
+          <Item Value="70" X="143" Y="219"/>
+          <Item Value="80" X="106" Y="219"/>
+          <Item Value="90" X="69" Y="204"/>
+		  <Item Value="100" X="43" Y="177"/>
+          <Item Value="110" X="29" Y="143"/>
+          <Item Value="120" X="30" Y="104"/>
+          <Item Value="130" X="43" Y="74"/>
+		  <Item Value="140" X="65" Y="48"/>
+		  <Item Value="150" X="94" Y="33"/>
+       </Nonlinearity>
+       <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+  
+  <Mouse>
+      <Help ID="HELPID_GAUGE_AIRSPEED"/>
+      <Tooltip ID="TOOLTIPTEXT_AIRSPEED_KNOTS"/>
+  </Mouse>
+</Gauge>

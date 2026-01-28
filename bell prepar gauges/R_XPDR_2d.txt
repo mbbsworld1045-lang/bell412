@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <Gauge Name="R_XPDR" Version="1.0">
+  <Image Name="r_xpdr_d2.bmp"/>
+
+  <Element>
+   <Position X="19" Y="28"/>
+    <Select>
+      <Value>(L:MasterACDC, bool) (L:xpdr,bool) 1 == &amp;&amp;</Value>
+      <Case Value="1">
+         <Image Name="r_screen_on2.bmp" Bright="Yes"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Position X="30" Y="155"/>
+    <Select>
+      <Value>(L:xpdr,bool)</Value>
+      <Case Value="1">
+         <Image Name="r_knob.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Visible>(L:MasterACDC, bool) (L:xpdr,bool) 1 == &amp;&amp;</Visible> 
+   <Element> 
+    <Position X="50" Y="50"/>
+     <Text X="112" Y="34" Length="7" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+        <String>%((A:TRANSPONDER1 CODE, Hz))%!4.0f!</String>
+     </Text>
+   </Element>
+  </Element>
+ 
+ <Mouse>
+    <Area Left="30" Top="155" Width="38" Height="38">
+      <Tooltip>%XPDR  On/Off(%((L:xpdr,bool))%{if}On%{else}Off %{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:xpdr,bool) ! (&gt;L:xpdr,bool)</Click>
+    </Area>
+	
+    <Area Left="109" Top="134" Width="17" Height="34">
+       <Click Event="XPNDR_1000_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="109" Top="167" Width="17" Height="34">
+       <Click Event="XPNDR_1000_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+
+    <Area Left="125" Top="134" Width="17" Height="34">
+       <Click Event="XPNDR_100_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="125" Top="167" Width="17" Height="34">
+       <Click Event="XPNDR_100_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+
+    <Area Left="141" Top="134" Width="17" Height="34">
+       <Click Event="XPNDR_10_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="141" Top="167" Width="17" Height="34">
+       <Click Event="XPNDR_10_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+	
+	<Area Left="157" Top="134" Width="17" Height="34">
+       <Click Event="XPNDR_1_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="157" Top="167" Width="17" Height="34">
+       <Click Event="XPNDR_1_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+
+  </Mouse>
+</Gauge>

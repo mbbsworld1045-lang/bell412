@@ -1,0 +1,288 @@
+<Gauge Name="Panel_Control" Version="1.0">
+   <Image Name="cntl_background.bmp"/>
+
+<Element>
+ <Position X="198" Y="51"/>
+   <Select>
+      <Value>(L:pitotcovers,bool)</Value>
+        <Case Value="1">
+            <Image Name="cntl_pitot.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="281" Y="0"/>
+   <Select>
+      <Value>(A:SIM ON GROUND, bool) || if{ (L:ExternalPower,bool) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_gpu.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="213" Y="110"/>
+   <Select>
+      <Value>(A:SIM ON GROUND, bool) || if{ (L:NoseDoor,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_nose.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="25" Y="240"/>
+   <Select>
+      <Value>(L:Copilotdoor,position)</Value>
+        <Case Value="1">
+            <Image Name="cntl_copilot_on.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="25" Y="323"/>
+   <Select>
+      <Value>(L:Door passenger l,percent) 1 &gt;</Value>
+        <Case Value="1">
+            <Image Name="cntl_cargo_off.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="25" Y="313"/>
+   <Select>
+      <Value>(L:Door passenger l,percent) 1 &gt; if{ (L:Door Cargo l,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_cargo_on_l.bmp"/>
+        </Case>
+    </Select>
+</Element> 
+
+<Element>
+ <Position X="9" Y="360"/>
+   <Select>
+      <Value>(L:Door passenger l,percent) 0 &gt;</Value>
+        <Case Value="1">
+            <Image Name="cntl_pass_l.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+
+
+<Element>
+ <Position X="402" Y="323"/>
+   <Select>
+      <Value>(L:Door passenger r,percent) 1 &gt;</Value>
+        <Case Value="1">
+            <Image Name="cntl_cargo_off.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="339" Y="313"/>
+   <Select>
+      <Value>(L:Door passenger r,percent) 1 &gt; if{ (L:Door Cargo r,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_cargo_on_r.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="341" Y="360"/>
+   <Select>
+      <Value>(L:Door passenger r,percent) 0 &gt;</Value>
+        <Case Value="1">
+            <Image Name="cntl_pass_r.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="164" Y="466"/>
+   <Select>
+      <Value>(A:Eng2 Combustion,bool) 0 == (A:Eng3 Combustion,bool) 0 == &amp;&amp; if{ (A:SIM ON GROUND, bool) || if{ (L:EngineCovers,bool) } }</Value>
+        <Case Value="1">
+            <Image Name="cntl_eng_cover.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="22" Y="535"/>
+   <Select>
+      <Value>(L:Door passenger l,percent) 1 &lt; if{ (L:Door Eng l,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_eng_on_l.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="301" Y="535"/>
+   <Select>
+      <Value>(L:Door passenger r,percent) 0 == if{ (L:Door Eng r,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_eng_on_r.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="269" Y="747"/>
+   <Select>
+      <Value>(A:SIM ON GROUND, bool) || if{ (L:Door baggage,position) }</Value>
+        <Case Value="1">
+            <Image Name="cntl_baggage_on.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="199" Y="382"/>
+   <Select>
+      <Value>(L:SeatAft,bool)</Value>
+        <Case Value="1">
+            <Image Name="cntl_pass.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+ <Position X="199" Y="305"/>
+   <Select>
+      <Value>(L:SeatFwd,bool)</Value>
+        <Case Value="1">
+            <Image Name="cntl_pass.bmp"/>
+        </Case>
+    </Select>
+</Element>
+
+<Element>
+  <Select>
+	<Value>
+	  (L:Door Eng l,position) 0 == if{ 1 (&gt;L:doorcntl,bool) } els{ 0 (&gt;L:doorcntl,bool) }
+	  (L:Door Eng r,position) 0 == if{ 1 (&gt;L:doorcntr,bool) } els{ 0 (&gt;L:doorcntr,bool) }
+	</Value>
+  </Select>
+</Element>
+
+
+
+ <Mouse>
+    <Area Left="199" Top="305" Width="96" Height="42">
+      <Tooltip ID="">Passenger Seats</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(A:SIM ON GROUND, bool) if{ (L:SeatFwd,bool) ! (&gt;L:SeatFwd,bool) }</Click>
+    </Area>
+	
+    <Area Left="199" Top="382" Width="96" Height="42">
+      <Tooltip ID="">Passenger Seats</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(A:SIM ON GROUND, bool) if{ (L:SeatAft,bool) ! (&gt;L:SeatAft,bool) }</Click>
+    </Area>
+	
+     <Area Left="281" Top="0" Width="55" Height="69">
+      <Tooltip ID="">External Power</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:ExternalPower,bool) ! (&gt;L:ExternalPower,bool)</Click>
+    </Area>
+
+    <Area Left="198" Top="51" Width="96" Height="42">
+      <Tooltip ID="">Pitot Covers</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(A:SIM ON GROUND, bool) if{ (L:pitotcovers,bool) ! (&gt;L:pitotcovers,bool) }</Click>
+    </Area>
+	
+	<Area Left="213" Top="110" Width="66" Height="68">
+      <Tooltip>%Nose Compartment(%((L:NoseDoor,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(A:SIM ON GROUND, bool) if{ (L:NoseDoor,position) ! (&gt;L:NoseDoor,position) }</Click>
+    </Area>
+	
+	<Area Left="25" Top="240" Width="69" Height="42">
+      <Tooltip>%Copilot Door(%((L:Copilotdoor,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:Copilotdoor,position) ! (&gt;L:Copilotdoor,position)</Click>
+    </Area>
+
+    <Area Left="25" Top="323" Width="69" Height="42">
+      <Tooltip>%Cargo Door(%((L:Door Cargo l,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:Door passenger l,percent) 1 &gt; if{ (L:Door Cargo l,position) ! (&gt;L:Door Cargo l,position) }</Click>
+    </Area>
+
+    <Area Left="402" Top="323" Width="69" Height="42">
+      <Tooltip>%Cargo Door(%((L:Door Cargo r,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:Door passenger r,percent) 1 &gt; if{ (L:Door Cargo r,position) ! (&gt;L:Door Cargo r,position) }</Click>
+    </Area>
+
+    <Area Left="32" Top="392" Width="50" Height="119">
+      <Tooltip>%Passenger Door(%((L:Door passenger l,percent))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+	  <Click Kind="LeftSingle+LeftDrag+Wheel">
+	       (L:doorcntl,bool) 1 == if{
+		     (M:Event) 'LeftSingle' scmp 0 !=
+             if{
+               (L:Doorpassengerl, position) s0 0 !=
+               if{
+                  (L:Door passenger l,percent) (M:Y) l0 &lt;
+                  if{ 5 - 0 max } els{ l0 (M:Y) &lt; if{  5 + 100 min } }
+                  (&gt;L:Door passenger l,percent)
+                  }
+                }
+             (M:Y) (&gt;L:Doorpassengerl, position)
+		   }
+	  </Click>
+    </Area>
+
+    <Area Left="408" Top="392" Width="50" Height="119">
+      <Tooltip>%Passenger Door(%((L:Door passenger r,percent))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+	  <Click Kind="LeftSingle+LeftDrag+Wheel">
+	       (L:doorcntr,bool) 1 == if{
+		     (M:Event) 'LeftSingle' scmp 0 !=
+             if{
+               (L:Doorpassengerr, position) s0 0 !=
+               if{
+                  (L:Door passenger r,percent) (M:Y) l0 &lt;
+                  if{ 5 - 0 max } els{ l0 (M:Y) &lt; if{  5 + 100 min } }
+                  (&gt;L:Door passenger r,percent)
+                  }
+                }
+             (M:Y) (&gt;L:Doorpassengerr, position)
+		   }
+	  </Click>
+    </Area>
+    
+	<Area Left="22" Top="567" Width="68" Height="42">
+      <Tooltip>%Engine Door(%((L:Door Eng l,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:Door passenger l,position) 0 == if{ (L:Door Eng l,position) ! (&gt;L:Door Eng l,position) }</Click>
+    </Area>
+	
+	<Area Left="399" Top="567" Width="68" Height="42">
+      <Tooltip>%Engine Door(%((L:Door Eng r,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:Door passenger r,position) 0 == if{ (L:Door Eng r,position) ! (&gt;L:Door Eng r,position) }</Click>
+    </Area>
+
+    <Area Left="212" Top="617" Width="68" Height="42">
+      <Tooltip ID="">Engine Covers</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:EngineCovers,bool) ! (&gt;L:EngineCovers,bool)</Click>
+    </Area>
+	
+	<Area Left="313" Top="764" Width="82" Height="42">
+      <Tooltip>%Baggage Door(%((L:Door baggage,position))%{if}Open%{else}Closed%{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(A:SIM ON GROUND, bool) if{ (L:Door baggage,position) ! (&gt;L:Door baggage,position) }</Click>
+    </Area>
+  </Mouse>
+</Gauge>

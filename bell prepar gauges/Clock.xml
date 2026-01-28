@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Clock" Version="1.0">
+ <Image Name="clock_background.bmp"/>
+ 
+ 
+ <Element>
+  <Position X="15" Y="40"/>
+    <Select>
+      <Value>(L:MasterDcBus,bool)</Value>
+      <Case Value="1">
+         <Image Name="clock_bg_on.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+  
+   <Element>
+   <Visible>(L:MasterDcBus,bool)</Visible>
+    <Position X="45" Y="45"/>
+      <Text X="87" Y="26" Length="8" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="#010707" Bright="Yes">
+         <String>%((G:Var3) 0 &gt; if{ (G:Var3) -- d (&gt;G:Var3) 0 == if{ 0 (&gt;G:Var1) } } (G:Var1))%{case}%{:0}%((P:Local time,hours) 24 % flr)%!02d%((P:Local time, seconds) 1 % 2 * flr)%{if}:%{else} %{end}%((P:Local time,minutes) 60 % flr)%!02d%{:1}%((P:Local day of month, number))%!2d %((P:Local month of year, number))%!2d%{:2}%((P:Local year, number))%!5d!%{end}</String>
+      </Text>
+   </Element>
+   
+      
+   <Mouse>
+    <Area Left="1" Top="125" Width="15" Height="24">
+       <Cursor Type="Hand"/>
+       <Click>(G:Var1) ++ 3 % d (&gt;G:Var1) 0 &gt; if{ 180 (&gt;G:Var3) }</Click>
+     </Area>
+  </Mouse>
+</Gauge>

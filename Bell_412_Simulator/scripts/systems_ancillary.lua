@@ -1,0 +1,1398 @@
+-- =============================================================================
+-- BELL 412 - ANCILLARY SYSTEMS LOGIC
+-- Platform: Air Manager + Arduino Mega 2560
+-- Hardware: Arduino Channel A (Overhead) + Channel B (Pedestal)
+-- Logic: Buttons Only (Active Low)
+-- =============================================================================
+
+-- =============================================================================
+-- 1. HARDWARE CONFIGURATION HEADER
+-- =============================================================================
+-- INPUTS - CHANNEL A (Overhead Panel) D13..D29
+local PIN_DOME_LIGHT_POS1 = "ARDUINO_MEGA2560_A_D13"  -- Aft Dome Light Position 1
+local PIN_PITOT_HEAT    = "ARDUINO_MEGA2560_A_D14"
+local PIN_NAV_LIGHTS    = "ARDUINO_MEGA2560_A_D15"
+local PIN_ANTICOLL      = "ARDUINO_MEGA2560_A_D16"
+local PIN_WIPER_PI      = "ARDUINO_MEGA2560_A_D17"
+local PIN_WIPER_CO      = "ARDUINO_MEGA2560_A_D18"
+local PIN_HEATER        = "ARDUINO_MEGA2560_A_D19"
+local PIN_VENT_BLOWER   = "ARDUINO_MEGA2560_A_D20"
+local PIN_AFT_OUTLET    = "ARDUINO_MEGA2560_A_D21"
+local PIN_DOME_LIGHT_POS2 = "ARDUINO_MEGA2560_A_D22"  -- Aft Dome Light Position 2
+local PIN_UTILITY_LT    = "ARDUINO_MEGA2560_A_D23"
+local PIN_FIRE_PULL1    = "ARDUINO_MEGA2560_A_D24"
+local PIN_FIRE_PULL2    = "ARDUINO_MEGA2560_A_D25"
+local PIN_FIRE_TEST     = "ARDUINO_MEGA2560_A_D26"
+local PIN_COMPASS_SLAVE = "ARDUINO_MEGA2560_A_D27"
+local PIN_EXTINGUISHER_POS1 = "ARDUINO_MEGA2560_A_D28"  -- Fire Extinguisher Position 1
+local PIN_EXTINGUISHER_POS2 = "ARDUINO_MEGA2560_A_D29"  -- Fire Extinguisher Position 2
+
+-- INPUTS - CHANNEL A (Analog - Dimmer Controls) A0
+local PIN_PLATE_MAPLIGHT = "ARDUINO_MEGA2560_A_A0"  -- Approach Plate and Maplight Dimmer
+local PIN_PLATE_MAPLIGHT_BTN = "ARDUINO_MEGA2560_A_D11"  -- Approach Plate and Maplight Dimmer Button (2nd control)
+
+-- OUTPUTS - CHANNEL A (Fire Handle Status LEDs) D30..D31
+local PIN_FIRE_HANDLE1_LED = "ARDUINO_MEGA2560_A_D30"  -- Fire Handle 1 Pulled Status
+local PIN_FIRE_HANDLE2_LED = "ARDUINO_MEGA2560_A_D31"  -- Fire Handle 2 Pulled Status
+
+local PIN_FIRE_ENG1_LED = "ARDUINO_MEGA2560_A_D35"  -- Light inside Handle 1
+local PIN_FIRE_ENG2_LED = "ARDUINO_MEGA2560_A_D36"  -- Light inside Handle 2
+local PIN_BAG_FIRE_LED  = "ARDUINO_MEGA2560_A_D37"  -- Baggage Fire
+
+-- INPUTS - CHANNEL C (Nav Selectors, Over Torque Test, AFT Call/Test, DME Select, Baggage Fire Test + Marker Test) D14..D29
+local PIN_COURSE_SET    = "ARDUINO_MEGA2560_C_D14"  -- Course Set Switch (0=Nav 1, 1=Nav 2)
+local PIN_BRG_PTR       = "ARDUINO_MEGA2560_C_D15"  -- BRG PTR Switch (0=Pilot, 1=Co-Pilot)
+local PIN_BRG_PTR2      = "ARDUINO_MEGA2560_C_D57"  -- BRG PTR Switch 2 (0=Pilot, 1=Co-Pilot)
+local PIN_OVERTQ_TEST   = "ARDUINO_MEGA2560_C_D16"  -- Over Torque Test Button
+local PIN_OVERTQ_TEST2  = "ARDUINO_MEGA2560_C_D47"  -- Over Torque Test Button 2
+local PIN_AFT_CALL      = "ARDUINO_MEGA2560_C_D17"  -- AFT Call Button
+local PIN_AFT_CALL2     = "ARDUINO_MEGA2560_C_D48"  -- AFT Call Button 2
+local PIN_AFT_TEST      = "ARDUINO_MEGA2560_C_D18"  -- AFT Test Button
+local PIN_AFT_TEST2     = "ARDUINO_MEGA2560_C_D49"  -- AFT Test Button 2
+local PIN_DME_SEL_POS1  = "ARDUINO_MEGA2560_C_D19"  -- DME Select Position 1 (N1)
+local PIN_DME_SEL_POS2  = "ARDUINO_MEGA2560_C_D28"  -- DME Select Position 2 (N2)
+local PIN_DAFCSEL       = "ARDUINO_MEGA2560_C_D27"  -- AFCS Selector (L:Dafcssel)
+local PIN_BAG_FIRE_TEST = "ARDUINO_MEGA2560_C_D29"  -- Baggage Fire Test Button (L:firetestbag)
+local PIN_MARKER_TEST   = "ARDUINO_MEGA2560_C_D26"  -- Marker Test Button
+local PIN_MARKER_TEST2  = "ARDUINO_MEGA2560_C_D58"  -- Marker Test Button 2
+
+-- OUTPUTS - CHANNEL C (Marker Test LEDs) D36..D38, D59
+local PIN_MARKER_OUTER_LED = "ARDUINO_MEGA2560_C_D36"  -- Marker Outer (Blue)
+local PIN_MARKER_MIDDLE_LED = "ARDUINO_MEGA2560_C_D37"  -- Marker Middle (Amber)
+local PIN_MARKER_INNER_LED = "ARDUINO_MEGA2560_C_D38"  -- Marker Inner (White)
+local PIN_MARKER_TEST_LED2 = "ARDUINO_MEGA2560_C_D59"  -- Marker Test LED 2
+
+-- OUTPUTS - CHANNEL C (Over Torque + AFT Call/Test + Baggage Fire Test LEDs) D39..D46, D54..D56
+local PIN_OVERTQ_LED       = "ARDUINO_MEGA2560_C_D39"  -- Over Torque Test LED
+local PIN_OVERTQ_LED2      = "ARDUINO_MEGA2560_C_D54"  -- Over Torque Test LED 2
+local PIN_AFT_CALL_LED     = "ARDUINO_MEGA2560_C_D44"  -- AFT Call LED
+local PIN_AFT_CALL_LED2    = "ARDUINO_MEGA2560_C_D55"  -- AFT Call LED 2
+local PIN_AFT_TEST_LED     = "ARDUINO_MEGA2560_C_D45"  -- AFT Test LED
+local PIN_AFT_TEST_LED2    = "ARDUINO_MEGA2560_C_D56"  -- AFT Test LED 2
+local PIN_BAG_FIRE_TEST_LED = "ARDUINO_MEGA2560_C_D46" -- Baggage Fire Test LED
+
+-- INPUTS - CHANNEL B (Pedestal Panel) D20..D29 (+ D39)
+local PIN_FORCE_TRIM    = "ARDUINO_MEGA2560_B_D20"
+local PIN_COMPASS       = "ARDUINO_MEGA2560_B_D21"
+local PIN_STATIC_SRC    = "ARDUINO_MEGA2560_B_D22"
+local PIN_AFCS_HP1      = "ARDUINO_MEGA2560_B_D23"
+local PIN_AFCS_HP2      = "ARDUINO_MEGA2560_B_D24"
+local PIN_AFCS_SAS      = "ARDUINO_MEGA2560_B_D25"
+local PIN_AFCS_ATT      = "ARDUINO_MEGA2560_B_D26"
+local PIN_STBY_ATT_TEST = "ARDUINO_MEGA2560_B_D27"
+local PIN_CARGO_REL     = "ARDUINO_MEGA2560_B_D28"
+local PIN_CARGO_TEST    = "ARDUINO_MEGA2560_B_D29"
+local PIN_BAMBI_REL     = "ARDUINO_MEGA2560_B_D39"  -- Bambi Release Switch
+local PIN_BAMBI_REL2    = "ARDUINO_MEGA2560_B_D50"  -- Bambi Release Switch 2
+
+-- INPUTS - CHANNEL B (Mag/Dg Switch - 4 buttons for 3-position: 0=Norm, 1=Mag, 2=Dg) D51..D54
+local PIN_MAG_DG_MAG1 = "ARDUINO_MEGA2560_B_D51"  -- Mag/Dg Switch Mag Button 1 (State = 1)
+local PIN_MAG_DG_MAG2 = "ARDUINO_MEGA2560_B_D52"  -- Mag/Dg Switch Mag Button 2 (State = 1)
+local PIN_MAG_DG_DG1  = "ARDUINO_MEGA2560_B_D53"  -- Mag/Dg Switch Dg Button 1 (State = 2)
+local PIN_MAG_DG_DG2  = "ARDUINO_MEGA2560_B_D54"  -- Mag/Dg Switch Dg Button 2 (State = 2)
+
+-- INPUTS - CHANNEL B (AFCS SYS 2, Auto Pilot, AHRS Test) D15..D19
+local PIN_AFCS_SYS2   = "ARDUINO_MEGA2560_B_D15"  -- AFCS SYS 2 (0/1)
+local PIN_AUTO_PILOT  = "ARDUINO_MEGA2560_B_D16"  -- Auto Pilot Button (0/1)
+local PIN_AHRS_TEST   = "ARDUINO_MEGA2560_B_D17"  -- AHRS Test Button (0/1)
+
+-- OUTPUTS - CHANNEL B (Cargo Test LED, Auto Pilot LED) D49, D55
+local PIN_CARGO_TEST_LED = "ARDUINO_MEGA2560_B_D49"  -- Cargo Test LED
+local PIN_AUTO_PILOT_LED = "ARDUINO_MEGA2560_B_D55"  -- Auto Pilot LED
+
+-- OUTPUTS - CHANNEL B (Servo Motors) D18, D19, D57
+local PIN_YAW_SERVO   = "ARDUINO_MEGA2560_B_D18"  -- YAW Servo Motor
+local PIN_ROLL_SERVO  = "ARDUINO_MEGA2560_B_D19"  -- ROLL Servo Motor
+local PIN_PITCH_SERVO = "ARDUINO_MEGA2560_B_D57"  -- PITCH Servo Motor
+local PIN_AHRS_SERVO  = "ARDUINO_MEGA2560_B_D56"  -- AHRS Servo Motor
+
+-- =============================================================================
+-- 2. INITIALIZE HARDWARE LEDS
+-- =============================================================================
+-- Fire Handle Status LEDs
+local led_fire_handle1_h = hw_led_add(PIN_FIRE_HANDLE1_LED, 0.0)  -- Fire Handle 1 Status
+local led_fire_handle2_h = hw_led_add(PIN_FIRE_HANDLE2_LED, 0.0)  -- Fire Handle 2 Status
+
+-- Fire Warning LEDs
+local led_fire_eng1_h = hw_led_add(PIN_FIRE_ENG1_LED, 0.0)
+local led_fire_eng2_h = hw_led_add(PIN_FIRE_ENG2_LED, 0.0)
+local led_bag_fire_h  = hw_led_add(PIN_BAG_FIRE_LED, 0.0)
+
+-- Marker Test LEDs
+local led_marker_outer_h = hw_led_add(PIN_MARKER_OUTER_LED, 0.0)  -- Marker Outer (Blue)
+local led_marker_middle_h = hw_led_add(PIN_MARKER_MIDDLE_LED, 0.0)  -- Marker Middle (Amber)
+local led_marker_inner_h = hw_led_add(PIN_MARKER_INNER_LED, 0.0)  -- Marker Inner (White)
+local led_marker_test_h2 = hw_led_add(PIN_MARKER_TEST_LED2, 0.0)  -- Marker Test LED 2
+
+-- Over Torque Test LED
+local led_overtq_h = hw_led_add(PIN_OVERTQ_LED, 0.0)
+
+-- AFT Call/Test LEDs
+local led_aft_call_h = hw_led_add(PIN_AFT_CALL_LED, 0.0)
+local led_aft_test_h = hw_led_add(PIN_AFT_TEST_LED, 0.0)
+
+-- Baggage Fire Test LED
+local led_bag_fire_test_h = hw_led_add(PIN_BAG_FIRE_TEST_LED, 0.0)
+
+-- Cargo Test LED
+local led_cargo_test_h = hw_led_add(PIN_CARGO_TEST_LED, 0.0)
+
+-- Auto Pilot LED
+local led_auto_pilot_h = hw_led_add(PIN_AUTO_PILOT_LED, 0.0)
+
+-- Servo Motors
+local servo_yaw_h   = hw_servo_output_add(PIN_YAW_SERVO, 0.0)
+local servo_roll_h  = hw_servo_output_add(PIN_ROLL_SERVO, 0.0)
+local servo_pitch_h = hw_servo_output_add(PIN_PITCH_SERVO, 0.0)
+local servo_ahrs_h  = hw_servo_output_add(PIN_AHRS_SERVO, 0.0)
+
+-- =============================================================================
+-- 3. INTERNAL VARIABLES & CONSTANTS
+-- =============================================================================
+-- AFCS Toggle States (Toggle-on-press behavior)
+local afcs_hp1_state = 0
+local afcs_hp2_state = 0
+local afcs_sas_state = 0
+local afcs_att_state = 0
+
+-- Force Trim State
+local force_trim_held = false
+
+-- Standby Attitude Test State
+local stby_att_pwr    = 0
+local stby_att_flag   = 1
+local stby_test_timer = nil
+
+-- Fire Handle States (local tracking)
+local fire_handle1_pulled = 0  -- Fire Handle 1 state (0=Reset, 1=Pulled)
+local fire_handle2_pulled = 0  -- Fire Handle 2 state (0=Reset, 1=Pulled)
+
+-- Fire Warning States (from Sim)
+local fire_warn_eng1 = 0
+local fire_warn_eng2 = 0
+local fire_warn_bag  = 0
+local fire_test_active = false
+
+-- Fire Extinguisher Switch State (3-position: 0=OFF, 1=Position 1, 2=Position 2)
+local extinguisher_pos1_pressed = false
+local extinguisher_pos2_pressed = false
+local extinguisher_state = 0
+
+-- Aft Dome Light Switch State (3-position: 0=OFF, 1=Position 1, 2=Position 2)
+local dome_light_pos1_pressed = false
+local dome_light_pos2_pressed = false
+local dome_light_state = 0
+
+-- DC Bus State
+local dc_bus = 0
+
+-- Over Torque Test State
+local overtq_state = 0  -- 0=OFF, 1=ON
+
+-- AFT Call/Test States
+local aft_call_state = 0  -- 0=OFF, 1=ON
+local aft_test_state = 0  -- 0=OFF, 1=ON
+
+-- Baggage Fire Test State
+local bag_fire_test_state = 0  -- 0=OFF, 1=ON
+
+-- Plate/Maplight Dimmer Button State
+local plate_maplight_btn_state = 0  -- 0=OFF, 25=ON (half brightness)
+
+-- DME Select Switch State (3-position: 0=OFF, 1=N1, 2=N2)
+local dme_sel_pos1_pressed = false
+local dme_sel_pos2_pressed = false
+local dme_sel_state = 0
+
+-- Mag/Dg Switch State (3-position: 0=Norm, 1=Mag, 2=Dg)
+local mag_dg_mag1_pressed = false  -- Mag Button 1
+local mag_dg_mag2_pressed = false  -- Mag Button 2
+local mag_dg_dg1_pressed = false   -- Dg Button 1
+local mag_dg_dg2_pressed = false   -- Dg Button 2
+local mag_dg_state = 0
+
+-- Marker Test State
+local marker_test_state = 0  -- 0=OFF, 1=ON
+
+-- AFCS SYS 2 State
+local afcs_sys2_state = 0  -- 0=OFF, 1=ON
+
+-- Auto Pilot State
+local auto_pilot_state = 0  -- 0=OFF, 1=ON
+
+-- AHRS Test State
+local ahrs_test_state = 0  -- 0=OFF, 1=ON
+
+-- =============================================================================
+-- 4. SYSTEM LOGIC FUNCTIONS
+-- =============================================================================
+
+-- FIRE HANDLE STATUS LED UPDATE: Update LEDs based on handle pull state
+local function update_fire_handle_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_fire_handle1_h, 0.0)
+        hw_led_set(led_fire_handle2_h, 0.0)
+        return
+    end
+    
+    -- LEDs ON when handles are pulled (state = 1)
+    hw_led_set(led_fire_handle1_h, (fire_handle1_pulled == 1) and 1.0 or 0.0)
+    hw_led_set(led_fire_handle2_h, (fire_handle2_pulled == 1) and 1.0 or 0.0)
+end
+
+-- FIRE LED UPDATE: Update based on fire warnings or test mode
+local function update_fire_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_fire_eng1_h, 0.0)
+        hw_led_set(led_fire_eng2_h, 0.0)
+        hw_led_set(led_bag_fire_h, 0.0)
+        return
+    end
+    
+    -- If Fire Test is active, illuminate all fire LEDs
+    if fire_test_active then
+        hw_led_set(led_fire_eng1_h, 1.0)
+        hw_led_set(led_fire_eng2_h, 1.0)
+        hw_led_set(led_bag_fire_h, 1.0)
+    else
+        -- Normal operation: LEDs reflect actual fire warnings
+        hw_led_set(led_fire_eng1_h, (fire_warn_eng1 == 1) and 1.0 or 0.0)
+        hw_led_set(led_fire_eng2_h, (fire_warn_eng2 == 1) and 1.0 or 0.0)
+        hw_led_set(led_bag_fire_h, (fire_warn_bag == 1) and 1.0 or 0.0)
+    end
+end
+
+-- OVER TORQUE TEST LED UPDATE: Update LEDs based on L:Overtq state
+local function update_overtq_led()
+    -- Over Torque test LEDs should respond directly to the test flag,
+    -- independent of DC bus power (to clearly show test action).
+    local led_value = (overtq_state == 1) and 1.0 or 0.0
+    hw_led_set(led_overtq_h, led_value)
+    hw_led_set(led_overtq_h2, led_value)
+end
+
+-- AFT CALL/TEST LED UPDATE: Update LEDs based on L:AFTcall and L:Testaft state
+local function update_aft_leds()
+    -- AFT Call LEDs reflect L:AFTcall (Number 0/1)
+    local call_value = (aft_call_state == 1) and 1.0 or 0.0
+    hw_led_set(led_aft_call_h, call_value)
+    hw_led_set(led_aft_call_h2, call_value)
+
+    -- AFT Test LEDs reflect L:Testaft (Number 0/1)
+    local test_value = (aft_test_state == 1) and 1.0 or 0.0
+    hw_led_set(led_aft_test_h, test_value)
+    hw_led_set(led_aft_test_h2, test_value)
+end
+
+-- BAGGAGE FIRE TEST LED UPDATE: Update LED based on L:firetestbag state
+local function update_bag_fire_test_led()
+    -- Baggage fire test LED directly reflects bag_fire_test_state
+    hw_led_set(led_bag_fire_test_h, (bag_fire_test_state == 1) and 1.0 or 0.0)
+end
+
+-- DME SELECT STATE UPDATE: Update L:Swdme based on switch state
+local function update_dme_select_state()
+    local new_state = 0
+
+    if dme_sel_pos2_pressed then
+        new_state = 2  -- Position 2 (N2) has priority
+    elseif dme_sel_pos1_pressed then
+        new_state = 1  -- Position 1 (N1)
+    else
+        new_state = 0  -- OFF (both released)
+    end
+
+    if dme_sel_state ~= new_state then
+        dme_sel_state = new_state
+        fsx_variable_write("L:Swdme", "Number", dme_sel_state)
+        print("DME SELECT: State changed to " .. tostring(dme_sel_state))
+    end
+end
+
+-- MAG/DG SWITCH STATE UPDATE: Update L:SwMagDg based on switch state (3-position: 0=Norm, 1=Mag, 2=Dg)
+local function update_mag_dg_state()
+    local new_state = 0
+
+    -- Check if any Dg button is pressed (Dg has priority)
+    if mag_dg_dg1_pressed or mag_dg_dg2_pressed then
+        new_state = 2  -- Dg
+    -- Check if any Mag button is pressed
+    elseif mag_dg_mag1_pressed or mag_dg_mag2_pressed then
+        new_state = 1  -- Mag
+    else
+        new_state = 0  -- Norm (all buttons released)
+    end
+
+    if mag_dg_state ~= new_state then
+        mag_dg_state = new_state
+        fsx_variable_write("L:SwMagDg", "Number", mag_dg_state)
+        print("MAG/DG SWITCH: State changed to " .. tostring(mag_dg_state))
+    end
+end
+
+-- MARKER TEST LED UPDATE: Update LEDs based on L:TestMarker state
+local function update_marker_leds()
+    local led_value = (marker_test_state == 1) and 1.0 or 0.0
+    if marker_test_state == 1 then
+        -- When test is active, illuminate all three marker LEDs
+        hw_led_set(led_marker_outer_h, 1.0)
+        hw_led_set(led_marker_middle_h, 1.0)
+        hw_led_set(led_marker_inner_h, 1.0)
+    else
+        -- When test is off, turn off all LEDs
+        hw_led_set(led_marker_outer_h, 0.0)
+        hw_led_set(led_marker_middle_h, 0.0)
+        hw_led_set(led_marker_inner_h, 0.0)
+    end
+    -- Update the second marker test LED (indicates test state)
+    hw_led_set(led_marker_test_h2, led_value)
+end
+
+-- FIRE EXTINGUISHER SWITCH: Update state based on two position pins
+local function update_extinguisher_state()
+    local new_state = 0
+    
+    if extinguisher_pos2_pressed then
+        new_state = 2  -- Position 2 has priority
+    elseif extinguisher_pos1_pressed then
+        new_state = 1  -- Position 1
+    else
+        new_state = 0  -- OFF (both released)
+    end
+    
+    if extinguisher_state ~= new_state then
+        extinguisher_state = new_state
+        fsx_variable_write("L:Extinguisher", "Number", extinguisher_state)
+        print("EXTINGUISHER: State changed to " .. tostring(extinguisher_state))
+    end
+end
+
+-- AFT DOME LIGHT SWITCH: Update state based on two position pins
+local function update_dome_light_state()
+    local new_state = 0
+    
+    if dome_light_pos2_pressed then
+        new_state = 2  -- Position 2 has priority
+    elseif dome_light_pos1_pressed then
+        new_state = 1  -- Position 1
+    else
+        new_state = 0  -- OFF (both released)
+    end
+    
+    if dome_light_state ~= new_state then
+        dome_light_state = new_state
+        fsx_variable_write("L:Swredwhite", "Number", dome_light_state)
+        print("DOME LIGHT: State changed to " .. tostring(dome_light_state))
+    end
+end
+
+-- STANDBY ATTITUDE TEST: 2-second timer logic
+local function stby_test_press()
+    print("ACTION: Stby Att Test PRESSED")
+    stby_att_flag = 0
+    fsx_variable_write("L:StbyAttFlag", "Number", 0)
+    fsx_variable_write("L:Masterstbatt", "Number", 1)
+
+    -- Cancel existing timer
+    if stby_test_timer ~= nil and timer_stop ~= nil then
+        pcall(timer_stop, stby_test_timer)
+        stby_test_timer = nil
+    end
+
+    -- Start 2-second timer
+    if timer_start ~= nil then
+        stby_test_timer = timer_start(2000, nil, function()
+            print("TIMER: Stby Test Expired")
+            if stby_att_pwr == 0 then
+                stby_att_flag = 1
+                fsx_variable_write("L:StbyAttFlag", "Number", 1)
+            end
+            fsx_variable_write("L:Masterstbatt", "Number", 0)
+            stby_test_timer = nil
+        end)
+    end
+end
+
+local function stby_test_release()
+    print("ACTION: Stby Att Test RELEASED")
+    if stby_test_timer ~= nil and timer_stop ~= nil then
+        pcall(timer_stop, stby_test_timer)
+        stby_test_timer = nil
+    end
+
+    fsx_variable_write("L:Masterstbatt", "Number", 0)
+
+    if stby_att_pwr == 0 then
+        stby_att_flag = 1
+        fsx_variable_write("L:StbyAttFlag", "Number", 1)
+    end
+end
+
+-- =============================================================================
+-- 5. HARDWARE INPUTS (BUTTONS)
+-- =============================================================================
+
+-- -------------------------
+-- CHANNEL A - OVERHEAD
+-- -------------------------
+
+-- PITOT HEAT
+hw_button_add(PIN_PITOT_HEAT,
+    function() -- PRESSED (ON)
+        print("ACTION: Pitot Heat ON")
+        fsx_variable_write("L:pitotcovers", "Number", 0)
+        fsx_event("PITOT_HEAT_ON")
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Pitot Heat OFF")
+        fsx_variable_write("L:pitotcovers", "Number", 1)
+        fsx_event("PITOT_HEAT_OFF")
+    end
+)
+
+-- NAV LIGHTS
+hw_button_add(PIN_NAV_LIGHTS,
+    function() -- PRESSED (ON)
+        print("ACTION: Nav Lights ON")
+        fsx_variable_write("L:Swposition", "Number", 1)
+        fsx_event("NAV_LIGHTS_ON")
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Nav Lights OFF")
+        fsx_variable_write("L:Swposition", "Number", 0)
+        fsx_event("NAV_LIGHTS_OFF")
+    end
+)
+
+-- ANTI-COLLISION
+hw_button_add(PIN_ANTICOLL,
+    function() -- PRESSED (ON)
+        print("ACTION: Anti-Coll ON")
+        fsx_variable_write("L:Swanticoll", "Number", 1)
+        fsx_event("BEACON_LIGHTS_ON")
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Anti-Coll OFF")
+        fsx_variable_write("L:Swanticoll", "Number", 0)
+        fsx_event("BEACON_LIGHTS_OFF")
+    end
+)
+
+-- PILOT WIPER (Binary ON/OFF)
+hw_button_add(PIN_WIPER_PI,
+    function() -- PRESSED (ON)
+        print("ACTION: Pilot Wiper ON")
+        fsx_variable_write("L:SwPiWiper", "Number", 1)
+        fsx_variable_write("L:Swpiwiper", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Pilot Wiper OFF")
+        fsx_variable_write("L:SwPiWiper", "Number", 0)
+        fsx_variable_write("L:Swpiwiper", "Number", 0)
+    end
+)
+
+-- COPILOT WIPER (Binary ON/OFF)
+hw_button_add(PIN_WIPER_CO,
+    function() -- PRESSED (ON)
+        print("ACTION: Copilot Wiper ON")
+        fsx_variable_write("L:SwCoWiper", "Number", 1)
+        fsx_variable_write("L:Swcowiper", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Copilot Wiper OFF")
+        fsx_variable_write("L:SwCoWiper", "Number", 0)
+        fsx_variable_write("L:Swcowiper", "Number", 0)
+    end
+)
+
+-- HEATER
+hw_button_add(PIN_HEATER,
+    function() -- PRESSED (ON)
+        print("ACTION: Heater ON")
+        fsx_variable_write("L:SwHeater", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Heater OFF")
+        fsx_variable_write("L:SwHeater", "Number", 0)
+    end
+)
+
+-- VENT BLOWER
+hw_button_add(PIN_VENT_BLOWER,
+    function() -- PRESSED (ON)
+        print("ACTION: Vent Blower ON")
+        fsx_variable_write("L:SwVentBlower", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Vent Blower OFF")
+        fsx_variable_write("L:SwVentBlower", "Number", 0)
+    end
+)
+
+-- AFT OUTLET
+hw_button_add(PIN_AFT_OUTLET,
+    function() -- PRESSED (ON)
+        print("ACTION: Aft Outlet ON")
+        fsx_variable_write("L:SwAftOutlet", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Aft Outlet OFF")
+        fsx_variable_write("L:SwAftOutlet", "Number", 0)
+    end
+)
+
+-- AFT DOME LIGHT SWITCH (3-Position: 0=OFF, 1=Position 1, 2=Position 2)
+-- Position 1 Button
+hw_button_add(PIN_DOME_LIGHT_POS1,
+    function() -- PRESSED (Position 1)
+        print("ACTION: Aft Dome Light -> Position 1")
+        dome_light_pos1_pressed = true
+        update_dome_light_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Aft Dome Light Position 1 RELEASED")
+        dome_light_pos1_pressed = false
+        update_dome_light_state()
+    end
+)
+
+-- Position 2 Button
+hw_button_add(PIN_DOME_LIGHT_POS2,
+    function() -- PRESSED (Position 2)
+        print("ACTION: Aft Dome Light -> Position 2")
+        dome_light_pos2_pressed = true
+        update_dome_light_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Aft Dome Light Position 2 RELEASED")
+        dome_light_pos2_pressed = false
+        update_dome_light_state()
+    end
+)
+
+-- UTILITY LIGHT
+hw_button_add(PIN_UTILITY_LT,
+    function() -- PRESSED (ON)
+        print("ACTION: Utility Light ON")
+        fsx_variable_write("L:SwUtilityLight", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Utility Light OFF")
+        fsx_variable_write("L:SwUtilityLight", "Number", 0)
+    end
+)
+
+-- FIRE HANDLE 1 (Left Engine)
+hw_button_add(PIN_FIRE_PULL1,
+    function() -- PRESSED (Pull)
+        print("ACTION: Fire Handle 1 PULLED")
+        fire_handle1_pulled = 1
+        fsx_variable_write("L:firethandl", "Number", 1)
+        update_fire_handle_leds()
+    end,
+    function() -- RELEASED (Reset)
+        print("ACTION: Fire Handle 1 RESET")
+        fire_handle1_pulled = 0
+        fsx_variable_write("L:firethandl", "Number", 0)
+        update_fire_handle_leds()
+    end
+)
+
+-- FIRE HANDLE 2 (Right Engine)
+hw_button_add(PIN_FIRE_PULL2,
+    function() -- PRESSED (Pull)
+        print("ACTION: Fire Handle 2 PULLED")
+        fire_handle2_pulled = 1
+        fsx_variable_write("L:firethandr", "Number", 1)
+        update_fire_handle_leds()
+    end,
+    function() -- RELEASED (Reset)
+        print("ACTION: Fire Handle 2 RESET")
+        fire_handle2_pulled = 0
+        fsx_variable_write("L:firethandr", "Number", 0)
+        update_fire_handle_leds()
+    end
+)
+
+-- FIRE TEST (Momentary - Also lights all fire LEDs)
+hw_button_add(PIN_FIRE_TEST,
+    function() -- PRESSED
+        print("ACTION: Fire Test PRESSED")
+        fire_test_active = true
+        fsx_variable_write("L:Swfiretest", "Bool", true)
+        update_fire_leds()  -- Force all fire LEDs ON
+    end,
+    function() -- RELEASED
+        print("ACTION: Fire Test RELEASED")
+        fire_test_active = false
+        fsx_variable_write("L:Swfiretest", "Bool", false)
+        update_fire_leds()  -- Return to normal state
+    end
+)
+
+-- BAGGAGE FIRE TEST (Momentary)
+-- Drives L:firetestbag (Number 0/1) and a dedicated test LED
+hw_button_add(PIN_BAG_FIRE_TEST,
+    function() -- PRESSED
+        print("ACTION: Baggage Fire Test PRESSED")
+        bag_fire_test_state = 1
+        fsx_variable_write("L:firetestbag", "Number", 1)
+        update_bag_fire_test_led()
+    end,
+    function() -- RELEASED
+        print("ACTION: Baggage Fire Test RELEASED")
+        bag_fire_test_state = 0
+        fsx_variable_write("L:firetestbag", "Number", 0)
+        update_bag_fire_test_led()
+    end
+)
+
+-- COMPASS CONTROL (Mag/Slave)
+hw_button_add(PIN_COMPASS_SLAVE,
+    function() -- PRESSED (Mag Mode)
+        print("ACTION: Compass -> MAG")
+        fsx_variable_write("L:CompassControl", "Number", 1)
+    end,
+    function() -- RELEASED (Slave Mode)
+        print("ACTION: Compass -> SLAVE")
+        fsx_variable_write("L:CompassControl", "Number", 0)
+    end
+)
+
+-- FIRE EXTINGUISHER SWITCH (3-Position: 0=OFF, 1=Position 1, 2=Position 2)
+-- Position 1 Button
+hw_button_add(PIN_EXTINGUISHER_POS1,
+    function() -- PRESSED (Position 1)
+        print("ACTION: Fire Extinguisher -> Position 1")
+        extinguisher_pos1_pressed = true
+        update_extinguisher_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Fire Extinguisher Position 1 RELEASED")
+        extinguisher_pos1_pressed = false
+        update_extinguisher_state()
+    end
+)
+
+-- Position 2 Button
+hw_button_add(PIN_EXTINGUISHER_POS2,
+    function() -- PRESSED (Position 2)
+        print("ACTION: Fire Extinguisher -> Position 2")
+        extinguisher_pos2_pressed = true
+        update_extinguisher_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Fire Extinguisher Position 2 RELEASED")
+        extinguisher_pos2_pressed = false
+        update_extinguisher_state()
+    end
+)
+
+-- -------------------------
+-- CHANNEL B - PEDESTAL
+-- -------------------------
+
+-- FORCE TRIM RELEASE (Momentary)
+-- Per Flight Manual: "Press cyclic FORCE TRIM release button...
+-- Release button when desired attitude is reached."
+-- The button releases the force trim, sim re-engages at new position on release.
+hw_button_add(PIN_FORCE_TRIM,
+    function() -- PRESSED: Release force trim
+        print("ACTION: Force Trim RELEASE PRESSED")
+        force_trim_held = true
+        fsx_variable_write("L:Sw forcetrim", "Number", 1)
+        -- Send event to release force trim in sim
+        fsx_event("ROTOR_TRIM_RESET")
+    end,
+    function() -- RELEASED: Force trim re-engages at new position
+        print("ACTION: Force Trim RELEASE - Re-engaged at new position")
+        force_trim_held = false
+        fsx_variable_write("L:Sw forcetrim", "Number", 0)
+        -- No action needed - sim holds new position automatically
+    end
+)
+
+-- COMPASS
+hw_button_add(PIN_COMPASS,
+    function() -- PRESSED (ON)
+        print("ACTION: Compass ON")
+        fsx_variable_write("L:SwCompass", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Compass OFF")
+        fsx_variable_write("L:SwCompass", "Number", 0)
+    end
+)
+
+-- STATIC SOURCE
+hw_button_add(PIN_STATIC_SRC,
+    function() -- PRESSED (ON)
+        print("ACTION: Static Source ON")
+        fsx_variable_write("L:SwStaticSource", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Static Source OFF")
+        fsx_variable_write("L:SwStaticSource", "Number", 0)
+    end
+)
+
+-- AFCS HP1 (Toggle-on-press)
+hw_button_add(PIN_AFCS_HP1,
+    function() -- PRESSED: Toggle state
+        afcs_hp1_state = (afcs_hp1_state == 0) and 1 or 0
+        print("ACTION: AFCS HP1 -> " .. tostring(afcs_hp1_state))
+        fsx_variable_write("L:HP1", "Number", afcs_hp1_state)
+    end,
+    function() -- RELEASED: Do nothing
+        print("ACTION: AFCS HP1 Released")
+    end
+)
+
+-- AFCS HP2 (Toggle-on-press)
+hw_button_add(PIN_AFCS_HP2,
+    function() -- PRESSED: Toggle state
+        afcs_hp2_state = (afcs_hp2_state == 0) and 1 or 0
+        print("ACTION: AFCS HP2 -> " .. tostring(afcs_hp2_state))
+        fsx_variable_write("L:HP2", "Number", afcs_hp2_state)
+    end,
+    function() -- RELEASED: Do nothing
+        print("ACTION: AFCS HP2 Released")
+    end
+)
+
+-- AFCS SAS (Toggle-on-press)
+hw_button_add(PIN_AFCS_SAS,
+    function() -- PRESSED: Toggle state
+        afcs_sas_state = (afcs_sas_state == 0) and 1 or 0
+        print("ACTION: AFCS SAS -> " .. tostring(afcs_sas_state))
+        fsx_variable_write("L:SASATT", "Number", afcs_sas_state)
+    end,
+    function() -- RELEASED: Do nothing
+        print("ACTION: AFCS SAS Released")
+    end
+)
+
+-- AFCS ATT (Toggle-on-press)
+hw_button_add(PIN_AFCS_ATT,
+    function() -- PRESSED: Toggle state
+        afcs_att_state = (afcs_att_state == 0) and 1 or 0
+        print("ACTION: AFCS ATT -> " .. tostring(afcs_att_state))
+        fsx_variable_write("L:AP_ATT", "Number", afcs_att_state)
+    end,
+    function() -- RELEASED: Do nothing
+        print("ACTION: AFCS ATT Released")
+    end
+)
+
+-- STANDBY ATTITUDE TEST (Momentary with timer)
+hw_button_add(PIN_STBY_ATT_TEST, stby_test_press, stby_test_release)
+
+-- CARGO RELEASE
+hw_button_add(PIN_CARGO_REL,
+    function() -- PRESSED (ON)
+        print("ACTION: Cargo Release ON")
+        fsx_variable_write("L:Swcargorel", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Cargo Release OFF")
+        fsx_variable_write("L:Swcargorel", "Number", 0)
+    end
+)
+
+-- CARGO TEST (Momentary)
+hw_button_add(PIN_CARGO_TEST,
+    function() -- PRESSED
+        print("ACTION: Cargo Test PRESSED")
+        fsx_variable_write("L:CRTest", "Number", 1)
+        hw_led_set(led_cargo_test_h, 1.0)
+    end,
+    function() -- RELEASED
+        print("ACTION: Cargo Test RELEASED")
+        fsx_variable_write("L:CRTest", "Number", 0)
+        hw_led_set(led_cargo_test_h, 0.0)
+    end
+)
+
+-- BAMBI RELEASE (ON/OFF)
+hw_button_add(PIN_BAMBI_REL,
+    function() -- PRESSED (ON)
+        print("ACTION: Bambi Release ON")
+        fsx_variable_write("L:SwBambiRelease", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Bambi Release OFF")
+        fsx_variable_write("L:SwBambiRelease", "Number", 0)
+    end
+)
+
+-- BAMBI RELEASE 2 (ON/OFF)
+hw_button_add(PIN_BAMBI_REL2,
+    function() -- PRESSED (ON)
+        print("ACTION: Bambi Release 2 ON")
+        fsx_variable_write("L:SwBambiRelease", "Number", 1)
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Bambi Release 2 OFF")
+        fsx_variable_write("L:SwBambiRelease", "Number", 0)
+    end
+)
+
+-- MAG/DG SWITCH (3-Position: 0=Norm, 1=Mag, 2=Dg)
+-- Mag Button 1 (State = 1)
+hw_button_add(PIN_MAG_DG_MAG1,
+    function() -- PRESSED (Mag)
+        print("ACTION: Mag/Dg Switch -> Mag Button 1 (State = 1)")
+        mag_dg_mag1_pressed = true
+        update_mag_dg_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Mag/Dg Switch Mag Button 1 RELEASED")
+        mag_dg_mag1_pressed = false
+        update_mag_dg_state()
+    end
+)
+
+-- Mag Button 2 (State = 1)
+hw_button_add(PIN_MAG_DG_MAG2,
+    function() -- PRESSED (Mag)
+        print("ACTION: Mag/Dg Switch -> Mag Button 2 (State = 1)")
+        mag_dg_mag2_pressed = true
+        update_mag_dg_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Mag/Dg Switch Mag Button 2 RELEASED")
+        mag_dg_mag2_pressed = false
+        update_mag_dg_state()
+    end
+)
+
+-- Dg Button 1 (State = 2)
+hw_button_add(PIN_MAG_DG_DG1,
+    function() -- PRESSED (Dg)
+        print("ACTION: Mag/Dg Switch -> Dg Button 1 (State = 2)")
+        mag_dg_dg1_pressed = true
+        update_mag_dg_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Mag/Dg Switch Dg Button 1 RELEASED")
+        mag_dg_dg1_pressed = false
+        update_mag_dg_state()
+    end
+)
+
+-- Dg Button 2 (State = 2)
+hw_button_add(PIN_MAG_DG_DG2,
+    function() -- PRESSED (Dg)
+        print("ACTION: Mag/Dg Switch -> Dg Button 2 (State = 2)")
+        mag_dg_dg2_pressed = true
+        update_mag_dg_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Mag/Dg Switch Dg Button 2 RELEASED")
+        mag_dg_dg2_pressed = false
+        update_mag_dg_state()
+    end
+)
+
+-- =============================================================================
+-- 5b. CHANNEL B INPUTS (AFCS SYS 2, Auto Pilot, AHRS Test)
+-- =============================================================================
+
+-- AFCS SYS 2 (0=OFF, 1=ON)
+hw_button_add(PIN_AFCS_SYS2,
+    function() -- PRESSED
+        print("ACTION: AFCS SYS 2 ON")
+        afcs_sys2_state = 1
+        fsx_variable_write("L:AFCSSys2", "Number", 1)
+    end,
+    function() -- RELEASED
+        print("ACTION: AFCS SYS 2 OFF")
+        afcs_sys2_state = 0
+        fsx_variable_write("L:AFCSSys2", "Number", 0)
+    end
+)
+
+-- AUTO PILOT (0=OFF, 1=ON) - Button and LED
+hw_button_add(PIN_AUTO_PILOT,
+    function() -- PRESSED
+        print("ACTION: Auto Pilot ON")
+        auto_pilot_state = 1
+        fsx_variable_write("L:AutoPilot", "Number", 1)
+        hw_led_set(led_auto_pilot_h, 1.0)
+    end,
+    function() -- RELEASED
+        print("ACTION: Auto Pilot OFF")
+        auto_pilot_state = 0
+        fsx_variable_write("L:AutoPilot", "Number", 0)
+        hw_led_set(led_auto_pilot_h, 0.0)
+    end
+)
+
+-- AHRS TEST (0=OFF, 1=ON)
+hw_button_add(PIN_AHRS_TEST,
+    function() -- PRESSED
+        print("ACTION: AHRS Test ON")
+        ahrs_test_state = 1
+        fsx_variable_write("L:AHRSTest", "Number", 1)
+    end,
+    function() -- RELEASED
+        print("ACTION: AHRS Test OFF")
+        ahrs_test_state = 0
+        fsx_variable_write("L:AHRSTest", "Number", 0)
+    end
+)
+
+-- =============================================================================
+-- 5c. CHANNEL C INPUTS (Nav Selectors, Over Torque Test, AFT Call/Test & Marker Test)
+-- =============================================================================
+
+-- COURSE SET SWITCH (0=Nav 1, 1=Nav 2)
+hw_button_add(PIN_COURSE_SET,
+    function() -- PRESSED (Nav 2)
+        print("ACTION: Course Set Switch = NAV2")
+        fsx_variable_write("L:SwCourseset", "Number", 1)
+    end,
+    function() -- RELEASED (Nav 1)
+        print("ACTION: Course Set Switch = NAV1")
+        fsx_variable_write("L:SwCourseset", "Number", 0)
+    end
+)
+
+-- BRG PTR SWITCH (0=Pilot, 1=Co-Pilot)
+hw_button_add(PIN_BRG_PTR,
+    function() -- PRESSED (Co-Pilot)
+        print("ACTION: BRG PTR Switch = CO-PILOT")
+        fsx_variable_write("L:SwBrgPtr", "Number", 1)
+    end,
+    function() -- RELEASED (Pilot)
+        print("ACTION: BRG PTR Switch = PILOT")
+        fsx_variable_write("L:SwBrgPtr", "Number", 0)
+    end
+)
+
+-- BRG PTR SWITCH 2 (0=Pilot, 1=Co-Pilot)
+hw_button_add(PIN_BRG_PTR2,
+    function() -- PRESSED (Co-Pilot)
+        print("ACTION: BRG PTR Switch 2 = CO-PILOT")
+        fsx_variable_write("L:SwBrgPtr", "Number", 1)
+    end,
+    function() -- RELEASED (Pilot)
+        print("ACTION: BRG PTR Switch 2 = PILOT")
+        fsx_variable_write("L:SwBrgPtr", "Number", 0)
+    end
+)
+
+-- AFCS SELECTOR (Set Dafcssel) - Momentary button (Number 0/1)
+hw_button_add(PIN_DAFCSEL,
+    function() -- PRESSED
+        print("ACTION: AFCS Selector (Dafcssel) ON")
+        fsx_variable_write("L:Dafcssel", "Number", 1)
+    end,
+    function() -- RELEASED
+        print("ACTION: AFCS Selector (Dafcssel) OFF")
+        fsx_variable_write("L:Dafcssel", "Number", 0)
+    end
+)
+
+-- OVER TORQUE TEST BUTTON (Momentary)
+hw_button_add(PIN_OVERTQ_TEST,
+    function() -- PRESSED (ON)
+        print("ACTION: Over Torque Test ON")
+        overtq_state = 1
+        fsx_variable_write("L:Overtq", "Number", 1)
+        update_overtq_led()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Over Torque Test OFF")
+        overtq_state = 0
+        fsx_variable_write("L:Overtq", "Number", 0)
+        update_overtq_led()
+    end
+)
+
+-- OVER TORQUE TEST BUTTON 2 (Momentary)
+hw_button_add(PIN_OVERTQ_TEST2,
+    function() -- PRESSED (ON)
+        print("ACTION: Over Torque Test 2 ON")
+        overtq_state = 1
+        fsx_variable_write("L:Overtq", "Number", 1)
+        update_overtq_led()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Over Torque Test 2 OFF")
+        overtq_state = 0
+        fsx_variable_write("L:Overtq", "Number", 0)
+        update_overtq_led()
+    end
+)
+
+-- DME SELECT SWITCH (3-position: 0=OFF, 1=N1, 2=N2)
+hw_button_add(PIN_DME_SEL_POS1,
+    function() -- PRESSED (N1)
+        print("ACTION: DME Select POS1 (N1)")
+        dme_sel_pos1_pressed = true
+        update_dme_select_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: DME Select POS1 RELEASED")
+        dme_sel_pos1_pressed = false
+        update_dme_select_state()
+    end
+)
+
+hw_button_add(PIN_DME_SEL_POS2,
+    function() -- PRESSED (N2)
+        print("ACTION: DME Select POS2 (N2)")
+        dme_sel_pos2_pressed = true
+        update_dme_select_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: DME Select POS2 RELEASED")
+        dme_sel_pos2_pressed = false
+        update_dme_select_state()
+    end
+)
+
+-- AFT CALL BUTTON (Momentary)
+hw_button_add(PIN_AFT_CALL,
+    function() -- PRESSED (ON)
+        print("ACTION: AFT Call ON")
+        aft_call_state = 1
+        fsx_variable_write("L:AFTcall", "Number", 1)
+        update_aft_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: AFT Call OFF")
+        aft_call_state = 0
+        fsx_variable_write("L:AFTcall", "Number", 0)
+        update_aft_leds()
+    end
+)
+
+-- AFT CALL BUTTON 2 (Momentary)
+hw_button_add(PIN_AFT_CALL2,
+    function() -- PRESSED (ON)
+        print("ACTION: AFT Call 2 ON")
+        aft_call_state = 1
+        fsx_variable_write("L:AFTcall", "Number", 1)
+        update_aft_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: AFT Call 2 OFF")
+        aft_call_state = 0
+        fsx_variable_write("L:AFTcall", "Number", 0)
+        update_aft_leds()
+    end
+)
+
+-- AFT TEST BUTTON (Momentary)
+hw_button_add(PIN_AFT_TEST,
+    function() -- PRESSED (ON)
+        print("ACTION: AFT Test ON")
+        aft_test_state = 1
+        fsx_variable_write("L:Testaft", "Number", 1)
+        update_aft_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: AFT Test OFF")
+        aft_test_state = 0
+        fsx_variable_write("L:Testaft", "Number", 0)
+        update_aft_leds()
+    end
+)
+
+-- AFT TEST BUTTON 2 (Momentary)
+hw_button_add(PIN_AFT_TEST2,
+    function() -- PRESSED (ON)
+        print("ACTION: AFT Test 2 ON")
+        aft_test_state = 1
+        fsx_variable_write("L:Testaft", "Number", 1)
+        update_aft_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: AFT Test 2 OFF")
+        aft_test_state = 0
+        fsx_variable_write("L:Testaft", "Number", 0)
+        update_aft_leds()
+    end
+)
+
+-- MARKER TEST BUTTON (Momentary)
+hw_button_add(PIN_MARKER_TEST,
+    function() -- PRESSED (ON)
+        print("ACTION: Marker Test ON")
+        marker_test_state = 1
+        fsx_variable_write("L:TestMarker", "Number", 1)
+        update_marker_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Marker Test OFF")
+        marker_test_state = 0
+        fsx_variable_write("L:TestMarker", "Number", 0)
+        update_marker_leds()
+    end
+)
+
+-- MARKER TEST BUTTON 2 (Momentary)
+hw_button_add(PIN_MARKER_TEST2,
+    function() -- PRESSED (ON)
+        print("ACTION: Marker Test 2 ON")
+        marker_test_state = 1
+        fsx_variable_write("L:TestMarker", "Number", 1)
+        update_marker_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Marker Test 2 OFF")
+        marker_test_state = 0
+        fsx_variable_write("L:TestMarker", "Number", 0)
+        update_marker_leds()
+    end
+)
+
+-- =============================================================================
+-- 5b. ANALOG INPUTS (Dimmer Controls)
+-- =============================================================================
+
+-- APPROACH PLATE AND MAPLIGHT DIMMER (Analog: 0.0-1.0 maps to 0-50)
+hw_adc_input_add(PIN_PLATE_MAPLIGHT, function(val)
+    local raw_value = val or 0.0
+    -- Map analog input (0.0 to 1.0) to dimmer range (0 to 50)
+    local dimmer_value = math.floor(raw_value * 50.0 + 0.5)  -- Round to nearest integer
+    dimmer_value = math.max(0, math.min(50, dimmer_value))  -- Clamp to 0-50
+    fsx_variable_write("L:platepilolight", "Number", dimmer_value)
+    print("PLATE/MAPLIGHT DIMMER: Value = " .. tostring(dimmer_value))
+end)
+
+-- APPROACH PLATE AND MAPLIGHT DIMMER BUTTON (2nd control - Toggle between 0 and 25)
+hw_button_add(PIN_PLATE_MAPLIGHT_BTN,
+    function() -- PRESSED (Toggle ON - Set to 25)
+        print("ACTION: Plate/Maplight Dimmer Button ON (25)")
+        plate_maplight_btn_state = 25
+        fsx_variable_write("L:platepilolight", "Number", 25)
+    end,
+    function() -- RELEASED (Toggle OFF - Set to 0)
+        print("ACTION: Plate/Maplight Dimmer Button OFF (0)")
+        plate_maplight_btn_state = 0
+        fsx_variable_write("L:platepilolight", "Number", 0)
+    end
+)
+
+-- =============================================================================
+-- 6. SIMULATOR SUBSCRIPTIONS (Data In -> Logic Update)
+-- =============================================================================
+
+-- Listen for DC Bus state (for fire LED power)
+fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
+    dc_bus = (val ~= 0) and 1 or 0
+    update_fire_leds()
+end)
+
+-- Listen for Standby Attitude Power Switch state
+fsx_variable_subscribe("L:stbatt", "Number", function(val)
+    stby_att_pwr = (val ~= 0) and 1 or 0
+
+    if stby_att_pwr == 1 then
+        stby_att_flag = 0
+        fsx_variable_write("L:StbyAttFlag", "Number", 0)
+    else
+        stby_att_flag = 1
+        fsx_variable_write("L:StbyAttFlag", "Number", 1)
+    end
+end)
+
+-- Fire Warning Engine 1 (from Sim fire detection)
+fsx_variable_subscribe("L:FireWarn1", "Number", function(val)
+    fire_warn_eng1 = (val ~= 0) and 1 or 0
+    print("SUBSCRIBE: Fire Warn Eng1 = " .. tostring(val))
+    update_fire_leds()
+end)
+
+-- Fire Warning Engine 2 (from Sim fire detection)
+fsx_variable_subscribe("L:FireWarn2", "Number", function(val)
+    fire_warn_eng2 = (val ~= 0) and 1 or 0
+    print("SUBSCRIBE: Fire Warn Eng2 = " .. tostring(val))
+    update_fire_leds()
+end)
+
+-- Baggage Fire Warning
+fsx_variable_subscribe("L:BagFire", "Number", function(val)
+    fire_warn_bag = (val ~= 0) and 1 or 0
+    print("SUBSCRIBE: Bag Fire = " .. tostring(val))
+    update_fire_leds()
+end)
+
+-- Fire Handle 1 State (from Sim/Other sources)
+fsx_variable_subscribe("L:firethandl", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if fire_handle1_pulled ~= new_state then
+        fire_handle1_pulled = new_state
+        update_fire_handle_leds()
+        print("SUBSCRIBE: Fire Handle 1 = " .. tostring(val))
+    end
+end)
+
+-- Fire Handle 2 State (from Sim/Other sources)
+fsx_variable_subscribe("L:firethandr", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if fire_handle2_pulled ~= new_state then
+        fire_handle2_pulled = new_state
+        update_fire_handle_leds()
+        print("SUBSCRIBE: Fire Handle 2 = " .. tostring(val))
+    end
+end)
+
+-- Marker Test State (from Sim/Other sources)
+fsx_variable_subscribe("L:TestMarker", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if marker_test_state ~= new_state then
+        marker_test_state = new_state
+        update_marker_leds()
+        print("SUBSCRIBE: Marker Test = " .. tostring(val))
+    end
+end)
+
+-- Over Torque Test State (from Sim/Other sources)
+fsx_variable_subscribe("L:Overtq", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if overtq_state ~= new_state then
+        overtq_state = new_state
+        update_overtq_led()
+        print("SUBSCRIBE: Over Torque Test = " .. tostring(val))
+    end
+end)
+
+-- AFT Call State (from Sim/Other sources)
+fsx_variable_subscribe("L:AFTcall", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if aft_call_state ~= new_state then
+        aft_call_state = new_state
+        update_aft_leds()
+        print("SUBSCRIBE: AFT Call = " .. tostring(val))
+    end
+end)
+
+-- AFT Test State (from Sim/Other sources)
+fsx_variable_subscribe("L:Testaft", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if aft_test_state ~= new_state then
+        aft_test_state = new_state
+        update_aft_leds()
+        print("SUBSCRIBE: AFT Test = " .. tostring(val))
+    end
+end)
+
+-- Baggage Fire Test State (from Sim/Other sources)
+fsx_variable_subscribe("L:firetestbag", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if bag_fire_test_state ~= new_state then
+        bag_fire_test_state = new_state
+        update_bag_fire_test_led()
+        print("SUBSCRIBE: Baggage Fire Test = " .. tostring(val))
+    end
+end)
+
+-- DME Select State (from Sim/Other sources)
+fsx_variable_subscribe("L:Swdme", "Number", function(val)
+    local new_state = tonumber(val) or 0
+    if dme_sel_state ~= new_state then
+        dme_sel_state = new_state
+        dme_sel_pos1_pressed = (new_state == 1)
+        dme_sel_pos2_pressed = (new_state == 2)
+        update_dme_select_state()
+        print("SUBSCRIBE: DME Select = " .. tostring(val))
+    end
+end)
+
+-- Mag/Dg Switch State (from Sim/Other sources)
+fsx_variable_subscribe("L:SwMagDg", "Number", function(val)
+    local new_state = tonumber(val) or 0
+    if mag_dg_state ~= new_state then
+        mag_dg_state = new_state
+        -- Update button states to match (any button from each group)
+        mag_dg_mag1_pressed = (new_state == 1)
+        mag_dg_mag2_pressed = (new_state == 1)
+        mag_dg_dg1_pressed = (new_state == 2)
+        mag_dg_dg2_pressed = (new_state == 2)
+        print("SUBSCRIBE: Mag/Dg Switch = " .. tostring(val))
+    end
+end)
+
+-- Servo Motor Subscriptions (YAW, ROLL, PITCH, AHRS)
+fsx_variable_subscribe("A:RUDDER POSITION", "Percent", function(val)
+    local servo_value = (val + 100.0) / 200.0  -- Convert -100 to 100 range to 0.0 to 1.0
+    hw_servo_output_position(servo_yaw_h, servo_value)
+end)
+
+fsx_variable_subscribe("A:AILERON POSITION", "Percent", function(val)
+    local servo_value = (val + 100.0) / 200.0  -- Convert -100 to 100 range to 0.0 to 1.0
+    hw_servo_output_position(servo_roll_h, servo_value)
+end)
+
+fsx_variable_subscribe("A:ELEVATOR POSITION", "Percent", function(val)
+    local servo_value = (val + 100.0) / 200.0  -- Convert -100 to 100 range to 0.0 to 1.0
+    hw_servo_output_position(servo_pitch_h, servo_value)
+end)
+
+fsx_variable_subscribe("A:INDICATED HEADING", "Degrees", function(val)
+    local servo_value = ((val % 360.0) + 360.0) % 360.0 / 360.0  -- Convert 0-360 degrees to 0.0 to 1.0
+    hw_servo_output_position(servo_ahrs_h, servo_value)
+end)
+
+-- =============================================================================
+-- 7. STARTUP INITIALIZATION
+-- =============================================================================
+fsx_variable_write("L:StbyAttFlag", "Number", 1)
+fsx_variable_write("L:Masterstbatt", "Number", 0)
+fsx_variable_write("L:firethandl", "Number", 0)
+fsx_variable_write("L:firethandr", "Number", 0)
+fsx_variable_write("L:Swfiretest", "Bool", false)
+fsx_variable_write("L:CompassControl", "Number", 0)
+fsx_variable_write("L:Sw forcetrim", "Number", 0)
+fsx_variable_write("L:Extinguisher", "Number", 0)
+fsx_variable_write("L:Swredwhite", "Number", 0)
+fsx_variable_write("L:SwBambiRelease", "Number", 0)
+fsx_variable_write("L:platepilolight", "Number", 0)
+fsx_variable_write("L:SwBrgPtr", "Number", 0)
+fsx_variable_write("L:SwCourseset", "Number", 0)
+fsx_variable_write("L:Overtq", "Number", 0)
+fsx_variable_write("L:AFTcall", "Number", 0)
+fsx_variable_write("L:Testaft", "Number", 0)
+fsx_variable_write("L:Swdme", "Number", 0)
+fsx_variable_write("L:SwMagDg", "Number", 0)
+fsx_variable_write("L:Dafcssel", "Number", 0)
+fsx_variable_write("L:firetestbag", "Number", 0)
+fsx_variable_write("L:TestMarker", "Number", 0)
+fsx_variable_write("L:AFCSSys2", "Number", 0)
+fsx_variable_write("L:AutoPilot", "Number", 0)
+fsx_variable_write("L:AHRSTest", "Number", 0)
+
+-- Initialize Over Torque Test LED
+update_overtq_led()
+
+-- Initialize AFT Call/Test LEDs
+update_aft_leds()
+
+-- Initialize Baggage Fire Test LED
+update_bag_fire_test_led()
+
+-- Initialize DME Select state
+update_dme_select_state()
+
+-- Initialize Mag/Dg Switch state
+update_mag_dg_state()
+
+-- Initialize marker test LEDs
+update_marker_leds()
+
+-- Initialize fire LEDs
+update_fire_leds()
+
+-- Initialize fire handle status LEDs
+update_fire_handle_leds()
+
+-- Initialize extinguisher state
+update_extinguisher_state()
+
+-- Initialize dome light state
+update_dome_light_state()

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="AMPS" Version="1.0">
+ <Image Name="amps_background.bmp"/>
+
+
+  <Element>
+    <Position X="72" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="0" Maximum="300">(L:Genel,bool) 1 == if{ (L:Ampsg1,amp) }</Value>
+        <Nonlinearity>
+ 	      <Item Value="0" X="54" Y="137"/>
+		  <Item Value="100" X="25" Y="109"/>
+		  <Item Value="200" X="26" Y="66"/>
+		  <Item Value="300" X="56" Y="40"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="106" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="0" Maximum="300">(L:Gener,bool) 1 == if{ (L:Ampsg2,amp) }</Value>
+        <Nonlinearity>
+          <Item Value="300" Degrees="-71"/>
+          <Item Value="200" Degrees="-26"/>
+          <Item Value="100" Degrees="23"/>		  		  		
+		  <Item Value="0" Degrees="68.8"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+  
+ 
+  <Element>
+   <Position X="63" Y="81"/>
+     <Image Name="amps_f.bmp"/>
+  </Element> 
+ 
+  <Mouse>
+  
+<!--amp 1 -->
+   <Area Left="10" Top="9" Width="80" Height="160">
+      <Tooltip>%Generator 1 (%((L:Genel,bool) 1 == if{ (L:Ampsg1,amp) })%!d!amp)</Tooltip>
+   </Area>
+   
+<!-- amp 2 -->
+   <Area Left="89" Top="9" Width="80" Height="160">
+      <Tooltip>%Generator 2 (%((L:Gener,bool) 1 == if{ (L:Ampsg2,amp) })%!d!amp)</Tooltip>
+   </Area>
+
+  </Mouse>
+</Gauge>

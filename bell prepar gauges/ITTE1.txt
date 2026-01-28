@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="ITTE1" Version="1.0">
+ <Image Name="itt_background.bmp"/>
+ 
+  <Element>
+    <Position X="90" Y="90"/>
+    <Image Name="RPM_needle1.bmp" PointsTo="North">
+      <Axis X="17" Y="60"/>
+    </Image>
+    <Rotate> 
+      <Value>(L:ITTE1,celsius)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="139" Y="44"/>
+          <Item Value="300" X="150" Y="57"/>		  
+          <Item Value="400" X="158" Y="78"/>
+          <Item Value="500" X="158" Y="102"/>
+          <Item Value="600" X="150" Y="123"/>
+          <Item Value="700" X="136" Y="141"/>
+          <Item Value="800" X="50" Y="148"/>
+          <Item Value="900" X="24" Y="66"/>
+ 	      <Item Value="1000" X="92" Y="20"/>
+		  <Item Value="1100" X="110" Y="25"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="5"/>
+    </Rotate>
+  </Element>
+ 
+  <Mouse>
+     <Tooltip>%Engine 1 Inter Turbine Temperature (%((L:ITTE1,celsius))%!d!&#176;C)</Tooltip>
+  </Mouse>
+</Gauge>

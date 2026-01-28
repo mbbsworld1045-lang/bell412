@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Comp" Version="1.0">
+ <Image Name="c_background.bmp"/>
+ 
+   <Element>
+      <MaskImage Name="c_win.bmp">
+         <Axis X="129" Y="122"/>
+      </MaskImage>
+      <Image Name="c_card.bmp">
+         <Nonlinearity>
+            <Item Value="360" X="84" Y="19"/>
+            <Item Value="180" X="300" Y="19"/>					 
+            <Item Value="0" X="516" Y="19"/>
+         </Nonlinearity>
+      </Image>
+      <Shift>
+         <Value>(A:Wiskey compass indication degrees,degrees) dnor</Value>
+      </Shift>
+   </Element>>
+  
+ <Element>
+    <Position X="128" Y="65"/>
+    <Image Name="c_m.bmp"/>
+ </Element>
+  
+  <Mouse>
+    <Tooltip ID="TOOLTIPTEXT_WHISKEY_COMPASS"/>
+  </Mouse>
+  
+</Gauge>

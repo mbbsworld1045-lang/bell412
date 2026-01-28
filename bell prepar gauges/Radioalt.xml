@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Radioalt" Version="1.0">
+ <Image Name="radioalt_background.bmp"/>
+ 
+  <Element>
+  <Position X="125" Y="125"/>
+    <Image Name="radioaltdecis_needle.bmp">
+      <Axis X="10" Y="101"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="-10" Maximum="1500">(A:DECISION HEIGHT,FEET)</Value>
+         <Nonlinearity>
+          <Item Value="0" Degrees="0"/>
+          <Item Value="50" Degrees="45"/>
+          <Item Value="100" Degrees="85.7"/>
+          <Item Value="150" Degrees="132.4"/>
+          <Item Value="200" Degrees="180"/>
+		  <Item Value="300" Degrees="-171"/>
+          <Item Value="500" Degrees="-152.8"/>
+          <Item Value="1000" Degrees="-109.2"/>
+          <Item Value="1500" Degrees="-66"/>
+       </Nonlinearity>
+    </Rotate>
+  </Element>
+  
+  <Element>
+  <Position X="0" Y="0"/>
+   <MaskImage Name="radioalt_win.bmp">
+      <Axis X="125" Y="125"/>
+   </MaskImage>
+      <Image Name="radioalt_Needle.bmp">
+      <Axis X="16" Y="94"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="-10" Maximum="1600">(L:MasterDcBus,bool) if{ (A:RADIO HEIGHT,FEET) (L:Radiotest,Feet) + (L:OVERRADIOH,FEET) + }</Value>
+       <Nonlinearity>
+          <Item Value="0" Degrees="0"/>
+          <Item Value="50" Degrees="45"/>
+          <Item Value="100" Degrees="85.7"/>
+          <Item Value="150" Degrees="132.4"/>
+          <Item Value="200" Degrees="180"/>
+		  <Item Value="300" Degrees="-171"/>
+          <Item Value="500" Degrees="-152.8"/>
+          <Item Value="1000" Degrees="-109.2"/>
+          <Item Value="1500" Degrees="-66"/>
+		  <Item Value="1600" Degrees="-33"/>
+	</Nonlinearity>
+	<Delay DegreesPerSecond="150"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+     <Select>
+        <Value>
+		(L:MStater,bool) 1 == if{ 1600 (&gt;L:OVERRADIOH,FEET) } els{ 0 (&gt;L:OVERRADIOH,FEET) }
+		</Value>
+     </Select>
+  </Element>
+  
+  <Element>
+     <Select>
+        <Value>
+		 (L:MStater,bool) 1 == if{ 1 (&gt;L:WARNINGOFF,BOOL) } els{ 0 (&gt;L:WARNINGOFF,BOOL) }
+		</Value>
+     </Select>
+  </Element>
+  
+  <Element>
+     <Select>
+        <Value>
+		(L:Testradaralt,bool) if{ 100 (&gt;L:Radiotest,Feet) } els{ 0 (&gt;L:Radiotest,Feet) }
+		</Value>
+     </Select>
+  </Element>
+ 
+  <Element>
+     <Select>
+        <Value>
+		 (L:MStater,bool) || (L:Testradaralt,bool) || if{ 0 (&gt;L:Raltflag,bool) } els{  1 (&gt;L:Raltflag,bool) }
+		</Value>
+     </Select>
+  </Element>
+  
+ 
+  <Element>
+     <MaskImage Name="radioalt_win.bmp">
+      <Axis X="193" Y="46"/>
+     </MaskImage>
+     <Image Name="radioalt_flag_off.bmp" PointsTo="Weast">
+      <Axis X="76" Y="15"/>
+     </Image>
+     <Rotate>
+        <Value>(L:MasterDcBus,bool) (L:Raltflag,bool) * </Value>
+         <Nonlinearity>
+	      <Item Value="0" Degrees="0"/>
+	      <Item Value="1" Degrees="150"/>
+    	</Nonlinearity>
+       <Delay DegreesPerSecond="200"/>
+     </Rotate>
+   </Element>
+
+  <Element>
+     <Position X="23" Y="22"/>
+     <Visible>(L:MasterDcBus,bool) (L:WARNINGOFF,BOOL) 0 == &amp;&amp; if{ (A:WARNING LOW HEIGHT,BOOL) || (L:Testradaralt,bool) || }</Visible>
+         <Image Name="radioalt_dh_on.bmp" Bright="Yes"/>
+  </Element>
+  
+ 
+  <Mouse>
+    <Tooltip ID="TOOLTIPTEXT_RADIO_ALTIMETER_FEET"/>
+		 
+    <Area Left="196" Top="200" Width="40" Height="40">
+	   <Tooltip ID="TOOLTIPTEXT_RADIO_ALTIMETER_DH_FEET"/>
+      <Area Right="20">
+        <Cursor Type="DownArrow"/>
+        <Click Event="DECREASE_DECISION_HEIGHT" Repeat="Yes"/>
+      </Area>
+      <Area Left="20">
+        <Cursor Type="UpArrow"/>
+        <Click Event="INCREASE_DECISION_HEIGHT" Repeat="Yes"/>
+      </Area>
+    </Area>
+
+    <Area Left="26" Top="214" Width="10" Height="10">
+        <Tooltip ID="">DH Test</Tooltip>
+	    <Cursor Type="Hand"/>
+	    <Click Kind="LeftSingle+Leave">
+		(M:Event) 'LeftSingle' scmp 0 == (L:Testradaralt,bool) 0 == and if{ 1 (&gt;L:Testradaralt,bool) }
+  		(M:Event) 'Leave' scmp 0 == (L:Testradaralt,bool) 1 == and if{ 0 (&gt;L:Testradaralt,bool) }			
+	    </Click>
+       </Area>
+   </Mouse>
+  
+</Gauge>
+

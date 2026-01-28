@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (A:Rotor RPM PCT:1, percent) s0 95 &lt;= s1 l0 100 &gt; l1 || (L:TestMC,enum) || }</Value>
+         <Case Value="1">
+            <Image Name="a_rpm_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+</Gauge>

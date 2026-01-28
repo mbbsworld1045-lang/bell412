@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <Gauge Name="R_NAV1" Version="1.0">
+  <Image Name="r_nav.bmp"/>
+
+  <Element>
+    <Position X="212" Y="211"/>
+    <Select>
+      <Value>(L:MasterACDC, bool) (L:nav1,bool) 1 == &amp;&amp;</Value>
+      <Case Value="1">
+         <Image Name="r_ledon.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+
+  <Element>
+   <Position X="19" Y="28"/>
+    <Select>
+      <Value>(L:MasterACDC, bool) (L:nav1,bool) 1 == &amp;&amp;</Value>
+      <Case Value="1">
+         <Image Name="r_screen_on.bmp" Bright="Yes"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Position X="235" Y="7"/>
+    <Select>
+      <Value>(L:nav1,bool)</Value>
+      <Case Value="1">
+         <Image Name="r_knob.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Visible>(L:MasterACDC, bool) (L:nav1,bool) 1 == &amp;&amp;</Visible> 
+   <Element> 
+    <Position X="31" Y="34"/>
+     <Text X="112" Y="34" Length="7" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((A:NAV1 ACTIVE FREQUENCY, MHz))%!6.2f!</String>
+     </Text>
+   </Element>
+   <Element> 
+    <Position X="31" Y="73"/>
+     <Text X="112" Y="34" Length="7" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((A:NAV1 STANDBY FREQUENCY, MHz))%!6.2f!</String>
+     </Text>
+   </Element>
+  </Element>
+ 
+ <Mouse>
+    <Area Left="235" Top="7" Width="40" Height="40">
+      <Tooltip>%NAV 1 On/Off(%((L:nav1,bool))%{if}On%{else}Off %{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:nav1,bool) ! (&gt;L:nav1,bool)</Click>
+    </Area>
+    <Area Left="211" Top="139" Width="34" Height="69">
+        <Help ID="HELPID_RADIO_NAV1"/>
+        <Tooltip ID="TOOLTIPTEXT_NAV1_FREQ"/>
+        <Cursor Type="UpArrow"/>
+        <Click Event="NAV1_RADIO_WHOLE_INC" Repeat="Yes"/>
+    </Area>      
+    <Area Left="245" Top="139" Width="34" Height="69">
+        <Help ID="HELPID_RADIO_NAV1"/>
+        <Tooltip ID="TOOLTIPTEXT_NAV1_FREQ"/>
+        <Cursor Type="DownArrow"/>
+        <Click Event="NAV1_RADIO_WHOLE_DEC" Repeat="Yes"/>
+    </Area>
+    <Area Left="219" Top="82" Width="26" Height="52">
+        <Help ID="HELPID_RADIO_NAV1"/>
+        <Tooltip ID="TOOLTIPTEXT_NAV1_FREQ"/>
+        <Cursor Type="UpArrow"/>
+        <Click Event="NAV1_RADIO_FRACT_INC" Repeat="Yes"/>
+    </Area>   
+    <Area Left="245" Top="82" Width="26" Height="52">
+        <Help ID="HELPID_RADIO_NAV1"/>
+        <Tooltip ID="TOOLTIPTEXT_NAV1_FREQ"/>
+        <Cursor Type="DownArrow"/>
+        <Click Event="NAV1_RADIO_FRACT_DEC" Repeat="Yes"/>
+    </Area>
+    <Area Left="168" Top="91" Width="17" Height="29">
+       <Tooltip ID="">Transfer Button</Tooltip>  
+	   <Click>(L:MasterACDC, bool) (L:nav1,bool) 1 == &amp;&amp; if{ 0 (>K:NAV_RADIO) 0 (>K:SELECT_1) 0 (>K:FREQUENCY_SWAP) }</Click>
+       <Cursor Type="Hand"/>
+    </Area>  
+  </Mouse>
+</Gauge>

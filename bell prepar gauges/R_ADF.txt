@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <Gauge Name="R_ADF" Version="1.0">
+  <Image Name="r_adf.bmp"/>
+
+  <Element>
+    <Position X="212" Y="211"/>
+    <Select>
+      <Value>(L:MasterACDC, bool) (L:adf,bool) 1 == &amp;&amp;</Value>
+      <Case Value="1">
+         <Image Name="r_ledon.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+
+  <Element>
+   <Position X="19" Y="28"/>
+    <Select>
+      <Value>(L:MasterACDC, bool) (L:adf,bool) 1 == &amp;&amp;</Value>
+      <Case Value="1">
+         <Image Name="r_screen_on.bmp" Bright="Yes"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Position X="235" Y="7"/>
+    <Select>
+      <Value>(L:adf,bool)</Value>
+      <Case Value="1">
+         <Image Name="r_knob.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Visible>(L:MasterACDC, bool) (L:adf,bool) 1 == &amp;&amp;</Visible> 
+   <Element> 
+    <Position X="50" Y="34"/>
+     <Text X="112" Y="34" Length="7" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+        <String>%((A:ADF ACTIVE FREQUENCY:1, kHz))%!4.0f!</String>
+     </Text>
+   </Element>
+   <Element> 
+    <Position X="50" Y="73"/>
+     <Text X="112" Y="34" Length="7" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((A:ADF ACTIVE FREQUENCY:2, kHz))%!4.0f!</String>
+     </Text>
+   </Element>
+  </Element>
+ 
+ <Mouse>
+    <Area Left="235" Top="7" Width="40" Height="40">
+      <Tooltip>%NAV 2 On/Off(%((L:adf,bool))%{if}On%{else}Off %{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:adf,bool) ! (&gt;L:adf,bool)</Click>
+    </Area>
+    <Area Left="211" Top="139" Width="22" Height="34">
+       <Click Event="ADF2_100_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="211" Top="173" Width="22" Height="34">
+       <Click Event="ADF2_100_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+
+    <Area Left="233" Top="139" Width="24" Height="34">
+       <Click Event="ADF2_10_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="233" Top="173" Width="24" Height="34">
+       <Click Event="ADF2_10_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+
+    <Area Left="257" Top="139" Width="22" Height="34">
+       <Click Event="ADF2_1_INC" Repeat="Yes"/>
+       <Cursor Type="UpArrow"/>
+    </Area>      
+
+    <Area Left="257" Top="173" Width="22" Height="34">
+       <Click Event="ADF2_1_DEC" Repeat="Yes"/>
+       <Cursor Type="DownArrow"/>
+    </Area>
+	
+    <Area Left="168" Top="91" Width="17" Height="29">
+       <Tooltip ID="">Transfer Button</Tooltip>  
+       <Cursor Type="Hand"/>
+	    <Click>
+		   (A:ADF ACTIVE FREQUENCY:2,Frequency ADF BCD32) (&gt;L:ADF Standby,Frequency ADF BCD32)
+		   (A:ADF1 ACTIVE FREQUENCY,Frequency ADF BCD32) (&gt;L:ADF Active,Frequency ADF BCD32)
+		   (L:ADF Active,Frequency ADF BCD32) (&gt;K:ADF2_COMPLETE_SET) 
+		   (L:ADF Standby,Frequency ADF BCD32) (&gt;K:ADF_COMPLETE_SET) 
+       </Click>
+    </Area>  
+  </Mouse>
+</Gauge>

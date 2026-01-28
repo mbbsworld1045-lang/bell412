@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="chip_plnty" Version="1.0">
+ 
+<Element>
+  <Select>
+    <Value>(L:chip plnty, bool)</Value>
+      <Case Value="0">
+         <Image Name="chip.bmp"/>
+       </Case>
+       <Case Value="1">
+          <Image Name="chip_test.bmp"/>
+       </Case>
+     </Select>
+</Element>
+
+  <Mouse>     
+        <Cursor Type="Hand"/>
+        <Click Kind="LeftSingle+Leave">
+		(M:Event) 'LeftSingle' scmp 0 == (L:chip plnty, bool) 0 == and if{ 1 (&gt;L:chip plnty, bool) }
+  		(M:Event) 'Leave' scmp 0 == (L:chip plnty, bool) 1 == and if{ 0 (&gt;L:chip plnty, bool) }			
+	  </Click>
+   </Mouse>
+</Gauge>

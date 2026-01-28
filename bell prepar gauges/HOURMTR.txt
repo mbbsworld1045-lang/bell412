@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Hourmtr" Version="1.0">
+  <Image Name="hourmtr.bmp"/>
+
+<Element>
+  <Position X="40" Y="71"/>
+   <MaskImage Name="win_hmeter.bmp">
+    <Axis X="41" Y="7"/>
+   </MaskImage>
+   <Image Name="hour1.bmp">
+    <Nonlinearity>
+     <Item Value="0" X="0" Y="7"/>
+     <Item Value="100" X="0" Y="90"/>     
+    </Nonlinearity>
+   </Image>
+   <Shift>
+    <Value>(A:GENERAL ENG ELAPSED TIME:1,minutes) 100 %</Value>
+   </Shift>
+</Element>
+
+<Element>
+  <Position X="40" Y="71"/>
+   <MaskImage Name="win_hmeter.bmp">
+    <Axis X="31" Y="7"/>
+   </MaskImage>
+   <Image Name="hour10.bmp">
+    <Nonlinearity>
+     <Item Value="0" X="0" Y="7"/>
+     <Item Value="10" X="0" Y="147"/>     
+    </Nonlinearity>
+   </Image>
+   <Shift>
+    <Value>(A:GENERAL ENG ELAPSED TIME:1,hours) 10 %</Value>
+   </Shift>
+</Element>
+
+<Element>
+  <Position X="40" Y="71"/>
+   <MaskImage Name="win_hmeter.bmp">
+    <Axis X="21" Y="7"/>
+   </MaskImage>
+   <Image Name="hour10.bmp">
+    <Nonlinearity>
+     <Item Value="0" X="0" Y="7"/>
+     <Item Value="100" X="0" Y="147"/>     
+    </Nonlinearity>
+   </Image>
+   <Shift>
+    <Value>(A:GENERAL ENG ELAPSED TIME:1,hours) 100 %</Value>
+   </Shift>
+</Element>
+
+<Element>
+  <Position X="40" Y="71"/>
+   <MaskImage Name="win_hmeter.bmp">
+    <Axis X="11" Y="7"/>
+   </MaskImage>
+   <Image Name="hour10.bmp">
+    <Nonlinearity>
+     <Item Value="0" X="0" Y="7"/>
+     <Item Value="1000" X="0" Y="147"/>     
+    </Nonlinearity>
+   </Image>
+   <Shift>
+    <Value>(A:GENERAL ENG ELAPSED TIME:1,hours) 1000 %</Value>
+   </Shift>
+</Element>
+
+<Element>
+  <Position X="40" Y="71"/>
+   <MaskImage Name="win_hmeter.bmp">
+    <Axis X="1" Y="7"/>
+   </MaskImage>
+   <Image Name="hour10.bmp">
+    <Nonlinearity>
+     <Item Value="0" X="0" Y="7"/>
+     <Item Value="10000" X="0" Y="147"/>     
+    </Nonlinearity>
+   </Image>
+   <Shift>
+    <Value>(A:GENERAL ENG ELAPSED TIME:1,hours) 10000 %</Value>
+   </Shift>
+</Element>
+
+</Gauge>

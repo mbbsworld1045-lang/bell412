@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_masterc_background.bmp"/>
+
+   <Element>
+     <Select>
+       <Value>(L:MasterDcBus,bool) if{
+(L:TestMC,enum) || (L:OILE1,psi) 50 &lt; || (L:OILE2,psi) 50 &lt; || (L:SwvalveEng1,bool) 0 == || (L:SwvalveEng2,bool) 0 == || (L:SwboostpuEng1,bool) 0 == || (L:SwboostpuEng2,bool) 0 == || (L:SwfueltransengA,bool) 0 == || (L:SwfueltransengB,bool) 0 == || (L:Swbatta,bool) (L:Swbattb,bool) 1 == &amp;&amp; || (A:FUEL TANK CENTER LEVEL,percent) 9.2 &lt; || (L:Swfuelintcon,bool) || (L:SwFuelxfeed,bool) || (L:SepP1,bool) == 0 || (L:SwpartsepA,bool)  || (L:SepP2,bool) == 0 || (L:SwpartsepB,bool) || (L:SwGovA,bool) || (L:SwGovB,bool) || (L:CGenel,bool) 0 == || (L:CGener,bool) 0 == || (A:Rotor Brake Active,bool) || (L:Swinva, bool) 0 == || (L:Swinvb, bool) 0 == || (L:SwHeater,bool) || (L:Door passenger l,percent) || (L:Door passenger r,percent) || (L:Door baggage,position) || (L:Gbox, psi) 40 &lt; || (L:XMSN,psi) 30 &lt; || (L:GboxT, celsius) 0 &lt; || (L:XMSNT,celsius) 0 &lt; || (L:Sw hydsysA,bool) || (L:Sw hydsysB,bool) || (L:ExternalPower,bool) ||
+		}		 
+	   </Value>
+       <Case Value="1">
+          <Image Name="a_masterc_on.bmp" Bright="Yes"/>
+       </Case>
+      </Select>
+   </Element>
+ 
+</Gauge>

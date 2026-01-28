@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="GEARBOX" Version="1.0">
+ <Image Name="gearbox_background.bmp"/>
+
+
+<!-- ========================= OIL TEMP ========================= --> 
+  <Element>
+    <Position X="72" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="-5" Maximum="150">(L:MasterDcBus,bool) 1 ==  if{ (L:GboxT, celsius) } els{ -5 }</Value>
+        <Nonlinearity>
+ 	      <Item Value="-5" X="52" Y="139"/>
+		  <Item Value="0" X="28" Y="119"/>
+		  <Item Value="50" X="19" Y="90"/>
+		  <Item Value="100" X="30" Y="57"/>
+		  <Item Value="150" X="56" Y="38"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="15"/>
+    </Rotate>
+  </Element>
+
+<!-- ========================= OIL PRESS ========================= --> 
+  <Element>
+    <Position X="106" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value>(L:Gbox, psi)</Value>
+        <Nonlinearity>
+          <Item Value="100" Degrees="-72"/>		
+          <Item Value="80" Degrees="-44"/>		
+          <Item Value="60" Degrees="-14"/>
+          <Item Value="40" Degrees="15"/>
+          <Item Value="20" Degrees="47"/>		  		  		
+		  <Item Value="0" Degrees="74"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="10"/>
+    </Rotate>
+  </Element>
+  
+ 
+  <Element>
+   <Position X="63" Y="81"/>
+     <Image Name="oil_f.bmp"/>
+  </Element> 
+ 
+  <Mouse>
+  
+<!-- OIL TEMP -->
+   <Area Left="10" Top="9" Width="80" Height="160">
+      <Tooltip>%Transmission Oil Temperature(%((L:MasterDcBus,bool) 1 ==  if{ (L:GboxT, celsius) } els{ -5 })%!d!&#176;C)</Tooltip>
+   </Area>
+   
+<!-- OIL PRESS -->
+   <Area Left="89" Top="9" Width="80" Height="160">
+      <Tooltip>%Transmission Oil Pressure(%((L:Gbox, psi))%!d!PSI)</Tooltip>
+   </Area>
+
+  </Mouse>
+</Gauge>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_cyc_background.bmp"/>
+
+  <Element>
+    <Position X="0" Y="0"/>
+    <Select>
+      <Value>(L:MasterDcBus,bool) 1 == (A:Rotor RPM PCT:1, percent) 95 &lt; &amp;&amp; if{ (A:YOKE X POSITION,percent) (A:YOKE Y POSITION,percent) -7 max 7 min } </Value>
+       <Case Value="-7">
+       <Image Name="a_cyc_on.bmp" Bright="Yes"/>
+       </Case>
+       <Case Value="7">
+       <Image Name="a_cyc_on.bmp" Bright="Yes"/>
+       </Case>
+     </Select>
+  </Element>
+  
+  <Element>
+    <Position X="0" Y="0"/>
+    <Select>
+      <Value>(L:MasterDcBus,bool) if{ (L:Cyctest,bool) } </Value>
+       <Case Value="1">
+       <Image Name="a_cyc_on.bmp" Bright="Yes"/>
+       </Case>
+     </Select>
+  </Element>
+
+<Mouse>
+ <Tooltip ID="">Cyc Control</Tooltip>
+  <Cursor Type="Hand"/>
+   <Click Kind="LeftSingle+Leave">
+	(M:Event) 'LeftSingle' scmp 0 == (L:Cyctest,bool) 0 == and if{ 1 (&gt;L:Cyctest,bool) }
+    (M:Event) 'Leave' scmp 0 == (L:Cyctest,bool) 1 == and if{ 0 (&gt;L:Cyctest,bool) }			
+   </Click>
+</Mouse>
+</Gauge>
+
+
+
+ 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="AFCS" Version="1.0">
+ <Image Name="afcs_background.bmp"/>
+ 
+  <Element>
+    <Position X="41" Y="24"/>
+    <Image Name="afcs_1.bmp" PointsTo="South">
+      <Axis X="5" Y="5"/>
+    </Image>
+    <Rotate>
+      <Value>(L:MasterDcBus,bool) if{ (A:RUDDER POSITION,percent) }</Value>
+       <Nonlinearity>
+	   <Item Value="100" X="70" Y="54"/>
+         <Item Value="0" X="41" Y="65"/>
+         <Item Value="-100" X="12" Y="54"/>
+       </Nonlinearity>
+      <Delay DegreesPerSecond="30"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="130" Y="56"/>
+    <Image Name="afcs_2.bmp" PointsTo="North">
+      <Axis X="5" Y="41"/>
+    </Image>
+    <Rotate>
+      <Value>(L:MasterDcBus,bool) if{ (A:AILERON POSITION,percent) }</Value>
+       <Nonlinearity>
+	   <Item Value="-100" X="104" Y="24"/>
+         <Item Value="0" X="130" Y="15"/>
+         <Item Value="100" X="155" Y="24"/>
+       </Nonlinearity>
+      <Delay DegreesPerSecond="30"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="233" Y="40"/>
+    <Image Name="afcs_3.bmp" PointsTo="West">
+      <Axis X="40" Y="5"/>
+    </Image>
+    <Rotate>
+      <Value>(L:MasterDcBus,bool) if{ (A:ELEVATOR POSITION,percent) }</Value>
+       <Nonlinearity>
+	   <Item Value="-100" X="200" Y="66"/>
+         <Item Value="0" X="192" Y="40"/>
+         <Item Value="100" X="204" Y="10"/>
+       </Nonlinearity>
+      <Delay DegreesPerSecond="30"/>
+    </Rotate>
+  </Element>
+
+</Gauge>

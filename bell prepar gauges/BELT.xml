@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="belts_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:Genmast,bool) }</Value>
+         <Case Value="1">
+            <Image Name="belts_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+</Gauge>

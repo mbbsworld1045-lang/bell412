@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="OAT" Version="1.0">
+ <Image Name="oat_background.bmp"/>
+ 
+  <Element>
+    <Position X="130" Y="130"/>
+    <Image Name="oat_needle.bmp" PointsTo="North">
+      <Axis X="10" Y="109"/>
+    </Image>
+    <Rotate>
+     <Value Minimum="-70.0" Maximum="50.0">(A:Total Air Temperature,Celsius)</Value>
+      <Nonlinearity>
+         <Item Value="-70" X="84" Y="232"/>
+         <Item Value="0" X="174" Y="26"/>
+         <Item Value="50" X="183" Y="227"/>
+      </Nonlinearity>
+    </Rotate>
+  </Element>
+  
+  <Mouse>
+    <Tooltip ID="TOOLTIPTEXT_AMBIENT_TEMPERATURE_CELSIUS"/>
+  </Mouse>
+</Gauge>

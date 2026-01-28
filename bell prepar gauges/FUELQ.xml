@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="FUELQ" Version="1.0">
+ <Image Name="fuelq_background.bmp"/>
+
+
+  <Element>
+    <Position X="71" Y="76"/>
+    <Image Name="fuelq_needle.bmp" PointsTo="East">
+      <Axis X="7" Y="8"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="0" Maximum="2200">(L:MasterDcBus,bool) 1 == if{ (L:fuelq,pound) (L:fuelqtc,pound) + } els{ 0 }</Value>
+        <Nonlinearity>
+		  <Item Value="0" X="37" Y="111"/>
+		  <Item Value="1000" X="26" Y="63"/>
+		  <Item Value="2200" X="70" Y="27"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="108" Y="76"/>
+    <Image Name="fuelq_needle.bmp" PointsTo="East">
+      <Axis X="7" Y="8"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="0" Maximum="2200">(L:MasterDcBus,bool) 1 == if{ (L:fuelq,pound) (L:fuelqtc,pound) + } els{ 0 }</Value>
+        <Nonlinearity>
+          <Item Value="2200" X="109" Y="28"/>
+ 	      <Item Value="1000" X="153" Y="63"/>
+		  <Item Value="0" X="141" Y="110"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+   <Visible>(L:Digitstest,bool) 0 == </Visible>
+    <Position X="59" Y="126"/>
+     <Text X="58" Y="24" Length="4" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="#ffd44f" Bright="Yes">
+       <String>%((L:fuelq,pound))%!4d!</String>
+	 </Text>
+	 <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  
+  <Element>
+   <Visible>(L:Digitstest,bool) 1 == </Visible>
+    <Position X="59" Y="126"/>
+     <Text X="58" Y="24" Length="4" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="#ffd44f" Bright="Yes">
+       <String>%((L:fuelqt,enum))%!4d!</String>
+	 </Text>
+	 <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+    </Failures>
+  </Element>
+
+
+</Gauge>

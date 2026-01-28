@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="ATT" Version="1.0">
+ <Image Name="att_background.bmp"/>
+
+  <Element>
+   <Position X="0" Y="0"/>
+   <MaskImage Name="att_win.bmp">
+      <Axis X="170" Y="165"/>
+   </MaskImage>
+   <Image Name="att_horizon.bmp">
+      <Axis X="147" Y="147"/>
+   </Image>
+   <Shift>
+      <Value>(L:MasterACDC, bool) if{ (A:ATTITUDE INDICATOR PITCH DEGREES,degrees) /-/ } </Value>
+      <Scale Y="2.2"/>
+    </Shift>
+    <Rotate>
+       <Value>(L:MasterACDC, bool) if{ (A:ATTITUDE INDICATOR BANK DEGREES,radians) } els{ 0.50 }</Value>
+    </Rotate>
+  </Element>
+
+  <Element> 
+    <Position X="170" Y="165"/>
+    <Image Name="att_pointer.bmp" PointsTo="east">
+      <Axis X="6" Y="102"/>
+    </Image>
+	<Rotate>
+      <Value>(G:Var2) 1 * dgrd </Value>
+    </Rotate>
+    <Rotate>
+      <Value>(L:MasterACDC, bool) if{ (A:Attitude indicator bank degrees,radians) }</Value>
+    </Rotate>
+  </Element>
+  
+<!-- ======================= flag ================================= -->
+
+<Element>
+    <Position X="0" Y="0"/>
+     <MaskImage Name="att_win_2.bmp">
+      <Axis X="63" Y="255"/>
+    </MaskImage>
+    <Image Name="att_flag.bmp" PointsTo="Weast">
+      <Axis X="2" Y="33"/>
+    </Image>
+     <Rotate>
+      <Value>(L:MasterACDC, bool)</Value>
+      <Nonlinearity>
+	    <Item Value="0" Degrees="0"/>
+   	    <Item Value="1" Degrees="115"/>
+	  </Nonlinearity>
+      <Delay DegreesPerSecond="190"/>
+    </Rotate>
+</Element>
+
+<Element>
+    <Position X="0" Y="0"/>
+     <MaskImage Name="att_win_2.bmp">
+      <Axis X="38" Y="183"/>
+    </MaskImage>
+    <Image Name="att_gs.bmp" PointsTo="Weast">
+      <Axis X="0" Y="35"/>
+    </Image>
+     <Rotate>
+      <Value>(L:MasterACDC, bool)</Value>
+      <Nonlinearity>
+	  <Item Value="1" Degrees="-70"/>
+	  <Item Value="0" Degrees="0"/>
+	 </Nonlinearity>
+      <Delay DegreesPerSecond="190"/>
+    </Rotate>
+</Element>
+
+<Element>
+    <Position X="0" Y="0"/>
+     <MaskImage Name="att_win_2.bmp">
+      <Axis X="92" Y="47"/>
+    </MaskImage>
+    <Image Name="att_fd.bmp" PointsTo="Weast">
+      <Axis X="13" Y="0"/>
+    </Image>
+     <Rotate>
+      <Value>(L:MasterACDC, bool)</Value>
+     <Nonlinearity>
+	  <Item Value="0" Degrees="0"/>
+	  <Item Value="1" Degrees="70"/>
+	 </Nonlinearity>
+      <Delay DegreesPerSecond="190"/>
+    </Rotate>
+</Element>
+
+<Element>
+    <Position X="0" Y="0"/>
+     <MaskImage Name="att_win_2.bmp">
+      <Axis X="303" Y="240"/>
+    </MaskImage>
+    <Image Name="att_rt.bmp">
+      <Axis X="25" Y="30"/>
+    </Image>
+     <Rotate>
+      <Value>(L:MasterACDC, bool)</Value>
+      <Nonlinearity>
+      	<Item Value="0" Degrees="0"/>
+	    <Item Value="1" Degrees="-78"/>
+	 </Nonlinearity>
+      <Delay DegreesPerSecond="190"/>
+    </Rotate>
+</Element>
+
+ <!-- ======================= Aircraft Symbol ==================== -->
+  <Element>
+    <Position X="44" Y="165"/>
+     <Image Name="att_aircraft.bmp" PointsTo="Weast">
+      <Axis X="0" Y="0"/>
+    </Image>
+    <Shift>
+      <Value Minimum="-70" Maximum="70">(G:Var1)</Value>
+      <Scale Y="1"/>
+    </Shift>
+   </Element>
+
+ <Element>
+  <Position X="0" Y="0"/>
+    <MaskImage Name="att_win_2.bmp">
+      <Axis X="170" Y="22"/>
+    </MaskImage>
+    <Image Name="att_needle_1.bmp">
+          <Axis X="17" Y="0"/>
+     </Image>
+     <Shift>
+      <Value>(L:MasterACDC, bool) if{ (A:NAV CDI:1, number) (L:Mlocnav, number) + }</Value>
+      <Scale X="0.65"/>
+      <Delay PixelsPerSecond="80"/>
+   </Shift>
+ </Element>
+ 
+ <Element>
+  <Position X="0" Y="0"/>
+    <MaskImage Name="att_win_2.bmp">
+      <Axis X="44" Y="169"/>
+    </MaskImage>
+    <Image Name="att_needle_2.bmp">
+          <Axis X="0" Y="17"/>
+     </Image>
+     <Shift>
+      <Value>(L:MasterACDC, bool) if{ (A:NAV GSI:1, number) (L:Mgsnav, number) + }</Value>
+      <Scale Y="0.30"/>
+      <Delay PixelsPerSecond="80"/>
+   </Shift>
+ </Element>
+
+<!-- ======================= Cage Knob =========================== -->
+  <Element>
+    <Position X="380" Y="134"/>
+    <Image Name="att_cage.bmp">
+      <Axis X="29.5" Y="29.5"/>
+    </Image>
+     <Rotate>
+      <Value>(G:Var1) -10 * dgrd</Value>
+      <Delay DegreesPerSecond="90"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="383" Y="220"/>
+    <Image Name="att_knob.bmp">
+      <Axis X="29.5" Y="29.5"/>
+    </Image>
+    <Rotate>
+      <Value>(G:Var2) 10 * dgrd</Value>
+      <Delay DegreesPerSecond="90"/>
+    </Rotate>
+  </Element>
+  
+<!-- ======================= Skid Ball =========================== -->
+<Element>
+  <Image Name="att_ball.bmp">
+      <Axis X="8" Y="8"/>
+   </Image>
+   <Shift>
+    <Value>(A:Turn coordinator ball,position)</Value>
+    <Nonlinearity>
+	   <Item Value="-1" X="137" Y="301"/>
+       <Item Value="0" X="170" Y="303"/>
+       <Item Value="1" X="203" Y="301"/>
+    </Nonlinearity>
+    <Delay PixelsPerSecond="20"/>
+   </Shift>
+</Element>
+
+<Element>
+  <Image Name="att_bank.bmp">
+      <Axis X="9" Y="8"/>
+   </Image>
+   <Shift>
+    <Value Minimum="-1.5" Maximum="1.5">(A:Delta heading rate,rpm)</Value>
+    <Nonlinearity>
+	   <Item Value="-1.5" X="137" Y="330"/>
+       <Item Value="0" X="170" Y="330"/>
+       <Item Value="1.5" X="203" Y="330"/>
+    </Nonlinearity>
+    <Delay PixelsPerSecond="20"/>
+   </Shift>
+</Element>
+
+ <Element>
+    <Position X="160" Y="293"/>
+    <Image Name="att_tube_lines.bmp"/>
+ </Element>
+ 
+  <Mouse>
+ <!-- CAGE Knob -->
+    <Area Left="351" Top="105" Width="60" Height="60">
+      <Area Right="30">
+        <Cursor Type="DownArrow"/>
+        <Click Repeat="Yes">
+          (G:Var1) 1 + 12 min (&gt;G:Var1)
+        </Click>
+      </Area>
+      <Area Left="30">
+        <Cursor Type="UpArrow"/>
+        <Click Repeat="Yes">
+          (G:Var1) 1 - -12 max (&gt;G:Var1)
+        </Click>
+      </Area>
+    </Area>
+
+   <Area Left="354" Top="191" Width="60" Height="60">
+	<Area Left="30">
+        <Cursor Type="UpArrow"/>
+        <Click Repeat="Yes">
+		  (G:Var2) 1 + 30 min (&gt;G:Var2)
+        </Click>
+      </Area>
+      <Area Right="30">
+        <Cursor Type="DownArrow"/>
+        <Click Repeat="Yes">
+          (G:Var2) 1 - -30 max (&gt;G:Var2)
+        </Click>
+      </Area>
+    </Area>
+  </Mouse>
+</Gauge>

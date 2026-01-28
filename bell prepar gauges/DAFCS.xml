@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="DAFCS" Version="1.0">
+ <Image Name="dafcs_background.bmp"/>
+
+
+  <Element>
+   <Visible>(L:Dafcssel,enum) 1 ==</Visible>
+  <Element>
+    <Position X="66" Y="15"/>
+     <Text X="72" Y="19" Length="4" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((L:pitotcovers,bool) 0 == if{ (A:AIRSPEED TRUE,Knots) })%!4d!</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  <Element>
+    <Position X="46" Y="14"/>
+     <Text X="20" Y="10" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>KT</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  </Element>
+  
+  <Element>
+   <Visible>(L:Dafcssel,enum) 2 ==</Visible>
+  <Element>
+     <Position X="66" Y="15"/>
+     <Text X="72" Y="19" Length="4" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((L:pitotcovers,bool) 0 == if{ (A:Vertical speed,feet per minute) })%!4d!</String>
+	 </Text>
+	 <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+    </Failures>
+  </Element>
+  <Element>
+    <Position X="48" Y="14"/>
+     <Text X="20" Y="10" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>FT</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  <Element>
+    <Position X="46" Y="25"/>
+     <Text X="18" Y="10" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>MIN</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  </Element>
+  
+  <Mouse> 
+   <Area Left="119" Top="45" Width="24" Height="24">
+    <Cursor Type="Hand"/>
+     <Click>(L:Dafcssel,enum) ++ d 2 &gt; if{ 0 } (&gt;L:Dafcssel,enum)</Click>  
+   </Area>
+  </Mouse>
+</Gauge>

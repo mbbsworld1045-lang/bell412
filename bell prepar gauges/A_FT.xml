@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:AFTcall,bool) || (L:Sw forcetrim,bool) || }</Value>
+         <Case Value="1">
+            <Image Name="a_ft_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+<Mouse>
+ <Tooltip ID="">Test</Tooltip>
+  <Cursor Type="Hand"/>
+   <Click Kind="LeftSingle+Leave">
+	(M:Event) 'LeftSingle' scmp 0 == (L:AFTcall,bool) 0 == and if{ 1 (&gt;L:AFTcall,bool) }
+    (M:Event) 'Leave' scmp 0 == (L:AFTcall,bool) 1 == and if{ 0 (&gt;L:AFTcall,bool) }			
+   </Click>
+</Mouse>
+
+</Gauge>

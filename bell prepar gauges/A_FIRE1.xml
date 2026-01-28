@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_fire1_b.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:Swfiretest,bool) || (L:firethandl,bool) || }</Value>
+         <Case Value="1">
+            <Image Name="a_fire1_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+  <Mouse>
+   <Tooltip ID="">Fire 1 Pull Handle Switch</Tooltip>
+    <Cursor Type="Hand"/>
+       <Click>(L:firethandl,bool) ! (&gt;L:firethandl,bool)</Click>
+  </Mouse>
+</Gauge>

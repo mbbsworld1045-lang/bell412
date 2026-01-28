@@ -1,0 +1,353 @@
+-- =============================================================================
+-- BELL 412 - TRANSMISSION & GOVERNOR LOGIC
+-- Platform: Air Manager + Arduino Mega 2560
+-- Hardware: Arduino Channel C (Collective Panel)
+-- Logic: Buttons Only (Active Low)
+-- =============================================================================
+
+-- =============================================================================
+-- 1. HARDWARE CONFIGURATION HEADER
+-- =============================================================================
+-- INPUTS (Buttons) D20..D25
+local PIN_GOV_MODE  = "ARDUINO_MEGA2560_C_D20"
+local PIN_RPM_SWITCH_POS1 = "ARDUINO_MEGA2560_C_D21"  -- Governor RPM Switch Position 1 (State = 1)
+local PIN_RPM_SWITCH_POS2 = "ARDUINO_MEGA2560_C_D22"  -- Governor RPM Switch Position 2 (State = -1)
+local PIN_GOV_ENG1  = "ARDUINO_MEGA2560_C_D23"  -- Governor Engine 1 Switch
+local PIN_GOV_ENG2  = "ARDUINO_MEGA2560_C_D25"  -- Governor Engine 2 Switch
+
+-- OUTPUTS (LEDs) D41..D43 (CWP Warning Lights)
+local PIN_GOV_A_WARN_LED = "ARDUINO_MEGA2560_C_D41"
+local PIN_GOV_B_WARN_LED = "ARDUINO_MEGA2560_C_D42"
+local PIN_CHIP_DET_LED   = "ARDUINO_MEGA2560_C_D43"
+
+-- OUTPUTS (LEDs) D32-D33 (Switch Status LEDs)
+local PIN_GOV_ENG1_LED   = "ARDUINO_MEGA2560_C_D32"  -- Governor Engine 1 Switch Status
+local PIN_GOV_ENG2_LED   = "ARDUINO_MEGA2560_C_D33"  -- Governor Engine 2 Switch Status
+
+-- OUTPUTS (LEDs) D50..D53 (XMSN/CBOX Panel Lights)
+local PIN_GOV_MAN_LED    = "ARDUINO_MEGA2560_C_D50"
+local PIN_XMSN_PRESS_LED = "ARDUINO_MEGA2560_C_D51"
+local PIN_XMSN_TEMP_LED  = "ARDUINO_MEGA2560_C_D52"
+local PIN_CBOX_PRESS_LED = "ARDUINO_MEGA2560_C_D53"
+
+-- =============================================================================
+-- 2. INITIALIZE HARDWARE LEDS
+-- =============================================================================
+-- CWP Warning LEDs
+local led_gov_a_warn_h = hw_led_add(PIN_GOV_A_WARN_LED, 0.0)
+local led_gov_b_warn_h = hw_led_add(PIN_GOV_B_WARN_LED, 0.0)
+local led_chip_det_h   = hw_led_add(PIN_CHIP_DET_LED, 0.0)
+
+-- Switch Status LEDs
+local led_gov_eng1_h   = hw_led_add(PIN_GOV_ENG1_LED, 0.0)  -- Governor Engine 1 Status
+local led_gov_eng2_h   = hw_led_add(PIN_GOV_ENG2_LED, 0.0)  -- Governor Engine 2 Status
+
+-- XMSN/CBOX Panel LEDs
+local led_gov_man_h    = hw_led_add(PIN_GOV_MAN_LED, 0.0)
+local led_xmsn_press_h = hw_led_add(PIN_XMSN_PRESS_LED, 0.0)
+local led_xmsn_temp_h  = hw_led_add(PIN_XMSN_TEMP_LED, 0.0)
+local led_cbox_press_h = hw_led_add(PIN_CBOX_PRESS_LED, 0.0)
+
+-- =============================================================================
+-- 3. INTERNAL VARIABLES & CONSTANTS
+-- =============================================================================
+-- Warning Thresholds
+local XMSN_PRESS_LOW  = 30.0
+local XMSN_TEMP_HIGH  = 120.0
+local CBOX_PRESS_LOW  = 25.0
+
+-- Local State (Switch/Button Positions)
+local sw_gov_manual = 0
+local sw_gov_eng1   = 0  -- Governor Engine 1 switch state
+local sw_gov_eng2   = 0  -- Governor Engine 2 switch state
+
+-- Governor RPM Switch State (3-position: 0=OFF, 1=Position 1, -1=Position 2)
+local rpm_switch_pos1_pressed = false
+local rpm_switch_pos2_pressed = false
+local rpm_switch_state = 0
+
+-- RPM Beep Timer
+local rpm_timer = nil
+
+-- Sim Feedback Variables
+local dc_bus        = 0
+local xmsn_oil_psi  = 50.0
+local xmsn_oil_temp = 80.0
+local cbox_oil_psi  = 50.0
+
+-- Warning States (Computed)
+local xmsn_press_warn = 0
+local xmsn_temp_warn  = 0
+local cbox_press_warn = 0
+
+-- CWP Subscribed Warning States
+local gov_a_warn   = 0
+local gov_b_warn   = 0
+local chip_det_warn = 0
+
+-- =============================================================================
+-- 4. SYSTEM LOGIC FUNCTIONS
+-- =============================================================================
+
+-- LED UPDATE: Governor Mode Direct Feedback
+local function update_gov_led()
+    hw_led_set(led_gov_man_h, (sw_gov_manual == 1) and 1.0 or 0.0)
+end
+
+-- LED UPDATE: Governor Engine Switch Status
+local function update_gov_switch_leds()
+    hw_led_set(led_gov_eng1_h, (sw_gov_eng1 == 1) and 1.0 or 0.0)
+    hw_led_set(led_gov_eng2_h, (sw_gov_eng2 == 1) and 1.0 or 0.0)
+end
+
+-- WARNINGS: Calculate from oil pressure/temp
+local function update_warnings()
+    if dc_bus == 0 then
+        xmsn_press_warn = 0
+        xmsn_temp_warn  = 0
+        cbox_press_warn = 0
+    else
+        xmsn_press_warn = (xmsn_oil_psi < XMSN_PRESS_LOW) and 1 or 0
+        xmsn_temp_warn  = (xmsn_oil_temp > XMSN_TEMP_HIGH) and 1 or 0
+        cbox_press_warn = (cbox_oil_psi < CBOX_PRESS_LOW) and 1 or 0
+    end
+
+    -- Write to Sim
+    fsx_variable_write("L:XmsnPressWarn", "Number", xmsn_press_warn)
+    fsx_variable_write("L:XmsnTempWarn", "Number", xmsn_temp_warn)
+    fsx_variable_write("L:CboxPressWarn", "Number", cbox_press_warn)
+
+    -- Update Warning LEDs
+    hw_led_set(led_xmsn_press_h, (xmsn_press_warn == 1) and 1.0 or 0.0)
+    hw_led_set(led_xmsn_temp_h, (xmsn_temp_warn == 1) and 1.0 or 0.0)
+    hw_led_set(led_cbox_press_h, (cbox_press_warn == 1) and 1.0 or 0.0)
+end
+
+-- CWP WARNING LEDs: Update from subscribed states
+local function update_cwp_warning_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_gov_a_warn_h, 0.0)
+        hw_led_set(led_gov_b_warn_h, 0.0)
+        hw_led_set(led_chip_det_h, 0.0)
+    else
+        hw_led_set(led_gov_a_warn_h, (gov_a_warn == 1) and 1.0 or 0.0)
+        hw_led_set(led_gov_b_warn_h, (gov_b_warn == 1) and 1.0 or 0.0)
+        hw_led_set(led_chip_det_h, (chip_det_warn == 1) and 1.0 or 0.0)
+    end
+end
+
+-- GOVERNOR RPM SWITCH: Update state based on two position pins (3-position: 0=OFF, 1=Position 1, -1=Position 2)
+local function update_rpm_switch_state()
+    local new_state = 0
+    
+    if rpm_switch_pos1_pressed then
+        new_state = 1  -- Position 1 (D21) - RPM Increase
+    elseif rpm_switch_pos2_pressed then
+        new_state = -1  -- Position 2 (D22) - RPM Decrease
+    else
+        new_state = 0  -- OFF (both released)
+    end
+    
+    if rpm_switch_state ~= new_state then
+        rpm_switch_state = new_state
+        fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", rpm_switch_state)
+        print("RPM SWITCH: State changed to " .. tostring(rpm_switch_state))
+        
+        -- Start/stop timer based on switch state
+        if rpm_switch_state == 1 then
+            start_rpm_timer()
+        elseif rpm_switch_state == -1 then
+            start_rpm_timer()
+        else
+            stop_rpm_timer()
+        end
+    end
+end
+
+-- RPM BEEP TIMER: Continuous while switch is in position 1 or -1
+local function start_rpm_timer()
+    if rpm_timer ~= nil then return end
+    if timer_start == nil then return end
+
+    rpm_timer = timer_start(0, 100, function()
+        if rpm_switch_state == 1 then
+            fsx_event("ROTOR_GOV_RPM_INC")
+        elseif rpm_switch_state == -1 then
+            fsx_event("ROTOR_GOV_RPM_DEC")
+        else
+            if rpm_timer ~= nil and timer_stop ~= nil then
+                pcall(timer_stop, rpm_timer)
+                rpm_timer = nil
+            end
+        end
+    end)
+end
+
+local function stop_rpm_timer()
+    if rpm_timer ~= nil and timer_stop ~= nil then
+        pcall(timer_stop, rpm_timer)
+        rpm_timer = nil
+    end
+end
+
+-- =============================================================================
+-- 5. HARDWARE INPUTS (BUTTONS)
+-- =============================================================================
+
+-- GOVERNOR MODE (Auto=OFF, Manual=ON)
+hw_button_add(PIN_GOV_MODE,
+    function() -- PRESSED (Manual)
+        print("ACTION: Gov Mode -> MANUAL")
+        sw_gov_manual = 1
+        fsx_variable_write("L:GovMode", "Number", 1)
+        update_gov_led()
+    end,
+    function() -- RELEASED (Auto)
+        print("ACTION: Gov Mode -> AUTO")
+        sw_gov_manual = 0
+        fsx_variable_write("L:GovMode", "Number", 0)
+        update_gov_led()
+    end
+)
+
+-- GOVERNOR RPM SWITCH (3-Position: 0=OFF, 1=Position 1 (D21), -1=Position 2 (D22))
+-- Position 1 Button (D21 -> State = 1, RPM Increase)
+hw_button_add(PIN_RPM_SWITCH_POS1,
+    function() -- PRESSED (Position 1)
+        print("ACTION: Governor RPM Switch -> Position 1 (State = 1, RPM Increase)")
+        rpm_switch_pos1_pressed = true
+        update_rpm_switch_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Governor RPM Switch Position 1 RELEASED")
+        rpm_switch_pos1_pressed = false
+        update_rpm_switch_state()
+    end
+)
+
+-- Position 2 Button (D22 -> State = -1, RPM Decrease)
+hw_button_add(PIN_RPM_SWITCH_POS2,
+    function() -- PRESSED (Position 2)
+        print("ACTION: Governor RPM Switch -> Position 2 (State = -1, RPM Decrease)")
+        rpm_switch_pos2_pressed = true
+        update_rpm_switch_state()
+    end,
+    function() -- RELEASED
+        print("ACTION: Governor RPM Switch Position 2 RELEASED")
+        rpm_switch_pos2_pressed = false
+        update_rpm_switch_state()
+    end
+)
+
+-- GOVERNOR ENGINE 1 SWITCH
+hw_button_add(PIN_GOV_ENG1,
+    function() -- PRESSED (ON)
+        print("ACTION: Gov Engine 1 ON")
+        sw_gov_eng1 = 1
+        fsx_variable_write("L:SwGovA", "Number", 1)
+        update_gov_switch_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Gov Engine 1 OFF")
+        sw_gov_eng1 = 0
+        fsx_variable_write("L:SwGovA", "Number", 0)
+        update_gov_switch_leds()
+    end
+)
+
+-- GOVERNOR ENGINE 2 SWITCH
+hw_button_add(PIN_GOV_ENG2,
+    function() -- PRESSED (ON)
+        print("ACTION: Gov Engine 2 ON")
+        sw_gov_eng2 = 1
+        fsx_variable_write("L:SwGovB", "Number", 1)
+        update_gov_switch_leds()
+    end,
+    function() -- RELEASED (OFF)
+        print("ACTION: Gov Engine 2 OFF")
+        sw_gov_eng2 = 0
+        fsx_variable_write("L:SwGovB", "Number", 0)
+        update_gov_switch_leds()
+    end
+)
+
+-- =============================================================================
+-- 6. SIMULATOR SUBSCRIPTIONS (Data In -> Logic Update)
+-- =============================================================================
+
+-- DC Bus
+fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
+    dc_bus = (val ~= 0) and 1 or 0
+    update_warnings()
+    update_gov_led()
+    update_cwp_warning_leds()
+end)
+
+-- XMSN Oil Pressure
+fsx_variable_subscribe("L:XmsnOilPress", "Number", function(val)
+    xmsn_oil_psi = val or 50.0
+    update_warnings()
+end)
+
+-- XMSN Oil Temp
+fsx_variable_subscribe("L:XmsnOilTemp", "Number", function(val)
+    xmsn_oil_temp = val or 80.0
+    update_warnings()
+end)
+
+-- CBOX Oil Pressure
+fsx_variable_subscribe("L:CboxOilPress", "Number", function(val)
+    cbox_oil_psi = val or 50.0
+    update_warnings()
+end)
+
+-- Governor A Switch State (from Sim/Other sources)
+fsx_variable_subscribe("L:SwGovA", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if sw_gov_eng1 ~= new_state then
+        sw_gov_eng1 = new_state
+        update_gov_switch_leds()
+    end
+    gov_a_warn = new_state
+    print("SUBSCRIBE: Gov A = " .. tostring(val))
+    update_cwp_warning_leds()
+end)
+
+-- Governor B Switch State (from Sim/Other sources)
+fsx_variable_subscribe("L:SwGovB", "Number", function(val)
+    local new_state = (val ~= 0) and 1 or 0
+    if sw_gov_eng2 ~= new_state then
+        sw_gov_eng2 = new_state
+        update_gov_switch_leds()
+    end
+    gov_b_warn = new_state
+    print("SUBSCRIBE: Gov B = " .. tostring(val))
+    update_cwp_warning_leds()
+end)
+
+-- XMSN Chip Detector Warning
+fsx_variable_subscribe("L:XMSN CHIP", "Bool", function(val)
+    chip_det_warn = val and 1 or 0
+    print("SUBSCRIBE: XMSN Chip = " .. tostring(val))
+    update_cwp_warning_leds()
+end)
+
+-- =============================================================================
+-- 7. STARTUP INITIALIZATION
+-- =============================================================================
+fsx_variable_write("L:XmsnPressWarn", "Number", 0)
+fsx_variable_write("L:XmsnTempWarn", "Number", 0)
+fsx_variable_write("L:CboxPressWarn", "Number", 0)
+fsx_variable_write("L:GovMode", "Number", 0)
+fsx_variable_write("L:SwGovA", "Number", 0)
+fsx_variable_write("L:SwGovB", "Number", 0)
+fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
+
+-- Initialize RPM switch state
+update_rpm_switch_state()
+
+-- Run logic once at start
+update_warnings()
+update_gov_led()
+update_gov_switch_leds()
+update_cwp_warning_leds()

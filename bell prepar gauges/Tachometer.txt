@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Tachometer" Version="1.0">
+ <Image Name="tachom_background.bmp"/>
+
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="tachoeng1_needle.bmp" PointsTo="South">
+      <Axis X="7" Y="31"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="0" Maximum="100">(L:Eng1N2,percent)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="119" Y="26"/>
+          <Item Value="10" X="165" Y="35"/>
+          <Item Value="20" X="202" Y="64"/>
+		  <Item Value="30" X="220" Y="106"/>		  
+          <Item Value="40" X="219" Y="151"/>
+          <Item Value="50" X="198" Y="191"/>
+          <Item Value="60" X="158" Y="217"/>
+          <Item Value="70" X="113" Y="222"/>
+          <Item Value="80" X="67" Y="205"/>
+          <Item Value="90" X="36" Y="168"/>
+ 	      <Item Value="100" X="27" Y="99"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="16"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="tachoeng2_needle.bmp" PointsTo="South">
+      <Axis X="7" Y="31"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="0" Maximum="100">(L:Eng2N2,percent)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="119" Y="26"/>
+          <Item Value="10" X="165" Y="35"/>
+          <Item Value="20" X="202" Y="64"/>
+		  <Item Value="30" X="220" Y="106"/>		  
+          <Item Value="40" X="219" Y="151"/>
+          <Item Value="50" X="198" Y="191"/>
+          <Item Value="60" X="158" Y="217"/>
+          <Item Value="70" X="113" Y="222"/>
+          <Item Value="80" X="67" Y="205"/>
+          <Item Value="90" X="36" Y="168"/>
+ 	      <Item Value="100" X="27" Y="99"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="16"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="tachorotor_needle.bmp" PointsTo="South">
+      <Axis X="7" Y="31"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="0" Maximum="100">(A:Eng Rotor Rpm,percent)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="119" Y="26"/>
+          <Item Value="10" X="165" Y="35"/>
+          <Item Value="20" X="202" Y="64"/>
+		  <Item Value="30" X="220" Y="106"/>		  
+          <Item Value="40" X="219" Y="151"/>
+          <Item Value="50" X="198" Y="191"/>
+          <Item Value="60" X="158" Y="217"/>
+          <Item Value="70" X="113" Y="222"/>
+          <Item Value="80" X="67" Y="205"/>
+          <Item Value="90" X="36" Y="168"/>
+ 	      <Item Value="100" X="27" Y="99"/>
+         </Nonlinearity>
+    </Rotate>
+  </Element>
+
+  <Mouse>
+     <Tooltip>Tachometer</Tooltip>
+  </Mouse>
+</Gauge>

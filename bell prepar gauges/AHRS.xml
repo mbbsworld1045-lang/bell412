@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="AHRS" Version="1.0">
+ <Image Name="ahrs_background.bmp"/>
+ 
+  <Element>
+    <Position X="44" Y="56"/>
+    <Image Name="afcs_2.bmp" PointsTo="North">
+      <Axis X="5" Y="41"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="-0.2" Maximum="0.2">(L:MasterDcBus,bool) if{ (A:ATTITUDE INDICATOR BANK DEGREES,radians) }</Value>
+       <Nonlinearity>
+	   <Item Value="-0.2" X="67" Y="22"/>
+         <Item Value="0" X="44" Y="16"/>
+         <Item Value="0.2" X="21" Y="22"/>
+       </Nonlinearity>
+      <Delay DegreesPerSecond="30"/>
+    </Rotate>
+  </Element>
+
+</Gauge>

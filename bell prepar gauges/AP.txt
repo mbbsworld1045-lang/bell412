@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="AP" Version="1.0">
+ <Image Name="AP.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) }</Value>
+         <Case Value="1">
+            <Image Name="Ap_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+</Gauge>

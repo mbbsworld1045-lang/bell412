@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="ALTC" Version="1.0">
+ <Image Name="Alt2_background.bmp"/>
+ 
+   <Element>
+    <Position X="49" Y="119"/>
+    <MaskImage Name="alt_win.bmp">
+      <Axis X="0" Y="7.5"/>
+    </MaskImage>
+    <Image Name="alt_strip_Mb.bmp">
+       <Nonlinearity> 
+          <Item Value="31.0" X="0" Y="367"/>
+          <Item Value="29.5" X="0" Y="187"/>
+		  <Item Value="28.0" X="0" Y="7"/>          
+       </Nonlinearity>
+    </Image> 
+    <Shift>
+       <Value>(A:Kohlsman setting hg,inHg)</Value>
+    </Shift>
+  </Element>
+  
+  <Element>
+    <Position X="177" Y="116"/>
+    <MaskImage Name="alt_win.bmp">
+      <Axis X="0" Y="7.5"/>
+    </MaskImage>
+    <Image Name="alt_strip_InHg.bmp">
+       <Nonlinearity> 
+          <Item Value="28.0" X="0" Y="7"/>
+          <Item Value="29.5" X="0" Y="187"/>
+          <Item Value="31.0" X="0" Y="367"/>
+       </Nonlinearity>
+    </Image> 
+    <Shift>
+       <Value Minimum="28.0" Maximum="31.0">(A:Kohlsman setting hg,inHg)</Value>
+    </Shift>
+  </Element>
+  
+   <!-- ======================= 10,000's Feet Needle =================== -->
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="alt_needle_10000.bmp">
+      <Axis X="40" Y="30"/>
+    </Image>
+    <Rotate>
+      <Value>(A:Indicated Altitude, feet)</Value>
+       <Failures>
+        <SYSTEM_PITOT_STATIC Action="Freeze"/>
+      </Failures>
+      <Nonlinearity>
+	      <Item Value="0" X="123" Y="22"/>
+          <Item Value="10000" X="183" Y="41"/>
+          <Item Value="20000" X="221" Y="91"/>
+          <Item Value="30000" X="220" Y="155"/>
+          <Item Value="40000" X="183" Y="205"/>
+          <Item Value="50000" X="124" Y="224"/>
+          <Item Value="60000" X="65" Y="205"/>
+          <Item Value="70000" X="28" Y="155"/>
+          <Item Value="80000" X="28" Y="91"/>
+          <Item Value="90000" X="65" Y="41"/>
+      </Nonlinearity>
+    </Rotate>
+  </Element>
+  
+  
+     <!-- ======================= 1000's Feet Needle ===================== -->
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="alt_needle_1000.bmp">
+      <Axis X="29" Y="22"/>
+    </Image>
+    <Rotate>
+      <Value>(A:Indicated Altitude, feet) 10000 % </Value>
+       <Failures>
+        <SYSTEM_PITOT_STATIC Action="Freeze"/>
+      </Failures>
+       <Nonlinearity>
+	      <Item Value="0" X="123" Y="22"/>
+          <Item Value="1000" X="183" Y="41"/>
+          <Item Value="2000" X="221" Y="91"/>
+          <Item Value="3000" X="220" Y="155"/>
+          <Item Value="4000" X="183" Y="205"/>
+          <Item Value="5000" X="124" Y="224"/>
+          <Item Value="6000" X="65" Y="205"/>
+          <Item Value="7000" X="28" Y="155"/>
+          <Item Value="8000" X="28" Y="91"/>
+          <Item Value="9000" X="65" Y="41"/>
+       </Nonlinearity>
+   </Rotate>
+  </Element>
+
+  <!-- ======================= 100's Feet Needle ====================== -->
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="alt_needle_100.bmp">
+      <Axis X="23" Y="11"/>
+    </Image>
+    <Rotate>
+      <Value>(A:Indicated Altitude, feet) 1000 % </Value>
+      <Failures>
+        <SYSTEM_PITOT_STATIC Action="Freeze"/>
+      </Failures>
+      <Nonlinearity>
+	      <Item Value="0" X="123" Y="22"/>
+          <Item Value="100" X="183" Y="41"/>
+          <Item Value="200" X="221" Y="91"/>
+          <Item Value="300" X="220" Y="155"/>
+          <Item Value="400" X="183" Y="205"/>
+          <Item Value="500" X="124" Y="224"/>
+          <Item Value="600" X="65" Y="205"/>
+          <Item Value="700" X="28" Y="155"/>
+          <Item Value="800" X="28" Y="91"/>
+          <Item Value="900" X="65" Y="41"/>
+         </Nonlinearity>
+    </Rotate>
+  </Element>
+  
+ 
+ <Mouse>
+     <Help ID="HELPID_GAUGE_ALTIMETER"/>
+     <Tooltip ID="TOOLTIPTEXT_ALTIMETER_FEET" MetricID="TOOLTIPTEXT_ALTIMETER_FEET_METERS_SPECIAL"/>
+     
+     <Area Left="11" Top="199" Width="40" Height="40">
+        <Tooltip ID="TOOLTIPTEXT_ALTIMETER_KOHLSMAN_INHG" MetricID="TOOLTIPTEXT_ALTIMETER_KOHLSMAN_MBAR"/>
+        <Area Right="20">
+          <Cursor Type="DownArrow"/>
+          <Click Event="KOHLSMAN_DEC" Repeat="Yes"/>
+        </Area>
+        <Area Left="20">
+          <Cursor Type="UpArrow"/>
+          <Click Event="KOHLSMAN_INC" Repeat="Yes"/>
+        </Area>
+     </Area>
+  </Mouse>
+</Gauge>

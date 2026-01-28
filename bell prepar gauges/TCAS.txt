@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="TCAS" Version="1.0">
+ <Image Name="tcas_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:tcas,bool) }</Value>
+         <Case Value="1">
+            <Image Name="tcas_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+  <Element>
+    <Position X="9" Y="204"/>
+    <Select>
+      <Value>(L:tcas,bool)</Value>
+      <Case Value="1">
+         <Image Name="tcas_on_1.bmp"/>
+      </Case>
+    </Select>
+  </Element>
+  
+  <Mouse>
+    <Area Left="9" Top="204" Width="18" Height="18">
+      <Tooltip>%TCAS On/Off(%((L:tcas,bool))%{if}On%{else}Off %{end})</Tooltip>
+      <Cursor Type="Hand"/>
+      <Click>(L:tcas,bool) ! (&gt;L:tcas,bool)</Click>
+    </Area>
+  </Mouse>
+</Gauge>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_1_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:Testaft,bool) }</Value>
+         <Case Value="1">
+            <Image Name="a_aft_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Mouse>
+    <Tooltip ID="">Test</Tooltip>
+	  <Cursor Type="Hand"/>
+	  <Click Kind="LeftSingle+Leave">
+		(M:Event) 'LeftSingle' scmp 0 == (L:Testaft,bool) 0 == and if{ 1 (&gt;L:Testaft,bool) }
+  		(M:Event) 'Leave' scmp 0 == (L:Testaft,bool) 1 == and if{ 0 (&gt;L:Testaft,bool) }			
+	  </Click>
+  </Mouse>
+</Gauge>

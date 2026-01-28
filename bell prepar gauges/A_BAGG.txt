@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_baggage_b.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:Test,bool) || (L:firetestbag,bool) || }</Value>
+         <Case Value="1">
+            <Image Name="a_baggage_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+</Gauge>

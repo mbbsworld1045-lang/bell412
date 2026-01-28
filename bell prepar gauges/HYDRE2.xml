@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="HYDRE2" Version="1.0">
+ <Image Name="hydr_background.bmp"/>
+
+
+<!-- ========================= OIL TEMP ========================= --> 
+  <Element>
+    <Position X="72" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="-5" Maximum="150">(L:MasterDcBus,bool) 1 ==  if{ (L:HYDRT,celsius) } els{ -5 }</Value>
+        <Nonlinearity>
+ 	      <Item Value="-5" X="52" Y="139"/>
+		  <Item Value="0" X="28" Y="119"/>
+		  <Item Value="50" X="19" Y="90"/>
+		  <Item Value="100" X="30" Y="57"/>
+		  <Item Value="150" X="56" Y="38"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="15"/>
+    </Rotate>
+  </Element>
+
+<!-- ========================= OIL PRESS ========================= --> 
+  <Element>
+    <Position X="106" Y="89"/>
+    <Image Name="oil_needle.bmp" PointsTo="East">
+      <Axis X="0" Y="4"/>
+    </Image>
+    <Rotate> 
+      <Value>(L:HYDRS2,psi)</Value>
+        <Nonlinearity>
+          <Item Value="1500" X="123" Y="39"/>
+          <Item Value="1000" X="153" Y="68"/>
+ 	      <Item Value="500" X="153" Y="111"/>
+		  <Item Value="0" X="120" Y="140"/>
+         </Nonlinearity>
+	    <Delay DegreesPerSecond="10"/>
+    </Rotate>
+  </Element>
+  
+ 
+  <Element>
+   <Position X="63" Y="81"/>
+     <Image Name="oil_f.bmp"/>
+  </Element> 
+ 
+  <Mouse>
+  
+<!-- OIL TEMP -->
+   <Area Left="10" Top="9" Width="80" Height="160">
+      <Tooltip>%Hydraulic System 2 Oil Temperature(%((L:MasterDcBus,bool) 1 ==  if{ (L:HYDRT,celsius) } els{ -5 })%!d!&#176;C)</Tooltip>
+   </Area>
+   
+<!-- OIL PRESS -->
+   <Area Left="89" Top="9" Width="80" Height="160">
+      <Tooltip>%Hydraulic System 2 Oil Pressure(%((L:HYDRS2,psi))%!d!PSI)</Tooltip>
+   </Area>
+
+  </Mouse>
+</Gauge>

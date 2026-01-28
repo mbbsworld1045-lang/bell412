@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="STBATT" Version="1.0">
+ <Image Name="stbatt_background.bmp"/>
+
+  <Element>
+    <Position X="0" Y="0"/>
+    <MaskImage Name="stbatt_win.bmp">
+       <Axis X="130" Y="134"/>
+    </MaskImage>
+      <Image Name="stbatt_horizon.bmp">
+         <Axis X="125" Y="125"/>
+      </Image>
+      <Shift>
+         <Value Minimum="-40" Maximum="40">(L:Masterstbatt,bool) if{ (A:Attitude indicator pitch degrees,degrees) /-/ } els{ 20 }</Value>
+         <Scale Y="2.2"/>
+      <Delay PixelsPerSecond="90"/>
+      </Shift>
+      <Rotate>
+         <Value>(L:Masterstbatt,bool) if{ (A:Attitude indicator bank degrees,radians) } els{ 0.50 }</Value>
+      <Delay DegreesPerSecond="60"/>
+      </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="84" Y="97"/>
+    <MaskImage Name="stbatt_win_pitch_point.bmp">
+       <Axis X="46" Y="36"/>
+    </MaskImage>
+      <Image Name="stbatt_pitch_point.bmp">
+         <Axis X="46" Y="3"/>
+      </Image>
+      <Shift>
+         <Value Minimum="-12" Maximum="12">(G:Var1)</Value>
+         <Scale Y="1"/>
+      </Shift>
+  </Element>
+    
+  <Element>
+    <Position X="130" Y="134"/>
+    <Image Name="stbatt_pointer.bmp" PointsTo="East">
+      <Axis X="20" Y="69"/>
+    </Image>
+    <Rotate> 
+      <Value>(L:Masterstbatt,bool) if{ (A:Attitude indicator bank degrees,radians) } els{ 0.51 }</Value>
+	<Delay DegreesPerSecond="60"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="122" Y="0"/>
+    <MaskImage Name="stbatt_flag_win.bmp">
+       <Axis X="90" Y="59"/>
+    </MaskImage>
+      <Image Name="stbatt_flag.bmp">
+         <Axis X="29" Y="4"/>
+      </Image>
+       <Rotate>
+        <Value>(L:Masterstbatt,bool)</Value>
+        <Nonlinearity>
+		  <Item Value="0" Degrees="0"/>
+	      <Item Value="1" Degrees="113"/>
+	    </Nonlinearity>
+        <Delay DegreesPerSecond="170"/>
+      </Rotate>
+  </Element>
+  
+  
+  <Mouse>
+  <Tooltip>Attitude Indicator (Bank %((L:Masterstbatt,bool) if{ (A:ATTITUDE INDICATOR BANK DEGREES, degrees) })%!d!&#176;, Pitch %((L:Masterstbatt,bool) if{ (A:Attitude indicator pitch degrees,degrees) /-/ })%!d!&#176;)</Tooltip>
+    <Area Left="111" Top="193" Width="36" Height="36">
+      <Area Right="18">
+        <Cursor Type="DownArrow"/>
+        <Click Repeat="Yes">
+          (G:Var1) 1 + 12 min (&gt;G:Var1)
+        </Click>
+      </Area>
+      <Area Left="18">
+        <Cursor Type="UpArrow"/>
+        <Click Repeat="Yes">
+          (G:Var1) 1 - -12 max (&gt;G:Var1)
+        </Click>
+      </Area>
+   </Area>
+   
+   <Area Left="199" Top="197" Width="46" Height="46">
+     <Cursor Type="Hand"/>
+      <Click>(L:stbatt,bool) ! (&gt;L:stbatt,bool)</Click>
+   </Area>
+	 
+  </Mouse>
+</Gauge>

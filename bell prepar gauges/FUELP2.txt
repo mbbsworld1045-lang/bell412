@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="FUELP2" Version="1.0">
+ <Image Name="fuelp_background.bmp"/>
+ 
+  <Element>
+    <Position X="90" Y="90"/>
+    <Image Name="fuelp_needle.bmp" PointsTo="North">
+      <Axis X="23" Y="54"/>
+    </Image>
+    <Rotate> 
+      <Value>(L:MasterACDC, bool) 1 == if{ (L:fuelp2,psi) }</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="135" Y="141"/>
+          <Item Value="10" X="77" Y="158"/>		  
+          <Item Value="20" X="25" Y="118"/>
+          <Item Value="30" X="27" Y="56"/>
+          <Item Value="40" X="70" Y="22"/>
+          <Item Value="50" X="125" Y="30"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="5"/>
+    </Rotate>
+  </Element>
+ 
+  <Mouse>
+     <Tooltip>%Engine 2 Fuel Pressure(%((L:MasterACDC, bool) 1 == if{ (L:fuelp2,psi) })%!d! PSI)</Tooltip>
+  </Mouse>
+</Gauge>

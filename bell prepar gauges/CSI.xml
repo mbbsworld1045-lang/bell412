@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="CSI" Version="1.0">
+ <Image Name="csi_background.bmp"/>
+
+  <Element>
+    <Position X="0" Y="0"/>
+   <MaskImage Name="csi_win.bmp">
+      <Axis X="125" Y="123"/>
+    </MaskImage>
+    <Image Name="csi_card.bmp" PointsTo="North">
+      <Axis X="94" Y="94"/>
+    </Image>
+    <Rotate>
+      <Value>(A:NAV2 OBS,degrees) 90 + - dgrd</Value>
+   </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="93" Y="132"/>
+    <Select>
+       <Value>(A:NAV GS FLAG:2,bool)</Value>
+       <Case Value="0">
+          <Image Name="csi_gs_flag.bmp"/>
+       </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Position X="142" Y="82"/>
+    <Select>
+       <Value>(A:NAV HAS NAV:2,bool)</Value>
+       <Case Value="0">
+          <Image Name="csi_nav_flag.bmp"/>
+       </Case>
+      </Select>
+  </Element>
+
+  <Element>
+    <Position X="147" Y="136"/>
+    <Select>
+       <Value>(A:NAV TOFROM:2, ENUM)</Value>
+       <Case Value="1">
+          <Image Name="csi_to_flag.bmp"/>
+       </Case>
+	 <Case Value="2">
+          <Image Name="csi_from_flag.bmp"/>
+       </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Position X="65" Y="117"/>
+    <Image Name="csi_needle_2.bmp">
+    <Axis X="0" Y="1.5"/>
+    </Image>
+   <Rotate>
+        <Value Minimum="-1" Maximum="1">(A:NAV GSI:2, number) 140 /</Value>
+        <Nonlinearity>
+          <Item Value="-1" Degrees="-25"/>
+          <Item Value="0" Degrees="0"/>
+          <Item Value="1" Degrees="25"/>
+        </Nonlinearity>
+       <Delay PixelsPerSecond="10"/>
+     </Rotate>
+  </Element>
+  
+  <Element>
+   <Position X="126" Y="62"/>
+    <Image Name="csi_needle_1.bmp">
+    <Axis X="1.5" Y="0"/>
+    </Image>
+   <Rotate>
+        <Value Minimum="-1" Maximum="1">(A:NAV CDI:2, number) 140 /</Value>
+        <Nonlinearity>
+          <Item Value="1" Degrees="-25"/>
+          <Item Value="0" Degrees="0"/>
+          <Item Value="-1" Degrees="25"/>
+        </Nonlinearity>
+       <Delay PixelsPerSecond="10"/>
+     </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="115" Y="24"/>
+    <Image Name="csi_m.bmp"/>
+  </Element>
+  
+  <Mouse>
+  <Tooltip>Course Select Indicator (%((A:NAV2 OBS,degrees))%!d!&#176;)</Tooltip>
+    <Area Left="206" Top="205" Width="40" Height="40">
+      <Help ID="HELPID_GAUGE_VOR2_OBS2"/>
+      <Area Right="20">
+        <Cursor Type="DownArrow"/>
+        <Click Event="VOR2_OBI_DEC" Repeat="Yes"/>
+      </Area>
+      <Area Left="20">
+        <Cursor Type="UpArrow"/>
+        <Click Event="VOR2_OBI_INC" Repeat="Yes"/>
+      </Area>
+    </Area>
+   </Mouse>
+</Gauge>

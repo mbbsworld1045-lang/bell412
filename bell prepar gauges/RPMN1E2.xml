@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="RPMN2E1" Version="1.0">
+ <Image Name="rpmN1_background.bmp"/>
+ 
+  <Element>
+    <Position X="90" Y="90"/>
+    <Image Name="RPM_needle1.bmp" PointsTo="North">
+      <Axis X="17" Y="60"/>
+    </Image>
+    <Rotate> 
+      <Value Minimum="0" Maximum="110">(L:RPM N1 E2,percent)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="86" Y="20"/>
+          <Item Value="10" X="118" Y="26"/>
+          <Item Value="20" X="144" Y="45"/>
+		  <Item Value="30" X="158" Y="74"/>		  
+          <Item Value="40" X="157" Y="107"/>
+          <Item Value="50" X="142" Y="135"/>
+          <Item Value="60" X="115" Y="153"/>
+          <Item Value="70" X="84" Y="158"/>
+          <Item Value="80" X="52" Y="148"/>
+          <Item Value="90" X="30" Y="125"/>
+ 	      <Item Value="100" X="20" Y="94"/>
+		  <Item Value="110" X="26" Y="60"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="25"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="67" Y="52"/>
+    <Image Name="RPM_needle2.bmp" PointsTo="North">
+      <Axis X="11" Y="11"/>
+    </Image>
+    <Rotate>
+      <Value>(L:RPM N1 E2,percent)</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="66" Y="39"/>
+          <Item Value="5" X="67" Y="63"/>
+      </Nonlinearity>
+		 <Delay DegreesPerSecond="280"/>
+    </Rotate>
+  </Element>
+  
+  <Mouse>
+     <Tooltip>%Engine 2 Gas Generator RPM (%((L:RPM N1 E2,percent))%!d!%%)%</Tooltip>
+  </Mouse>
+</Gauge>

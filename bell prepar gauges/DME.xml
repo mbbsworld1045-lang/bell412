@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="DME" Version="1.0">
+ <Image Name="dme_background.bmp"/>
+
+ <Element>
+   <Visible>(L:Swdme,Enum) 0 &gt;</Visible>
+  <Element>
+    <Position X="30" Y="10"/>
+     <Text X="185" Y="24" Length="12" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>%((L:Swdme,Enum) 2 ==)%{if}%((A:NAV2 DME, nmiles) s0 (A:NAV2 DMESPEED, knots) s1)%{else}%((A:NAV1 DME, nmiles) s0 (A:NAV1 DMESPEED, knots) s1)%{end}%(l0 0 &gt;=)%{if}%(l0 9999 min d 99 &lt;=)%{if}%!4.1f! %{else}%!3d!%{end} %(l1 9999 min)%!03d! %(l0 l1 / 60 * 99 min)%!02d! min%{else}---- ---- --%{end})"</String>
+	 </Text>
+	 <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+    </Failures>
+  </Element> 
+  <Element>
+    <Position X="84" Y="32"/>
+     <Text X="26" Y="12" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>NM</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  <Element>
+    <Position X="161" Y="32"/>
+     <Text X="26" Y="12" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>KT</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+  <Element>
+    <Position X="210" Y="32"/>
+     <Text X="26" Y="12" Length="3" Font="Quartz" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="RED" Bright="Yes">
+       <String>MIN</String>
+	 </Text>
+     <Failures>
+    	<SYSTEM_ELECTRICAL_PANELS Action="NoDraw"/>
+     </Failures>
+  </Element>
+ </Element>
+</Gauge>

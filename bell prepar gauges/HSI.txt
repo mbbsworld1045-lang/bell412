@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="HSI" Version="1.0">
+ <Image Name="hsi_background.bmp"/>
+
+  <Element>
+    <Position X="155" Y="141"/>
+    <Image Name="hsi_card.bmp">
+      <Axis X="90" Y="90"/>
+    </Image>
+    <Rotate>
+      <Value>(A:Plane heading degrees gyro,radians) /-/ </Value>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="155" Y="141"/>
+    <Image Name="hsi_scale_card.bmp" PointsTo="North">
+       <Axis X="60" Y="80"/>
+    </Image>
+    <Rotate>
+        <Value>(A:NAV1 OBS,degrees) d (A:Plane heading degrees gyro,degrees) 90 + - dgrd</Value>
+    </Rotate>
+  </Element>
+  
+   <Element>
+    <Position X="155" Y="141"/>
+     <Select>
+        <Value>(A:HSI TF flags, ENUM)</Value>
+        <Case Value="1">
+           <Image Name="hsi_to.bmp" PointsTo="North">
+              <Axis X="15" Y="32"/>
+           </Image>
+        </Case>
+        <Case Value="2">
+           <Image Name="hsi_from.bmp" PointsTo="North">
+              <Axis X="15" Y="-16"/>
+           </Image>
+        </Case>
+     </Select>
+     <Rotate>
+        <Value>(A:NAV1 OBS,degrees) d (A:Plane heading degrees gyro,degrees) 90 + - dgrd</Value>
+     </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="155" Y="141"/>
+    <Select>
+       <Value>(A:HSI CDI needle valid,bool)</Value>
+       <Case Value="0">
+          <Image Name="hsi_nav_flag.bmp" PointsTo="North">
+             <Axis X="18" Y="43"/>
+         </Image>
+       </Case>
+    </Select>
+    <Rotate>
+        <Value>(A:NAV1 OBS,degrees) d (A:Plane heading degrees gyro,degrees) 90 + - dgrd</Value>
+     </Rotate>
+  </Element>
+  
+  <Element>
+   <Position X="23" Y="124"/>
+    <Select>
+       <Value>(A:HSI GSI needle valid,bool)</Value>
+       <Case Value="0">
+          <Image Name="hsi_gs_flag.bmp"/>
+       </Case>
+    </Select>
+  </Element>
+  
+  <Element>
+   <Position X="20" Y="141"/>
+    <Image Name="hsi_gs_pointer.bmp">
+       <Axis X="0" Y="9"/>
+    </Image>
+    <Shift>
+       <Value Minimum="-90" Maximum="90">(A:HSI GSI needle valid, bool) if{ (A:HSI GSI needle, number) } els{ 0 }</Value>
+       <Scale Y="0.48"/>
+       <Delay PixelsPerSecond="20"/>
+    </Shift>
+  </Element>
+  
+  <Element>
+   <Position X="155" Y="141"/>
+    <Image Name="hsi_needle.bmp" PointsTo="North">            
+      <Axis X="1" Y="49"/>
+    </Image>
+    <Shift>
+       <Value>(A:NAV1 HAS NAV, bool) if{ (A:HSI CDI needle, number)  } els{ 0 }</Value>
+       <Scale Y="0.30"/>  
+    </Shift>
+    <Rotate>
+       <Value>(A:NAV1 OBS,degrees) d (A:Plane heading degrees gyro,degrees) 90 + - dgrd</Value>
+    </Rotate>
+  </Element>
+  
+  <Element>
+   <Position X="155" Y="141"/>
+      <Image Name="hsi_nav_2.bmp">
+         <Axis X="10" Y="105"/>
+      </Image>
+      <Rotate>
+         <Value>(L:MasterACDC, bool) if{ (A:ADF1 Radial,radians) } els{ 1.570 }</Value>
+         <Delay DegreesPerSecond="180"/>
+      </Rotate>
+   </Element>
+
+  <Element>
+   <Position X="155" Y="141"/>
+      <Image Name="hsi_nav_1.bmp">
+         <Axis X="12" Y="104"/>
+      </Image>
+      <Rotate>
+         <Value>(A:NAV1 radial, radians) (A:Plane heading degrees gyro, radians) - pi + </Value>
+         <Delay DegreesPerSecond="180"/>
+      </Rotate>
+   </Element>
+   
+   <Element>
+   <Position X="155" Y="141"/>
+     <Image Name="hsi_heading.bmp" PointsTo="North">
+       <Axis X="7" Y="95"/>     
+     </Image>
+     <Rotate>
+       <Value>(A:Autopilot heading lock dir,radians) (A:Plane heading degrees gyro,radians) - </Value>
+     </Rotate>
+   </Element>
+   
+   <Element>
+    <Position X="277" Y="105"/>
+    <Select>
+       <Value>(L:MasterACDC, bool)</Value>
+       <Case Value="0">
+          <Image Name="hsi_off.bmp"/>
+       </Case>
+    </Select>
+ </Element>
+ 
+ <Element>
+   <Position X="342" Y="104"/>
+    <Image Name="hsi_heading_set.bmp">
+      <Axis X="25" Y="25"/>
+    </Image>
+    <Rotate>
+       <Value>(A:Autopilot heading lock dir,radians)</Value>
+    </Rotate>
+  </Element>
+  
+  <Element>
+   <Position X="342" Y="179"/>
+    <Image Name="hsi_course_set.bmp">
+      <Axis X="25" Y="25"/>
+    </Image>
+    <Rotate>
+       <Value>(A:NAV1 OBS,radians)</Value>
+    </Rotate>
+  </Element>
+  
+   <Element>
+      <Position X="256" Y="63"/>
+     <Text X="33" Y="14" Length="4" Font="Gill Sans MT" Fixed="Yes" Adjust="Center" VerticalAdjust="Center" Color="white">
+       <String>%((A:NAV1 OBS,degrees))%!003d!</String>
+	 </Text>
+  </Element>
+  
+  <Element>
+    <Position X="140" Y="13"/>
+       <Image Name="hsi_aircraft.bmp"/>
+ </Element>
+  
+  <Mouse>
+    <Tooltip ID="">Horizontal Situation Indicador</Tooltip>
+
+    <Area Left="317" Top="153" Width="50" Height="50">
+      <Area Right="25">
+        <Cursor Type="DownArrow"/>
+        <Click Event="VOR1_OBI_DEC" Repeat="Yes"/>
+      </Area>
+      <Area Left="25">
+        <Cursor Type="UpArrow"/>
+        <Click Event="VOR1_OBI_INC" Repeat="Yes"/>
+      </Area>
+     </Area>
+
+	<Area Left="317" Top="79" Width="50" Height="50">
+	<Tooltip>(%((A:Autopilot heading lock dir,degrees) (A:Plane heading degrees gyro,degrees) - )%!d!&#176;)</Tooltip>
+     <Area Right="25">
+        <Cursor Type="DownArrow"/>
+        <Click Event="HEADING_BUG_DEC" Repeat="Yes"/>
+      </Area>
+      <Area Left="25">
+        <Cursor Type="UpArrow"/>
+        <Click Event="HEADING_BUG_INC" Repeat="Yes"/>
+      </Area>
+     </Area>
+  </Mouse>
+
+</Gauge>

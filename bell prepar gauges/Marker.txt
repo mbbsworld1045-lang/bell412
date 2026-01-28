@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Marker" Version="1.0">
+ <Image Name="marker_background.bmp"/>
+ 
+    <Element>
+      <Position X="62" Y="0"/>
+      <Select>
+         <Value>(L:MasterDcBus, bool) if{ (L:TestMarker,bool) || (A:Outer Marker,bool) || }</Value>
+         <Case Value="1">
+            <Image Name="marker3.bmp" Bright="Yes" />
+         </Case>
+      </Select>
+   </Element>
+
+   <Element>
+      <Position X="31" Y="0"/>
+      <Select>
+         <Value>(L:MasterDcBus, bool) if{ (L:TestMarker,bool) || (A:Middle Marker,bool) || }</Value>
+         <Case Value="1">
+            <Image Name="marker2.bmp" Bright="Yes" />
+         </Case>
+      </Select>
+   </Element>
+
+   <Element>
+      <Position X="0" Y="0"/>
+      <Select>
+         <Value>(L:MasterDcBus, bool) if{ (L:TestMarker,bool) || (A:Inner Marker,bool) || }</Value>
+        <Case Value="1">
+            <Image Name="marker1.bmp" Bright="Yes" />
+         </Case>
+      </Select>
+   </Element>
+
+ <Mouse>
+  <Area Left="27" Top="23" Width="7" Height="7">
+   <Tooltip ID="">Marker Test</Tooltip>
+   <Cursor Type="Hand"/>
+   <Click Kind="LeftSingle+Leave">
+	(M:Event) 'LeftSingle' scmp 0 == (L:TestMarker,bool) 0 == and if{ 1 (&gt;L:TestMarker,bool) }
+    (M:Event) 'Leave' scmp 0 == (L:TestMarker,bool) 1 == and if{ 0 (&gt;L:TestMarker,bool) }			
+   </Click>
+  </Area>
+ </Mouse>
+</Gauge>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="a_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:Overtq,bool) || (L:Trotor,percent) 100 &gt; || }</Value>
+         <Case Value="1">
+            <Image Name="a_otorque_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+
+<Mouse>
+ <Tooltip ID="">Over Torque Test</Tooltip>
+  <Cursor Type="Hand"/>
+   <Click Kind="LeftSingle+Leave">
+	(M:Event) 'LeftSingle' scmp 0 == (L:Overtq,bool) 0 == and if{ 1 (&gt;L:Overtq,bool) }
+    (M:Event) 'Leave' scmp 0 == (L:Overtq,bool) 1 == and if{ 0 (&gt;L:Overtq,bool) }			
+   </Click>
+</Mouse>
+   
+</Gauge>

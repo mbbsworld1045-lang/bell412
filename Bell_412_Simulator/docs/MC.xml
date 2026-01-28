@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="A_MASTERC" Version="1.0">
+ <Image Name="mc_background.bmp"/>
+
+   <Element>
+    <Position X="14" Y="24"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:OILE1,psi) 50 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="24"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:OILE2,psi) 50 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="61"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="61"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="98"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwvalveEng1,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="98"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwvalveEng2,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwboostpuEng1,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwboostpuEng2,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwfueltransengA,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca5.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwfueltransengB,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca6.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:Swbatta,bool) (L:Swbattb,bool) 1 == &amp;&amp; || (L:TestMC,enum) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca7.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+  <Element>
+    <Position X="561" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+ 
+  <Element>
+    <Position X="14" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (A:FUEL TANK CENTER LEVEL,percent) 9.2 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca8.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:Swfuelintcon,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf5.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="320"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="320"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwFuelxfeed,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cf6.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="14" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca10.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="561" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="24"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:CSepP1,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="24"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:CSepP2,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="61"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwGovA,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="61"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwGovB,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="98"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:CGenel,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="98"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:CGener,bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ce1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb5.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (A:Rotor Brake Active,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb6.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (A:Rotor Brake Active,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb6.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ce2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) ||  (L:Swinva, bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb7.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) ||  (L:Swinvb, bool) 0 == || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ce3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+  <Element>
+    <Position X="125" Y="320"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:SwHeater,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cb8.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="320"/>
+      <Select>
+        <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:Door passenger l,percent) || (L:Door passenger r,percent) || (L:Door baggage,position) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_ce4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="125" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="453" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="135"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:Gbox, psi) 40 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="172"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:XMSN,psi) 30 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cd1.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:GboxT, celsius) 0 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="209"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:XMSNT,celsius) 0 &lt; || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cd2.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="246"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cd3.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:Sw hydsysA,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc5.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="283"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:Sw hydsysB,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cd4.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="320"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:ResetMC,bool) 0 == if{ (L:TestMC,enum) || (L:ExternalPower,bool) || } }</Value>
+         <Case Value="1">
+            <Image Name="mc_cc6.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="320"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_cd5.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="234" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Element>
+    <Position X="344" Y="357"/>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (L:TestMC,enum) 0 &gt; }</Value>
+         <Case Value="1">
+            <Image Name="mc_ca9.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Mouse>
+   <Area Left="324" Top="38" Width="20" Height="20">
+	<Tooltip>Reset</Tooltip>
+       <Cursor Type="Hand"/>
+	    <Click Kind="LeftSingle+Leave">
+		(M:Event) 'LeftSingle' scmp 0 == (L:ResetMC,bool) 0 == and if{ 1 (&gt;L:ResetMC,bool) }
+  		(M:Event) 'Leave' scmp 0 == (L:ResetMC,bool) 1 == and if{ 0 (&gt;L:ResetMC,bool) }			
+	    </Click>
+       </Area>
+   </Mouse>
+      
+</Gauge>

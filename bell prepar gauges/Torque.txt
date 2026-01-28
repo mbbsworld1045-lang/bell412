@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="Torque" Version="1.0">
+ <Image Name="torque_background.bmp"/>
+
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="trotor_needle.bmp" PointsTo="South">
+      <Axis X="6" Y="6"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="0" Maximum="110">(L:MasterACDC,bool) (L:Combustionm,bool) &amp;&amp; if{ (L:Trotor,percent) } els{ 0 }</Value>
+      <Nonlinearity>
+	      <Item Value="0" X="125" Y="193"/>
+          <Item Value="10" X="101" Y="190"/>
+		  <Item Value="20" X="85" Y="182"/>
+          <Item Value="30" X="71" Y="171"/>		  
+          <Item Value="40" X="62" Y="158"/>
+          <Item Value="50" X="56" Y="141"/>
+          <Item Value="60" X="54" Y="123"/>
+          <Item Value="70" X="56" Y="106"/>
+          <Item Value="80" X="63" Y="88"/>
+          <Item Value="90" X="74" Y="74"/>
+ 	      <Item Value="100" X="89" Y="60"/>
+		  <Item Value="110" X="106" Y="54"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="12"/>
+    </Rotate>
+  </Element>
+
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="teng1_needle.bmp" PointsTo="South">
+      <Axis X="8" Y="8"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="0" Maximum="100">(L:MasterACDC,bool) (A:Eng2 Combustion,bool) &amp;&amp; if{ (L:Eng1TQ,percent) } els{ 0 }</Value>
+      <Nonlinearity>
+ 	      <Item Value="100" X="143" Y="56"/>  
+          <Item Value="90" X="162" Y="64"/>		  
+          <Item Value="80" X="178" Y="74"/>		  
+          <Item Value="70" X="186" Y="90"/>		  
+          <Item Value="60" X="197" Y="108"/>		  
+          <Item Value="50" X="195" Y="128"/>
+          <Item Value="40" X="191" Y="146"/>
+          <Item Value="30" X="184" Y="161"/>
+		  <Item Value="20" X="171" Y="176"/> 
+		  <Item Value="10" X="155" Y="187"/>
+		  <Item Value="3" X="137" Y="193"/>
+		  <Item Value="0" X="125" Y="193"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="12"/>
+    </Rotate>
+  </Element>
+  
+  <Element>
+    <Position X="125" Y="125"/>
+    <Image Name="teng2_needle.bmp" PointsTo="South">
+      <Axis X="8" Y="8"/>
+    </Image>
+    <Rotate>
+      <Value Minimum="-5" Maximum="100">(L:MasterACDC,bool) (A:Eng3 Combustion,bool) &amp;&amp; if{ (L:Eng2TQ,percent) } els{ 0 }</Value>
+      <Nonlinearity>
+ 	      <Item Value="100" X="143" Y="56"/>  
+          <Item Value="90" X="162" Y="64"/>		  
+          <Item Value="80" X="178" Y="74"/>		  
+          <Item Value="70" X="186" Y="90"/>		  
+          <Item Value="60" X="197" Y="108"/>		  
+          <Item Value="50" X="195" Y="128"/>
+          <Item Value="40" X="191" Y="146"/>
+          <Item Value="30" X="184" Y="161"/>
+		  <Item Value="20" X="171" Y="176"/> 
+		  <Item Value="10" X="155" Y="187"/>
+		  <Item Value="3" X="137" Y="193"/>
+		  <Item Value="0" X="125" Y="193"/>
+         </Nonlinearity>
+		 <Delay DegreesPerSecond="12"/>
+    </Rotate>
+  </Element>
+
+   <Mouse>
+     <Tooltip>Triple Torque</Tooltip>
+  </Mouse>
+</Gauge>
