@@ -133,7 +133,10 @@ Fuel,Digit Test,,,L:Digitstest,Number,"0, 1",Logic Output,,fuel_logic.lua,Digit 
 Fuel,Master DC Bus,,,L:MasterDcBus,Number,"0, 1",Subscribe,,fuel_logic.lua,DC power for valve/pump operation
 Hydraulics,Hydraulic Sys 1,PIN_HYD1_SW,ARDUINO_MEGA2560_B,D40,L:Sw hydsysA,Number,"0, 1",hw_button_add,,hydraulics_logic.lua,Hydraulic system 1
 Hydraulics,Hydraulic Sys 2,PIN_HYD2_SW,ARDUINO_MEGA2560_B,D41,L:Sw hydsysB,Number,"0, 1",hw_button_add,,hydraulics_logic.lua,Hydraulic system 2
-Hydraulics,Cyclic Center Test,PIN_CYC_CTR_TEST,ARDUINO_MEGA2560_B,D42,L:Cyctest,Number,"0, 1",hw_button_add (momentary),,hydraulics_logic.lua,Stick centering test
+Hydraulics,Cyclic Center Test 1,PIN_CYC_CTR_TEST1,ARDUINO_MEGA2560_B,D42,L:Cyctest,Number,"0, 1",hw_button_add (momentary),,hydraulics_logic.lua,Stick centering test button 1
+Hydraulics,Cyclic Center Test 2,PIN_CYC_CTR_TEST2,ARDUINO_MEGA2560_B,D43,L:Cyctest,Number,"0, 1",hw_button_add (momentary),,hydraulics_logic.lua,Stick centering test button 2
+Hydraulics,Cyclic Center Test 1 LED,PIN_CYC_CTR_TEST1_LED,ARDUINO_MEGA2560_B,D44,,,LED Output,led_cyc_ctr_test1_h,hydraulics_logic.lua,Test 1 Status
+Hydraulics,Cyclic Center Test 2 LED,PIN_CYC_CTR_TEST2_LED,ARDUINO_MEGA2560_B,D45,,,LED Output,led_cyc_ctr_test2_h,hydraulics_logic.lua,Test 2 Status
 Hydraulics,Hyd 1 Fail LED,PIN_HYD1_FAIL_LED,ARDUINO_MEGA2560_B,D46,,,LED Output,led_hyd1_h,hydraulics_logic.lua,ON if OFF or <600 PSI
 Hydraulics,Hyd 2 Fail LED,PIN_HYD2_FAIL_LED,ARDUINO_MEGA2560_B,D47,,,LED Output,led_hyd2_h,hydraulics_logic.lua,ON if OFF or <600 PSI
 Hydraulics,Cyclic Center LED,PIN_CYC_CTR_LED,ARDUINO_MEGA2560_B,D48,,,LED Output,led_cyc_ctr_h,hydraulics_logic.lua,ON if off-center AND RPM<95%

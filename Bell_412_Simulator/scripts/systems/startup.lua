@@ -15,8 +15,9 @@ local PIN_START_ENG_POS2 = "ARDUINO_MEGA2560_C_D3"  -- Start Engine Position 2 (
 -- Idle Stop Switch (3-position: 0=OFF, 1=Engine 1, -1=Engine 2)
 local PIN_IDLE_STOP_POS1 = "ARDUINO_MEGA2560_C_D4"  -- Idle Stop Position 1 (State = 1, Engine 1)
 local PIN_IDLE_STOP_POS2 = "ARDUINO_MEGA2560_C_D7"  -- Idle Stop Position 2 (State = -1, Engine 2)
-local PIN_PARTSEP1    = "ARDUINO_MEGA2560_C_D5"
-local PIN_PARTSEP2    = "ARDUINO_MEGA2560_C_D6"
+-- Particle Separators (Mega A)
+local PIN_PARTSEP1          = "ARDUINO_MEGA2560_A_D25"
+local PIN_PARTSEP2          = "ARDUINO_MEGA2560_A_D27"
 
 -- INPUTS (Rotor Brake) D24
 local PIN_ROTOR_BRAKE_SW  = "ARDUINO_MEGA2560_C_D24"
@@ -188,9 +189,10 @@ local function update_idle_stop_state()
         fsx_variable_write("L:idle eng", "Number", idle_stop_state)
         print("IDLE STOP SWITCH: State changed to " .. tostring(idle_stop_state))
         
+        
         -- Update legacy L:IdleStopRel for compatibility (1 if either engine selected, 0 if off)
         local idle_stop_rel = (idle_stop_state ~= 0) and 1 or 0
-        fsx_variable_write("L:IdleStopRel", "Number", idle_stop_rel)
+        -- fsx_variable_write("L:IdleStopRel", "Number", idle_stop_rel)
         
         -- Update fuel cut based on engine selection
         if idle_stop_state == 1 then
@@ -317,13 +319,13 @@ hw_button_add(PIN_PARTSEP1,
     function() -- PRESSED (ON)
         print("ACTION: Part Sep 1 ON")
         sw_partsep1 = 1
-        fsx_variable_write("L:SwpartsepA", "Number", 1)
+        fsx_variable_write("L:SwpartsepA", "Number", 0)
         update_partsep_leds()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Part Sep 1 OFF")
         sw_partsep1 = 0
-        fsx_variable_write("L:SwpartsepA", "Number", 0)
+        fsx_variable_write("L:SwpartsepA", "Number", 1)
         update_partsep_leds()
     end
 )
@@ -333,13 +335,13 @@ hw_button_add(PIN_PARTSEP2,
     function() -- PRESSED (ON)
         print("ACTION: Part Sep 2 ON")
         sw_partsep2 = 1
-        fsx_variable_write("L:SwpartsepB", "Number", 1)
+        fsx_variable_write("L:SwpartsepB", "Number", 0)
         update_partsep_leds()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Part Sep 2 OFF")
         sw_partsep2 = 0
-        fsx_variable_write("L:SwpartsepB", "Number", 0)
+        fsx_variable_write("L:SwpartsepB", "Number", 1)
         update_partsep_leds()
     end
 )
@@ -472,11 +474,11 @@ end)
         fsx_variable_write("L:starteng", "Number", 0)
 fsx_variable_write("L:idle eng", "Number", 0)
         fsx_variable_write("L:StartSwitch", "Number", 0)
-fsx_variable_write("L:IdleStopRel", "Number", 0)
+-- fsx_variable_write("L:IdleStopRel", "Number", 0)
 fsx_variable_write("L:FuelcutE1", "Number", 0)
 fsx_variable_write("L:FuelcutE2", "Number", 0)
-fsx_variable_write("L:SwpartsepA", "Number", 0)
-fsx_variable_write("L:SwpartsepB", "Number", 0)
+fsx_variable_write("L:SwpartsepA", "Number", 1)
+fsx_variable_write("L:SwpartsepB", "Number", 1)
 
 -- Initialize switch states
 update_start_switch_state()

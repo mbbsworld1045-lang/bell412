@@ -9,14 +9,12 @@
 -- 1. HARDWARE CONFIGURATION HEADER
 -- =============================================================================
 -- INPUTS (Switches converted to Buttons) D40..D43
-local PIN_HYD1_SW     = "ARDUINO_MEGA2560_B_D40"
-local PIN_HYD2_SW     = "ARDUINO_MEGA2560_B_D41"
-local PIN_CYC_CTR_TEST1 = "ARDUINO_MEGA2560_B_D42"  -- Cyclic Center Test Button 1
-local PIN_CYC_CTR_TEST2 = "ARDUINO_MEGA2560_B_D43"  -- Cyclic Center Test Button 2
-
--- OUTPUTS (LEDs) D44..D48
-local PIN_CYC_CTR_TEST1_LED = "ARDUINO_MEGA2560_B_D44"  -- Cyclic Center Test Status LED 1
-local PIN_CYC_CTR_TEST2_LED = "ARDUINO_MEGA2560_B_D45"  -- Cyclic Center Test Status LED 2
+local PIN_CYC_CTR_LED_L     = "ARDUINO_MEGA2560_B_D42" -- Note: B_D42
+local PIN_CYC_CTR_LED_R     = "ARDUINO_MEGA2560_B_D42" -- Note: B_D42 (Shared Pin)
+local PIN_CYC_CTR_TEST_R    = "ARDUINO_MEGA2560_B_D32"
+local PIN_CYC_CTR_TEST_L    = "ARDUINO_MEGA2560_B_D40"
+local PIN_HYD1_SW           = "ARDUINO_MEGA2560_A_D39"
+local PIN_HYD2_SW           = "ARDUINO_MEGA2560_A_D42"
 local PIN_HYD1_FAIL_LED = "ARDUINO_MEGA2560_B_D46"
 local PIN_HYD2_FAIL_LED = "ARDUINO_MEGA2560_B_D47"
 local PIN_CYC_CTR_LED   = "ARDUINO_MEGA2560_B_D48"  -- Cyclic Centering Warning LED (stick off-center)
@@ -24,8 +22,8 @@ local PIN_CYC_CTR_LED   = "ARDUINO_MEGA2560_B_D48"  -- Cyclic Centering Warning 
 -- =============================================================================
 -- 2. INITIALIZE HARDWARE LEDS
 -- =============================================================================
-local led_cyc_ctr_test1_h = hw_led_add(PIN_CYC_CTR_TEST1_LED, 0.0)  -- Cyclic Center Test Status LED 1
-local led_cyc_ctr_test2_h = hw_led_add(PIN_CYC_CTR_TEST2_LED, 0.0)  -- Cyclic Center Test Status LED 2
+local led_cyc_ctr_test_l = hw_led_add(PIN_CYC_CTR_LED_L, 0.0)  -- Cyclic Center Test Status LED Left
+local led_cyc_ctr_test_r = hw_led_add(PIN_CYC_CTR_LED_R, 0.0)  -- Cyclic Center Test Status LED Right
 local led_hyd1_h    = hw_led_add(PIN_HYD1_FAIL_LED, 0.0)
 local led_hyd2_h    = hw_led_add(PIN_HYD2_FAIL_LED, 0.0)
 local led_cyc_ctr_h = hw_led_add(PIN_CYC_CTR_LED, 0.0)  -- Cyclic Centering Warning LED
@@ -42,6 +40,8 @@ local CYC_CTR_THRESHOLD = 5.0  -- Percent deflection threshold
 -- Local State (Switch Positions)
 local sw_hyd1 = 0
 local sw_hyd2 = 0
+local btn_cyc_ch1_state = 0
+local btn_cyc_ch2_state = 0
 
 -- Sim Feedback Variables
 local dc_bus        = 0
@@ -113,15 +113,15 @@ hw_button_add(PIN_HYD1_SW,
     function() -- PRESSED (ON)
         print("ACTION: Hyd Sys 1 ON - Pin: " .. PIN_HYD1_SW)
         sw_hyd1 = 1
-        fsx_variable_write("L:Sw hydsysA", "Number", 1)
-        print("WRITE: L:Sw hydsysA = 1")
+        fsx_variable_write("L:Sw hydsysA", "Number", 0)
+        print("WRITE: L:Sw hydsysA = 0")
         update_hydraulics_logic()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Hyd Sys 1 OFF - Pin: " .. PIN_HYD1_SW)
         sw_hyd1 = 0
-        fsx_variable_write("L:Sw hydsysA", "Number", 0)
-        print("WRITE: L:Sw hydsysA = 0")
+        fsx_variable_write("L:Sw hydsysA", "Number", 1)
+        print("WRITE: L:Sw hydsysA = 1")
         update_hydraulics_logic()
 end
 )
@@ -144,27 +144,43 @@ hw_button_add(PIN_HYD2_SW,
     end
 )
 
--- CYCLIC CENTERING TEST BUTTON 1 (Momentary)
-hw_button_add(PIN_CYC_CTR_TEST1,
+-- CYCLIC CENTERING TEST BUTTON LEFT (Momentary)
+hw_button_add(PIN_CYC_CTR_TEST_L,
     function() -- PRESSED
-        print("ACTION: Cyclic Center Test 1 PRESSED")
-        fsx_variable_write("L:Cyctest", "Number", 1)
+        print("ACTION: Cyclic Center Test Left PRESSED")
+        btn_cyc_ch1_state = 1
+        hw_led_set(led_cyc_ctr_test_l, 1.0)
+        -- Write 1 if EITHER button is pressed
+        local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
+        fsx_variable_write("L:Cyctest", "Number", val)
     end,
     function() -- RELEASED
-        print("ACTION: Cyclic Center Test 1 RELEASED")
-        fsx_variable_write("L:Cyctest", "Number", 0)
+        print("ACTION: Cyclic Center Test Left RELEASED")
+        btn_cyc_ch1_state = 0
+        hw_led_set(led_cyc_ctr_test_l, 0.0)
+        -- Write 1 if EITHER button is pressed
+        local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
+        fsx_variable_write("L:Cyctest", "Number", val)
     end
 )
 
--- CYCLIC CENTERING TEST BUTTON 2 (Momentary)
-hw_button_add(PIN_CYC_CTR_TEST2,
+-- CYCLIC CENTERING TEST BUTTON RIGHT (Momentary)
+hw_button_add(PIN_CYC_CTR_TEST_R,
     function() -- PRESSED
-        print("ACTION: Cyclic Center Test 2 PRESSED")
-        fsx_variable_write("L:Cyctest", "Number", 1)
+        print("ACTION: Cyclic Center Test Right PRESSED")
+        btn_cyc_ch2_state = 1
+        hw_led_set(led_cyc_ctr_test_r, 1.0)
+        -- Write 1 if EITHER button is pressed
+        local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
+        fsx_variable_write("L:Cyctest", "Number", val)
     end,
     function() -- RELEASED
-        print("ACTION: Cyclic Center Test 2 RELEASED")
-        fsx_variable_write("L:Cyctest", "Number", 0)
+        print("ACTION: Cyclic Center Test Right RELEASED")
+        btn_cyc_ch2_state = 0
+        hw_led_set(led_cyc_ctr_test_r, 0.0)
+        -- Write 1 if EITHER button is pressed
+        local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
+        fsx_variable_write("L:Cyctest", "Number", val)
     end
 )
 
@@ -197,10 +213,8 @@ fsx_variable_subscribe("A:YOKE X POSITION", "Percent",
 )
 
 -- Listen for Cyclic Center Test state (for status LEDs)
+-- Listen for Cyclic Center Test state (Debug logging only, LEDs handled by buttons)
 fsx_variable_subscribe("L:Cyctest", "Number", function(val)
-    local led_state = (val ~= 0) and 1.0 or 0.0
-    hw_led_set(led_cyc_ctr_test1_h, led_state)
-    hw_led_set(led_cyc_ctr_test2_h, led_state)
     print("SUBSCRIBE: L:Cyctest = " .. tostring(val))
 end)
 
@@ -213,7 +227,7 @@ print("INIT: PIN_HYD2_SW = " .. PIN_HYD2_SW)
 
 fsx_variable_write("L:HydPressure1", "Number", 0.0)
 fsx_variable_write("L:HydPressure2", "Number", 0.0)
-fsx_variable_write("L:Sw hydsysA", "Number", 0)
+fsx_variable_write("L:Sw hydsysA", "Number", 1)
 fsx_variable_write("L:Sw hydsysB", "Number", 0)
 fsx_variable_write("L:Cyctest", "Number", 0)
 

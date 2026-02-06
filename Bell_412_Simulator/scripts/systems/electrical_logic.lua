@@ -241,12 +241,10 @@ hw_button_add(PIN_NONESNTL_SW,
     function() -- PRESSED (ON)
         print("ACTION: Non-Ess Bus ON")
         fsx_variable_write("L:Swnonbus", "Number", 1)
-        fsx_variable_write("L:SwNonEsntl", "Number", 1)
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Non-Ess Bus OFF")
         fsx_variable_write("L:Swnonbus", "Number", 0)
-        fsx_variable_write("L:SwNonEsntl", "Number", 0)
     end
 )
 
@@ -266,11 +264,11 @@ hw_button_add(PIN_EMERGLOAD_SW,
 hw_button_add(PIN_STBYATT_SW,
     function() -- PRESSED (ON/TEST)
         print("ACTION: Stby Att ON")
-        fsx_variable_write("L:stbatt", "Number", 1)
+        fsx_variable_write("L:Swstbyatt", "Number", 1)
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Stby Att OFF")
-        fsx_variable_write("L:stbatt", "Number", 0)
+        fsx_variable_write("L:Swstbyatt", "Number", 0)
     end
 )
 

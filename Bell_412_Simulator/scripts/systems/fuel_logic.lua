@@ -9,20 +9,26 @@
 -- 1. HARDWARE CONFIGURATION HEADER
 -- =============================================================================
 -- INPUTS (Switches converted to Buttons) D2..D14
-local PIN_FUEL_TRANS1   = "ARDUINO_MEGA2560_B_D2"
-local PIN_FUEL_TRANS2   = "ARDUINO_MEGA2560_B_D3"
-local PIN_BOOST1        = "ARDUINO_MEGA2560_B_D4"
-local PIN_BOOST2        = "ARDUINO_MEGA2560_B_D5"
-local PIN_INTCON        = "ARDUINO_MEGA2560_B_D6"
-local PIN_XFEED         = "ARDUINO_MEGA2560_B_D7"
-local PIN_VALVE1        = "ARDUINO_MEGA2560_B_D8"
-local PIN_VALVE2        = "ARDUINO_MEGA2560_B_D9"
-local PIN_FUEL_QUANTITY_POS1 = "ARDUINO_MEGA2560_B_D12"  -- Fuel Quantity Position 1 (State = 1)
-local PIN_FUEL_QUANTITY_POS2 = "ARDUINO_MEGA2560_B_D10"  -- Fuel Quantity Position 2 (State = -1)
-local PIN_FUEL_DIGIT_TEST = "ARDUINO_MEGA2560_B_D11"
+-- Fuel System (Mega A)
+local PIN_VALVE1            = "ARDUINO_MEGA2560_A_D30"
+local PIN_VALVE2            = "ARDUINO_MEGA2560_A_D32"
+local PIN_XFEED             = "ARDUINO_MEGA2560_A_D28"      -- XFEED Bus Test 1 (L:Swxfeedbus = 1)
+local PIN_FUEL_TRANS1       = "ARDUINO_MEGA2560_A_D34"      -- Trans Fuel 1 (L:SwfueltransengA)
+local PIN_BOOST1            = "ARDUINO_MEGA2560_A_D35"      -- Boost Pump 1 (L:SwboostpuEng1)
+local PIN_FUEL_INTCON       = "ARDUINO_MEGA2560_A_D36"      -- Fuel Intercon (L:Swfuelintcon)
+local PIN_FUEL_TRANS2       = "ARDUINO_MEGA2560_A_D37"
+local PIN_BOOST2            = "ARDUINO_MEGA2560_A_D38"
+local PIN_XFEED_INTCON_POS2 = "ARDUINO_MEGA2560_A_D31"
+
+-- Fuel Tests (Mega B)
+local PIN_FUEL_SYS_TEST_FWD = "ARDUINO_MEGA2560_B_D34"
+local PIN_FUEL_SYS_TEST_MID = "ARDUINO_MEGA2560_B_D53"
+-- PIN_XFEED_INTCON_POS1 = "Ground" (Handled by 3-way logic, no pin)
+-- PIN_FUEL_DIGIT_TEST = "Recheck" (Disabled per spreadsheet)
+
 -- Fuel XFEED/INTCON Switch (3-position: 0=Norm, 1=Test Bus 1, 2=Test Bus 2)
-local PIN_XFEED_INTCON_POS1 = "ARDUINO_MEGA2560_B_D13"  -- XFEED/INTCON Position 1 (State = 1, Test Bus 1)
-local PIN_XFEED_INTCON_POS2 = "ARDUINO_MEGA2560_B_D14"  -- XFEED/INTCON Position 2 (State = 2, Test Bus 2)
+-- local PIN_XFEED_INTCON_POS1 = "ARDUINO_MEGA2560_B_D13"  -- Disabled/Ground
+-- local PIN_FUEL_DIGIT_TEST = "ARDUINO_MEGA2560_B_D11" -- Disabled
 
 -- OUTPUTS (LEDs) D30..D38
 local PIN_TRANS1_LED       = "ARDUINO_MEGA2560_B_D30"
@@ -68,8 +74,9 @@ local sw_valve1  = 0
 local sw_valve2  = 0
 
 -- Fuel Quantity Switch State (3-position: 0=OFF, 1=Position 1, -1=Position 2)
-local fuel_quantity_pos1_pressed = false
-local fuel_quantity_pos2_pressed = false
+-- Fuel Quantity / Test Switch State
+local fuel_test_fwd_pressed = false
+local fuel_test_mid_pressed = false
 local fuel_quantity_state = 0
 
 -- Fuel XFEED/INTCON Switch State (3-position: 0=Norm, 1=Test Bus 1, 2=Test Bus 2)
@@ -111,10 +118,10 @@ end
 local function update_fuel_quantity_state()
     local new_state = 0
     
-    if fuel_quantity_pos1_pressed then
-        new_state = 1  -- Position 1 (D12)
-    elseif fuel_quantity_pos2_pressed then
-        new_state = -1  -- Position 2 (D10)
+    if fuel_test_mid_pressed then
+        new_state = 1  -- Mid Tank Test
+    elseif fuel_test_fwd_pressed then
+        new_state = -1  -- Fwd Tank Test
     else
         new_state = 0  -- OFF (both released)
     end
@@ -203,10 +210,10 @@ local function command_valve_1(cmd)
     fsx_variable_write("L:SwvalveEng1", "Number", cmd)
     fsx_variable_write("L:MvalveEng1", "Number", cmd)
 
-    if dc_bus == 0 then return end
+    if dc_bus == 1 then return end
 
     valve1_start  = valve1_pos
-    valve1_target = (cmd == 1) and 1.0 or 0.0
+    valve1_target = (cmd == 0) and 1.0 or 0.0
     valve1_t0     = os.clock()
     valve1_moving = true
 end
@@ -266,14 +273,14 @@ end
 hw_button_add(PIN_FUEL_TRANS1,
     function() -- PRESSED (ON)
         print("ACTION: Fuel Trans 1 ON")
-        sw_trans1 = 1
-        fsx_variable_write("L:SwfueltransengA", "Number", 1)
+        sw_trans1 = 0
+        fsx_variable_write("L:SwfueltransengA", "Number", 0)
         update_led_states()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Fuel Trans 1 OFF")
-        sw_trans1 = 0
-        fsx_variable_write("L:SwfueltransengA", "Number", 0)
+        sw_trans1 = 1
+        fsx_variable_write("L:SwfueltransengA", "Number", 1)
         update_led_states()
     end
 )
@@ -334,14 +341,14 @@ hw_button_add(PIN_BOOST2,
 hw_button_add(PIN_INTCON,
     function() -- PRESSED (ON)
         print("ACTION: Fuel Intcon ON")
-        sw_intcon = 1
-        fsx_variable_write("L:Swfuelintcon", "Number", 1)
+        sw_intcon = 0
+        fsx_variable_write("L:Swfuelintcon", "Number", 0)
         update_led_states()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Fuel Intcon OFF")
-        sw_intcon = 0
-        fsx_variable_write("L:Swfuelintcon", "Number", 0)
+        sw_intcon = 1
+        fsx_variable_write("L:Swfuelintcon", "Number", 1)
         update_led_states()
     end
 )
@@ -388,36 +395,37 @@ hw_button_add(PIN_VALVE2,
     end
 )
 
--- FUEL QUANTITY SWITCH (3-Position: 0=OFF, 1=Position 1 (D12), -1=Position 2 (D10))
--- Position 1 Button (D12 -> State = 1)
-hw_button_add(PIN_FUEL_QUANTITY_POS1,
-    function() -- PRESSED (Position 1)
-        print("ACTION: Fuel Quantity -> Position 1 (State = 1)")
-        fuel_quantity_pos1_pressed = true
+-- FUEL SYSTEM TEST SWITCHES
+-- MID TANK TEST (D49 -> State = 1)
+hw_button_add(PIN_FUEL_SYS_TEST_MID,
+    function() -- PRESSED
+        print("ACTION: Fuel Test -> MID (State = 1)")
+        fuel_test_mid_pressed = true
         update_fuel_quantity_state()
     end,
     function() -- RELEASED
-        print("ACTION: Fuel Quantity Position 1 RELEASED")
-        fuel_quantity_pos1_pressed = false
+        print("ACTION: Fuel Test MID RELEASED")
+        fuel_test_mid_pressed = false
         update_fuel_quantity_state()
     end
 )
 
--- Position 2 Button (D10 -> State = -1)
-hw_button_add(PIN_FUEL_QUANTITY_POS2,
-    function() -- PRESSED (Position 2)
-        print("ACTION: Fuel Quantity -> Position 2 (State = -1)")
-        fuel_quantity_pos2_pressed = true
+-- FWD TANK TEST (D29 -> State = -1)
+hw_button_add(PIN_FUEL_SYS_TEST_FWD,
+    function() -- PRESSED
+        print("ACTION: Fuel Test -> FWD (State = -1)")
+        fuel_test_fwd_pressed = true
         update_fuel_quantity_state()
     end,
     function() -- RELEASED
-        print("ACTION: Fuel Quantity Position 2 RELEASED")
-        fuel_quantity_pos2_pressed = false
+        print("ACTION: Fuel Test FWD RELEASED")
+        fuel_test_fwd_pressed = false
         update_fuel_quantity_state()
     end
 )
 
--- FUEL DIGIT TEST (Momentary)
+-- FUEL DIGIT TEST (Disabled by default, but code preserved for reference)
+--[[
 hw_button_add(PIN_FUEL_DIGIT_TEST,
     function() -- PRESSED
         print("ACTION: Fuel Digit Test PRESSED")
@@ -428,9 +436,11 @@ hw_button_add(PIN_FUEL_DIGIT_TEST,
         fsx_variable_write("L:Digitstest", "Number", 0)
     end
 )
+]]
 
--- FUEL XFEED/INTCON SWITCH (3-Position: 0=Norm, 1=Test Bus 1 (D13), 2=Test Bus 2 (D14))
--- Position 1 Button (D13 -> State = 1, Test Bus 1)
+-- FUEL XFEED/INTCON SWITCH (3-Position: 0=Norm, 1=Test Bus 1 (Ground?), 2=Test Bus 2 (D31))
+-- Position 1 Button (Handled by logic or physical ground - disabling software input for now)
+--[[
 hw_button_add(PIN_XFEED_INTCON_POS1,
     function() -- PRESSED (Position 1 - Test Bus 1)
         print("ACTION: Fuel XFEED/INTCON Switch -> Position 1 (State = 1, Test Bus 1)")
@@ -443,6 +453,7 @@ hw_button_add(PIN_XFEED_INTCON_POS1,
         update_xfeed_intcon_state()
     end
 )
+]]
 
 -- Position 2 Button (D14 -> State = 2, Test Bus 2)
 hw_button_add(PIN_XFEED_INTCON_POS2,

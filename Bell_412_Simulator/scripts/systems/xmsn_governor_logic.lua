@@ -14,9 +14,10 @@ local PIN_RPM_SWITCH_POS1 = "ARDUINO_MEGA2560_C_D21"  -- Governor RPM Switch Pos
 local PIN_RPM_SWITCH_POS2 = "ARDUINO_MEGA2560_C_D22"  -- Governor RPM Switch Position 2 (State = -1, Decrease)
 local PIN_RPM_SWITCH_POS1_2 = "ARDUINO_MEGA2560_C_D60"  -- Governor RPM Switch Position 1 Button 2 (State = 1, Increase)
 local PIN_RPM_SWITCH_POS2_2 = "ARDUINO_MEGA2560_C_D61"  -- Governor RPM Switch Position 2 Button 2 (State = -1, Decrease)
-local PIN_GOV_ENG1  = "ARDUINO_MEGA2560_C_D23"  -- Governor Engine 1 Switch
-local PIN_GOV_ENG2  = "ARDUINO_MEGA2560_C_D25"  -- Governor Engine 2 Switch
-local PIN_RPM_AUDIO = "ARDUINO_MEGA2560_C_D62"  -- Rotor RPM Audio (0/1)
+-- Governor (Mega A)
+local PIN_GOV_ENG1          = "ARDUINO_MEGA2560_A_D23"
+local PIN_GOV_ENG2          = "ARDUINO_MEGA2560_A_D29"      -- Governor Eng 2 (L:SwGovB)
+local PIN_RPM_AUDIO         = "ARDUINO_MEGA2560_A_D41"
 
 -- OUTPUTS (LEDs) D41..D43 (CWP Warning Lights)
 local PIN_GOV_A_WARN_LED = "ARDUINO_MEGA2560_C_D41"
@@ -164,12 +165,14 @@ local function update_rpm_switch_state()
         fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", rpm_switch_state)
         print("RPM SWITCH: State changed to " .. tostring(rpm_switch_state))
         
-        -- Start/stop timer based on switch state
         if rpm_switch_state == 1 then
+            fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 1)  -- Add explicit write as requested
             start_rpm_timer()
         elseif rpm_switch_state == -1 then
+            fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", -1) -- Add explicit write as requested
             start_rpm_timer()
         else
+            fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)  -- Add explicit write as requested
             stop_rpm_timer()
         end
     end
@@ -312,16 +315,17 @@ hw_button_add(PIN_GOV_ENG2,
 )
 
 -- ROTOR RPM AUDIO (0=OFF, 1=ON)
+-- ROTOR RPM AUDIO (Switch: 0=OFF, 1=ON)
 hw_button_add(PIN_RPM_AUDIO,
     function() -- PRESSED (ON)
-        print("ACTION: Rotor RPM Audio ON")
+        print("ACTION: Rotor RPM Audio Switch ON")
         rpm_audio_state = 1
-        fsx_variable_write("L:RPMAudio", "Number", 1)
+        fsx_variable_write("L:Sw RPMAudio", "Number", 1)
     end,
     function() -- RELEASED (OFF)
-        print("ACTION: Rotor RPM Audio OFF")
+        print("ACTION: Rotor RPM Audio Switch OFF")
         rpm_audio_state = 0
-        fsx_variable_write("L:RPMAudio", "Number", 0)
+        fsx_variable_write("L:Sw RPMAudio", "Number", 0)
     end
 )
 
@@ -396,7 +400,7 @@ fsx_variable_write("L:GovMode", "Number", 0)
 fsx_variable_write("L:SwGovA", "Number", 0)
 fsx_variable_write("L:SwGovB", "Number", 0)
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
-fsx_variable_write("L:RPMAudio", "Number", 0)
+fsx_variable_write("L:Sw RPMAudio", "Number", 0)
 
 -- Initialize RPM switch state
 update_rpm_switch_state()

@@ -11,11 +11,12 @@
 -- INPUTS (Buttons) D10..D13
 local PIN_TEST_PNL_POS1 = "ARDUINO_MEGA2560_C_D10"  -- MC Test Panel Position 1
 local PIN_TEST_PNL_POS2 = "ARDUINO_MEGA2560_C_D13"  -- MC Test Panel Position 2
-local PIN_TEST_LT   = "ARDUINO_MEGA2560_C_D11"
-local PIN_RESET     = "ARDUINO_MEGA2560_C_D12"
+local PIN_TEST_LT     = "ARDUINO_MEGA2560_C_D11"
+local PIN_MC_RESET_R  = "ARDUINO_MEGA2560_B_D36"  -- Right Reset
+local PIN_MC_RESET_L  = "ARDUINO_MEGA2560_B_D41"  -- Left Reset
 
 -- OUTPUTS (LEDs) D40
-local PIN_MC_LED    = "ARDUINO_MEGA2560_C_D40"
+local PIN_MC_LED    = "ARDUINO_MEGA2560_B_D43"  -- Shared for Left/Right LEDs
 
 -- =============================================================================
 -- 2. INITIALIZE HARDWARE LEDS
@@ -29,6 +30,8 @@ local led_mc_h = hw_led_add(PIN_MC_LED, 0.0)
 local test_pnl_pos1_pressed = false  -- MC Test Panel Position 1
 local test_pnl_pos2_pressed = false  -- MC Test Panel Position 2
 local test_lt_held  = false
+local mc_reset_r_held = false
+local mc_reset_l_held = false
 local mc_test       = 0
 
 -- Sim Feedback Variables
@@ -181,6 +184,13 @@ local function update_test_switch()
     end
 end
 
+-- MC RESET Logic: Combine L and R inputs
+local function update_mc_reset()
+    local reset_active = mc_reset_l_held or mc_reset_r_held
+    fsx_variable_write("L:ResetMC", "Number", reset_active and 1 or 0)
+    print("ACTION: MC Reset State = " .. tostring(reset_active))
+end
+
 -- =============================================================================
 -- 5. HARDWARE INPUTS (BUTTONS)
 -- =============================================================================
@@ -230,15 +240,31 @@ hw_button_add(PIN_TEST_LT,
     end
 )
 
--- MC RESET (Momentary)
-hw_button_add(PIN_RESET,
+-- MC RESET RIGHT (Momentary)
+hw_button_add(PIN_MC_RESET_R,
     function() -- PRESSED
-        print("ACTION: MC Reset PRESSED")
-        fsx_variable_write("L:ResetMC", "Number", 1)
+        print("ACTION: MC Reset Right PRESSED")
+        mc_reset_r_held = true
+        update_mc_reset()
     end,
     function() -- RELEASED
-        print("ACTION: MC Reset RELEASED")
-        fsx_variable_write("L:ResetMC", "Number", 0)
+        print("ACTION: MC Reset Right RELEASED")
+        mc_reset_r_held = false
+        update_mc_reset()
+    end
+)
+
+-- MC RESET LEFT (Momentary)
+hw_button_add(PIN_MC_RESET_L,
+    function() -- PRESSED
+        print("ACTION: MC Reset Left PRESSED")
+        mc_reset_l_held = true
+        update_mc_reset()
+    end,
+    function() -- RELEASED
+        print("ACTION: MC Reset Left RELEASED")
+        mc_reset_l_held = false
+        update_mc_reset()
     end
 )
 
@@ -422,4 +448,7 @@ fsx_variable_write("L:TestMC", "Number", 0)
 update_test_panel_state()
 
 -- Run logic once at start
+-- Run logic once at start
 update_master_caution()
+
+-- NOTE: L:DimMC (Dim Master Caution) logic omitted as no hardware pin is currently assigned.
