@@ -6,7 +6,7 @@
 -- =============================================================================
 
 -- =============================================================================
-print("Bell 412 - Front Panel Script is now active")
+print("Front Panel Script Running")
 
 -- =============================================================================
 -- 1. HARDWARE CONFIGURATION HEADER
@@ -715,4 +715,4 @@ update_cyc_ctr_led()
 update_extinguisher_state()
 update_engine_leds()
 
-print("DEBUG: Front Panel Script Loaded")
+update_engine_leds()

@@ -4,7 +4,7 @@
 -- Hardware: Arduino Channel C (Collective)
 -- =============================================================================
 
-print("Bell 412 - Collective Script is now active")
+print("Collective Script Running")
 
 -- =============================================================================
 -- 1. HARDWARE CONFIGURATION HEADER
@@ -298,25 +298,21 @@ hw_button_add(PIN_YAW_DOWN_LH,
 
 -- Landing Light State (for LED feedback)
 fsx_variable_subscribe("A:LIGHT LANDING", "Bool", function(val)
-    print("A:LIGHT LANDING = " .. tostring(val))
     -- Add LED control here if needed
 end)
 
 -- Search Light State (for LED feedback)
 fsx_variable_subscribe("A:LIGHT SEARCH", "Bool", function(val)
-    print("A:LIGHT SEARCH = " .. tostring(val))
     -- Add LED control here if needed
 end)
 
 -- Rudder Trim Position (for debug)
 fsx_variable_subscribe("A:RUDDER TRIM PCT", "Percent", function(val)
     -- Optional: Monitor rudder trim position for debug
-    -- print("A:RUDDER TRIM PCT = " .. tostring(val))
 end)
 
 -- Go Around Active (for LED feedback)
 fsx_variable_subscribe("A:AUTOPILOT TOGA ACTIVE", "Bool", function(val)
-    print("A:AUTOPILOT TOGA ACTIVE = " .. tostring(val))
     -- Add LED control here if needed
 end)
 
@@ -327,4 +323,4 @@ fsx_variable_write("L:starteng", "Number", 0)
 fsx_variable_write("L:idle eng", "Number", 0)
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
 
-print("DEBUG: Collective Script Loaded (SimConnect K-Events enabled)")
+fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)

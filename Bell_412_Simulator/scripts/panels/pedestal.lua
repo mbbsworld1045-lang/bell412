@@ -5,7 +5,7 @@
 -- Logic: Buttons Only (Active Low)
 -- =============================================================================
 
-print("Bell 412 - Pedestal Script is now active")
+print("Pedestal Script Running")
 
 -- =============================================================================
 -- 1. HARDWARE CONFIGURATION HEADER
@@ -697,7 +697,7 @@ end)
 -- =============================================================================
 -- 7. STARTUP INITIALIZATION
 -- =============================================================================
-print("INIT: Pedestal Logic - Initializing...")
+-- INIT: Pedestal Logic
 
 fsx_variable_write("L:AutoPilot", "Number", 0)
 fsx_variable_write("L:AutoPilot2", "Number", 0)
@@ -722,4 +722,4 @@ fsx_variable_write("L:Sw RPMAudio", "Number", 1)
 -- Initialize LEDs
 update_sas_att()
 
-print("INIT: Pedestal Logic - Initialization Complete")
+update_sas_att()

@@ -1,86 +1,88 @@
 -- =============================================================================
 -- BELL 412 - CAUTION WARNING PANEL (CWP) LOGIC
 -- Platform: Air Manager + Arduino Mega 2560
--- Hardware: Arduino Channel D (Caution Panel)
+-- Hardware: Arduino Channel E (Caution Panel)
 -- Logic: 56 LEDs + 3 Switches (Active Low)
 -- =============================================================================
 
-print("Bell 412 - Caution Panel Script is now active")
+print("Caution Panel Script Running")
+-- ... (rest of file)
+-- Remove end print
 
 -- =============================================================================
 -- 1. HARDWARE CONFIGURATION HEADER
 -- =============================================================================
 
 -- INPUTS (Switches/Buttons)
-local PIN_TEST_SW_POS1      = "ARDUINO_MEGA2560_D_D22"      -- Test Switch Position 1 (PNL)
-local PIN_TEST_BTN          = "ARDUINO_MEGA2560_D_D23"      -- Test Button (LT - Lamp Test)
-local PIN_TEST_SW_POS2      = "ARDUINO_MEGA2560_D_D24"      -- Test Switch Position 2
-local PIN_BRIGHT_DIM_POS1   = "ARDUINO_MEGA2560_D_D4"       -- Bright/Dim Switch Position 1
-local PIN_BRIGHT_DIM_POS2   = "ARDUINO_MEGA2560_D_D5"       -- Bright/Dim Switch Position 2
+local PIN_TEST_SW_POS1      = "ARDUINO_MEGA2560_E_D22"      -- Test Switch Position 1 (PNL)
+local PIN_TEST_BTN          = "ARDUINO_MEGA2560_E_D23"      -- Test Button (LT - Lamp Test)
+local PIN_TEST_SW_POS2      = "ARDUINO_MEGA2560_E_D24"      -- Test Switch Position 2
+local PIN_BRIGHT_DIM_POS1   = "ARDUINO_MEGA2560_E_D4"       -- Bright/Dim Switch Position 1
+local PIN_BRIGHT_DIM_POS2   = "ARDUINO_MEGA2560_E_D5"       -- Bright/Dim Switch Position 2
 
 -- =============================================================================
 -- OUTPUTS (56 Caution LEDs) - Mapped by Panel Position
 -- =============================================================================
 
 -- RJ1 Connector LEDs (Pins 25-50, 3, 43-49)
-local PIN_LED_ENG1_OUT      = "ARDUINO_MEGA2560_D_D25"      -- 1: ENG 1 OUT
-local PIN_LED_ENG2_OUT      = "ARDUINO_MEGA2560_D_D26"      -- 2: ENG 2 OUT
-local PIN_LED_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_D27"      -- 3: ROTOR BRAKE
-local PIN_LED_XMSN_OIL_PRESS = "ARDUINO_MEGA2560_D_D28"     -- 4: XMSN OIL PRESS
-local PIN_LED_XMSN_OIL_TEMP = "ARDUINO_MEGA2560_D_D29"      -- 5: XMSN OIL TEMP
-local PIN_LED_CBOX_OIL_PRESS = "ARDUINO_MEGA2560_D_D30"     -- 6: C BOX OIL PRESS
-local PIN_LED_CBOX_OIL_TEMP = "ARDUINO_MEGA2560_D_D31"      -- 7: C BOX OIL TEMP
-local PIN_LED_BATT1_HOT     = "ARDUINO_MEGA2560_D_D32"      -- 8: BATT 1 HOT
-local PIN_LED_BATT2_HOT     = "ARDUINO_MEGA2560_D_D33"      -- 9: BATT 2 HOT
-local PIN_LED_ENG_OIL_PRESS1 = "ARDUINO_MEGA2560_D_D34"     -- 10: ENGINE OIL PRESS 1
-local PIN_LED_ENG_OIL_PRESS2 = "ARDUINO_MEGA2560_D_D35"     -- 11: ENGINE OIL PRESS 2
-local PIN_LED_ENG_CHIP1     = "ARDUINO_MEGA2560_D_D36"      -- 12: ENGINE CHIP 1
-local PIN_LED_ENG_CHIP2     = "ARDUINO_MEGA2560_D_D37"      -- 13: ENGINE CHIP 2
-local PIN_LED_FUEL_FILTER1  = "ARDUINO_MEGA2560_D_D38"      -- 14: FUEL FILTER 1
-local PIN_LED_FUEL_FILTER2  = "ARDUINO_MEGA2560_D_D39"      -- 15: FUEL FILTER 2
-local PIN_LED_FUEL_BOOST1   = "ARDUINO_MEGA2560_D_D40"      -- 16: FUEL BOOST 1
-local PIN_LED_FUEL_BOOST2   = "ARDUINO_MEGA2560_D_D41"      -- 17: FUEL BOOST 2
-local PIN_LED_FUEL_TRANS1   = "ARDUINO_MEGA2560_D_D42"      -- 18: FUEL TRANS 1
-local PIN_LED_FUEL_TRANS2   = "ARDUINO_MEGA2560_D_D50"      -- 19: FUEL TRANS 2
-local PIN_LED_FUEL_VALVE1   = "ARDUINO_MEGA2560_D_D49"      -- 20: FUEL VALVE 1
-local PIN_LED_FUEL_VALVE2   = "ARDUINO_MEGA2560_D_D48"      -- 21: FUEL VALVE 2
-local PIN_LED_FUEL_LOW      = "ARDUINO_MEGA2560_D_D3"       -- 22: FUEL LOW
-local PIN_LED_FUEL_INTCON   = "ARDUINO_MEGA2560_D_D47"      -- 23: FUEL INTCON
-local PIN_LED_FUEL_XFEED    = "ARDUINO_MEGA2560_D_D46"      -- 24: FUEL XFEED
-local PIN_LED_GOV_MAN1      = "ARDUINO_MEGA2560_D_D45"      -- 25: GOV MANUAL 1
-local PIN_LED_GOV_MAN2      = "ARDUINO_MEGA2560_D_D44"      -- 26: GOV MANUAL 2
-local PIN_LED_PARTSEP1      = "ARDUINO_MEGA2560_D_D43"      -- 27: PART SEP OFF 1
-local PIN_LED_PARTSEP2      = "ARDUINO_MEGA2560_D_D6"       -- 28: PART SEP OFF 2
+local PIN_LED_ENG1_OUT      = "ARDUINO_MEGA2560_E_D25"      -- 1: ENG 1 OUT
+local PIN_LED_ENG2_OUT      = "ARDUINO_MEGA2560_E_D26"      -- 2: ENG 2 OUT
+local PIN_LED_ROTOR_BRAKE   = "ARDUINO_MEGA2560_E_D27"      -- 3: ROTOR BRAKE
+local PIN_LED_XMSN_OIL_PRESS = "ARDUINO_MEGA2560_E_D28"     -- 4: XMSN OIL PRESS
+local PIN_LED_XMSN_OIL_TEMP = "ARDUINO_MEGA2560_E_D29"      -- 5: XMSN OIL TEMP
+local PIN_LED_CBOX_OIL_PRESS = "ARDUINO_MEGA2560_E_D30"     -- 6: C BOX OIL PRESS
+local PIN_LED_CBOX_OIL_TEMP = "ARDUINO_MEGA2560_E_D31"      -- 7: C BOX OIL TEMP
+local PIN_LED_BATT1_HOT     = "ARDUINO_MEGA2560_E_D32"      -- 8: BATT 1 HOT
+local PIN_LED_BATT2_HOT     = "ARDUINO_MEGA2560_E_D33"      -- 9: BATT 2 HOT
+local PIN_LED_ENG_OIL_PRESS1 = "ARDUINO_MEGA2560_E_D34"     -- 10: ENGINE OIL PRESS 1
+local PIN_LED_ENG_OIL_PRESS2 = "ARDUINO_MEGA2560_E_D35"     -- 11: ENGINE OIL PRESS 2
+local PIN_LED_ENG_CHIP1     = "ARDUINO_MEGA2560_E_D36"      -- 12: ENGINE CHIP 1
+local PIN_LED_ENG_CHIP2     = "ARDUINO_MEGA2560_E_D37"      -- 13: ENGINE CHIP 2
+local PIN_LED_FUEL_FILTER1  = "ARDUINO_MEGA2560_E_D38"      -- 14: FUEL FILTER 1
+local PIN_LED_FUEL_FILTER2  = "ARDUINO_MEGA2560_E_D39"      -- 15: FUEL FILTER 2
+local PIN_LED_FUEL_BOOST1   = "ARDUINO_MEGA2560_E_D40"      -- 16: FUEL BOOST 1
+local PIN_LED_FUEL_BOOST2   = "ARDUINO_MEGA2560_E_D41"      -- 17: FUEL BOOST 2
+local PIN_LED_FUEL_TRANS1   = "ARDUINO_MEGA2560_E_D42"      -- 18: FUEL TRANS 1
+local PIN_LED_FUEL_TRANS2   = "ARDUINO_MEGA2560_E_D50"      -- 19: FUEL TRANS 2
+local PIN_LED_FUEL_VALVE1   = "ARDUINO_MEGA2560_E_D49"      -- 20: FUEL VALVE 1
+local PIN_LED_FUEL_VALVE2   = "ARDUINO_MEGA2560_E_D48"      -- 21: FUEL VALVE 2
+local PIN_LED_FUEL_LOW      = "ARDUINO_MEGA2560_E_D3"       -- 22: FUEL LOW
+local PIN_LED_FUEL_INTCON   = "ARDUINO_MEGA2560_E_D47"      -- 23: FUEL INTCON
+local PIN_LED_FUEL_XFEED    = "ARDUINO_MEGA2560_E_D46"      -- 24: FUEL XFEED
+local PIN_LED_GOV_MAN1      = "ARDUINO_MEGA2560_E_D45"      -- 25: GOV MANUAL 1
+local PIN_LED_GOV_MAN2      = "ARDUINO_MEGA2560_E_D44"      -- 26: GOV MANUAL 2
+local PIN_LED_PARTSEP1      = "ARDUINO_MEGA2560_E_D43"      -- 27: PART SEP OFF 1
+local PIN_LED_PARTSEP2      = "ARDUINO_MEGA2560_E_D6"       -- 28: PART SEP OFF 2
 
 -- RJ2 Connector LEDs (Pins 6-13, A0-A15, 51-53)
-local PIN_LED_DC_GEN1       = "ARDUINO_MEGA2560_D_D7"       -- 29: DC GENERATOR 1
-local PIN_LED_DC_GEN2       = "ARDUINO_MEGA2560_D_D8"       -- 30: DC GENERATOR 2
-local PIN_LED_INVERTER1     = "ARDUINO_MEGA2560_D_A15"      -- 31: INVERTER 1
-local PIN_LED_INVERTER2     = "ARDUINO_MEGA2560_D_A14"      -- 32: INVERTER 2
-local PIN_LED_BATTERY       = "ARDUINO_MEGA2560_D_A13"      -- 33: BATTERY
-local PIN_LED_GEN_OVHT1     = "ARDUINO_MEGA2560_D_A12"      -- 34: GEN OVHT 1
-local PIN_LED_GEN_OVHT2     = "ARDUINO_MEGA2560_D_A11"      -- 35: GEN OVHT 2
-local PIN_LED_HYDRAULIC1    = "ARDUINO_MEGA2560_D_A10"      -- 36: HYDRAULIC 1
-local PIN_LED_HYDRAULIC2    = "ARDUINO_MEGA2560_D_A9"       -- 37: HYDRAULIC 2
-local PIN_LED_EXT_POWER     = "ARDUINO_MEGA2560_D_A8"       -- 38: EXTERNAL POWER
-local PIN_LED_XMSN_CHIP     = "ARDUINO_MEGA2560_D_A7"       -- 39: XMSN CHIP
-local PIN_LED_CBOX_CHIP     = "ARDUINO_MEGA2560_D_A6"       -- 40: C BOX CHIP
-local PIN_LED_4290_CHIP     = "ARDUINO_MEGA2560_D_A5"       -- 41: 42/90 CHIP
-local PIN_LED_OVER_TORQ     = "ARDUINO_MEGA2560_D_D51"      -- 42: OVER TORQ
-local PIN_LED_RPM           = "ARDUINO_MEGA2560_D_D52"      -- 43: RPM
-local PIN_LED_AFCS          = "ARDUINO_MEGA2560_D_D53"      -- 44: AFCS
-local PIN_LED_FT_OFF        = "ARDUINO_MEGA2560_D_A4"       -- 45: FT OFF
-local PIN_LED_CYC_CTR       = "ARDUINO_MEGA2560_D_A3"       -- 46: CYC CTR
-local PIN_LED_DOOR_LOCK     = "ARDUINO_MEGA2560_D_A2"       -- 47: DOOR LOCK
-local PIN_LED_HEATER_AIR    = "ARDUINO_MEGA2560_D_A1"       -- 48: HEATER AIR LINE
-local PIN_LED_CAUTION_PNL   = "ARDUINO_MEGA2560_D_A0"       -- 49: CAUTION PANEL
-local PIN_LED_EMER_FLOATS   = "ARDUINO_MEGA2560_D_D9"       -- 50: EMER FLOATS
-local PIN_LED_CARGO_REL     = "ARDUINO_MEGA2560_D_D10"      -- 51: CARGO RELEASE
-local PIN_LED_BAG_FIRE      = "ARDUINO_MEGA2560_D_D11"      -- 52: BAGGAGE FIRE
-local PIN_LED_WSHLD_HEAT    = "ARDUINO_MEGA2560_D_D12"      -- 53: WSHLD HEAT
-local PIN_LED_20FT_CAUTION  = "ARDUINO_MEGA2560_D_D13"      -- 54: 20 FT CAUTION
-local PIN_LED_NIGHTSUN      = "ARDUINO_MEGA2560_D_D2"       -- 55: NIGHTSUN (spare pin)
-local PIN_LED_SPARE         = "ARDUINO_MEGA2560_D_D14"      -- 56: SPARE/BLANK
+local PIN_LED_DC_GEN1       = "ARDUINO_MEGA2560_E_D7"       -- 29: DC GENERATOR 1
+local PIN_LED_DC_GEN2       = "ARDUINO_MEGA2560_E_D8"       -- 30: DC GENERATOR 2
+local PIN_LED_INVERTER1     = "ARDUINO_MEGA2560_E_A15"      -- 31: INVERTER 1
+local PIN_LED_INVERTER2     = "ARDUINO_MEGA2560_E_A14"      -- 32: INVERTER 2
+local PIN_LED_BATTERY       = "ARDUINO_MEGA2560_E_A13"      -- 33: BATTERY
+local PIN_LED_GEN_OVHT1     = "ARDUINO_MEGA2560_E_A12"      -- 34: GEN OVHT 1
+local PIN_LED_GEN_OVHT2     = "ARDUINO_MEGA2560_E_A11"      -- 35: GEN OVHT 2
+local PIN_LED_HYDRAULIC1    = "ARDUINO_MEGA2560_E_A10"      -- 36: HYDRAULIC 1
+local PIN_LED_HYDRAULIC2    = "ARDUINO_MEGA2560_E_A9"       -- 37: HYDRAULIC 2
+local PIN_LED_EXT_POWER     = "ARDUINO_MEGA2560_E_A8"       -- 38: EXTERNAL POWER
+local PIN_LED_XMSN_CHIP     = "ARDUINO_MEGA2560_E_A7"       -- 39: XMSN CHIP
+local PIN_LED_CBOX_CHIP     = "ARDUINO_MEGA2560_E_A6"       -- 40: C BOX CHIP
+local PIN_LED_4290_CHIP     = "ARDUINO_MEGA2560_E_A5"       -- 41: 42/90 CHIP
+local PIN_LED_OVER_TORQ     = "ARDUINO_MEGA2560_E_D51"      -- 42: OVER TORQ
+local PIN_LED_RPM           = "ARDUINO_MEGA2560_E_D52"      -- 43: RPM
+local PIN_LED_AFCS          = "ARDUINO_MEGA2560_E_D53"      -- 44: AFCS
+local PIN_LED_FT_OFF        = "ARDUINO_MEGA2560_E_A4"       -- 45: FT OFF
+local PIN_LED_CYC_CTR       = "ARDUINO_MEGA2560_E_A3"       -- 46: CYC CTR
+local PIN_LED_DOOR_LOCK     = "ARDUINO_MEGA2560_E_A2"       -- 47: DOOR LOCK
+local PIN_LED_HEATER_AIR    = "ARDUINO_MEGA2560_E_A1"       -- 48: HEATER AIR LINE
+local PIN_LED_CAUTION_PNL   = "ARDUINO_MEGA2560_E_A0"       -- 49: CAUTION PANEL
+local PIN_LED_EMER_FLOATS   = "ARDUINO_MEGA2560_E_D9"       -- 50: EMER FLOATS
+local PIN_LED_CARGO_REL     = "ARDUINO_MEGA2560_E_D10"      -- 51: CARGO RELEASE
+local PIN_LED_BAG_FIRE      = "ARDUINO_MEGA2560_E_D11"      -- 52: BAGGAGE FIRE
+local PIN_LED_WSHLD_HEAT    = "ARDUINO_MEGA2560_E_D12"      -- 53: WSHLD HEAT
+local PIN_LED_20FT_CAUTION  = "ARDUINO_MEGA2560_E_D13"      -- 54: 20 FT CAUTION
+local PIN_LED_NIGHTSUN      = "ARDUINO_MEGA2560_E_D2"       -- 55: NIGHTSUN (spare pin)
+local PIN_LED_SPARE         = "ARDUINO_MEGA2560_E_D14"      -- 56: SPARE/BLANK
 
 -- =============================================================================
 -- 2. INITIALIZE HARDWARE LEDS
@@ -598,4 +600,4 @@ update_bright_dim_state()
 -- Initialize all LEDs
 update_all_leds()
 
-print("DEBUG: Caution Panel Script Loaded - 56 LEDs, 3 Switches")
+update_all_leds()

@@ -125,6 +125,7 @@ local PINS_C = {
     YAW_UP_LH = "ARDUINO_MEGA2560_C_D44",
     YAW_DN_LH = "ARDUINO_MEGA2560_C_D43",
     GA_LH = "ARDUINO_MEGA2560_C_D42",
+    FT_RELEASE = "ARDUINO_MEGA2560_C_D47", -- New Force Trim Release
 }
 
 -- =============================================================================
@@ -412,7 +413,23 @@ local STATE = {
 -- HELPER FUNCTIONS
 -- =============================================================================
 
+local update_cwp_leds -- Forward Declaration
+local update_mc_reset -- Forward Declaration
+
 local function update_sas_att()
+    -- Force Trim Interlock: If FT is OFF, forced to SAS mode
+    if STATE.caution_states.ft_off == 1 then STATE.sas_mode = "SAS" end
+    
+    -- Coupled Interlock
+    if STATE.cpl then
+        local valid_cpl = (STATE.ap1 or STATE.ap2) and (STATE.sas_mode == "ATT") and (STATE.caution_states.ft_off == 0)
+        if not valid_cpl then
+            STATE.cpl = false
+            fsx_variable_write("L:CplActive", "Number", 0)
+            if LEDS_A.cpl then hw_output_set(LEDS_A.cpl, false) end
+        end
+    end
+
     if STATE.ap1 or STATE.ap2 then
         if STATE.sas_mode == "SAS" then hw_led_set(LEDS_A.sas, 1.0); hw_led_set(LEDS_A.att, 0.0)
         else hw_led_set(LEDS_A.sas, 0.0); hw_led_set(LEDS_A.att, 1.0) end
@@ -472,7 +489,7 @@ local function update_extinguisher()
     if STATE.ext_state ~= ns then STATE.ext_state = ns; fsx_variable_write("L:Extinguisher", "Number", ns) end
 end
 
-local function update_mc_reset()
+function update_mc_reset()
     fsx_variable_write("L:ResetMC", "Number", (STATE.mc_l or STATE.mc_r) and 1 or 0)
     hw_led_set(LEDS_B.mc_l, STATE.mc_l and 1.0 or 0.0)
     hw_led_set(LEDS_B.mc_r, STATE.mc_r and 1.0 or 0.0)
@@ -501,14 +518,29 @@ end
 local function update_elec_leds()
     local g1 = ((not STATE.gen1_prod) or (not STATE.gen1)) and 1.0 or 0.0
     local g2 = ((not STATE.gen2_prod) or (not STATE.gen2)) and 1.0 or 0.0
-    local i1 = (not STATE.inv1) and 1.0 or 0.0
-    local i2 = (not STATE.inv2) and 1.0 or 0.0
+    -- Inverter Caution: Switch OFF or DC Bus Dead
+    local i1 = ((not STATE.inv1) or (STATE.dc_bus == 0)) and 1.0 or 0.0
+    local i2 = ((not STATE.inv2) or (STATE.dc_bus == 0)) and 1.0 or 0.0
+    
     hw_led_set(LEDS_D.gen1_fail, g1); hw_led_set(LEDS_D.gen2_fail, g2)
     hw_led_set(LEDS_D.inv1_fail, i1); hw_led_set(LEDS_D.inv2_fail, i2)
+    
     -- Battery Caution: Batts ON but no Gens
     local batts_on = STATE.batt1 or STATE.batt2
     local gens_on = STATE.gen1_prod or STATE.gen2_prod
-    hw_led_set(LEDS_D.batt_caut, (batts_on and not gens_on) and 1.0 or 0.0)
+    local b_caut = (batts_on and not gens_on) and 1.0 or 0.0
+    hw_led_set(LEDS_D.batt_caut, b_caut)
+
+    -- Update Caution Panel States (Sync logic)
+    if STATE.caution_states then
+        STATE.caution_states.dc_gen1 = (g1 == 1.0) and 1 or 0
+        STATE.caution_states.dc_gen2 = (g2 == 1.0) and 1 or 0
+        STATE.caution_states.inverter1 = (i1 == 1.0) and 1 or 0
+        STATE.caution_states.inverter2 = (i2 == 1.0) and 1 or 0
+        STATE.caution_states.battery = (b_caut == 1.0) and 1 or 0
+    end
+    
+    if update_cwp_leds then update_cwp_leds() end
 end
 
 local function update_oh_fire_leds()
@@ -528,7 +560,7 @@ local function set_cwp_led(led_handle, state)
     hw_led_set(led_handle, (state == 1) and STATE.led_brightness or 0.0)
 end
 
-local function update_cwp_leds()
+function update_cwp_leds()
     local s = STATE.caution_states
     
     set_cwp_led(LEDS_E.eng1_out, s.eng1_out); set_cwp_led(LEDS_E.eng2_out, s.eng2_out)
@@ -542,7 +574,12 @@ local function update_cwp_leds()
     set_cwp_led(LEDS_E.fuel_filter1, s.fuel_filter1); set_cwp_led(LEDS_E.fuel_filter2, s.fuel_filter2)
     set_cwp_led(LEDS_E.fuel_boost1, s.fuel_boost1); set_cwp_led(LEDS_E.fuel_boost2, s.fuel_boost2)
     set_cwp_led(LEDS_E.fuel_trans1, s.fuel_trans1); set_cwp_led(LEDS_E.fuel_trans2, s.fuel_trans2)
-    set_cwp_led(LEDS_E.fuel_valve1, s.fuel_valve1); set_cwp_led(LEDS_E.fuel_valve2, s.fuel_valve2)
+    
+    -- Valve Transit Logic override
+    local v1 = (STATE.valve_transit_1) and 1 or s.fuel_valve1
+    local v2 = (STATE.valve_transit_2) and 1 or s.fuel_valve2
+    set_cwp_led(LEDS_E.fuel_valve1, v1); set_cwp_led(LEDS_E.fuel_valve2, v2)
+    
     set_cwp_led(LEDS_E.fuel_low, s.fuel_low); set_cwp_led(LEDS_E.fuel_intcon, s.fuel_intcon)
     set_cwp_led(LEDS_E.fuel_xfeed, s.fuel_xfeed)
     set_cwp_led(LEDS_E.gov_man1, s.gov_man1); set_cwp_led(LEDS_E.gov_man2, s.gov_man2)
@@ -552,10 +589,22 @@ local function update_cwp_leds()
     set_cwp_led(LEDS_E.inverter1, s.inverter1); set_cwp_led(LEDS_E.inverter2, s.inverter2)
     set_cwp_led(LEDS_E.battery, s.battery)
     set_cwp_led(LEDS_E.gen_ovht1, s.gen_ovht1); set_cwp_led(LEDS_E.gen_ovht2, s.gen_ovht2)
-    set_cwp_led(LEDS_E.hydraulic1, s.hydraulic1); set_cwp_led(LEDS_E.hydraulic2, s.hydraulic2)
+    
+    -- Hydraulics Logic (Switch OFF or Low Pressure/RPM)
+    local h1 = (s.hydraulic1 == 1) or (STATE.rpm_n1_e1 < 40.0) and 1 or 0
+    local h2 = (s.hydraulic2 == 1) or (STATE.rpm_n1_e2 < 40.0) and 1 or 0
+    set_cwp_led(LEDS_E.hydraulic1, h1); set_cwp_led(LEDS_E.hydraulic2, h2)
+    
+    -- Hydraulic Master Caution Trigger
+    if (h1 == 1 or h2 == 1) and (STATE.dc_bus > 0) then fsx_variable_write("L:MasterCaution", "Number", 1) end
+
     set_cwp_led(LEDS_E.ext_power, s.ext_power)
     
-    set_cwp_led(LEDS_E.xmsn_chip, s.xmsn_chip); set_cwp_led(LEDS_E.cbox_chip, s.cbox_chip)
+    -- XMSN Oil Press Logic
+    local xmsn = (s.xmsn_oil_press == 1) or ((STATE.xmsn_press or 100) < 30) and 1 or 0
+    set_cwp_led(LEDS_E.xmsn_oil_press, xmsn); set_cwp_led(LEDS_E.xmsn_oil_temp, s.xmsn_oil_temp)
+    
+    set_cwp_led(LEDS_E.cbox_chip, s.cbox_chip)
     set_cwp_led(LEDS_E.chip_4290, s.chip_4290); set_cwp_led(LEDS_E.over_torq, s.over_torq)
     set_cwp_led(LEDS_E.rpm, s.rpm); set_cwp_led(LEDS_E.afcs, s.afcs)
     set_cwp_led(LEDS_E.ft_off, s.ft_off); set_cwp_led(LEDS_E.cyc_ctr, s.cyc_ctr)
@@ -632,8 +681,34 @@ hw_button_add(PINS_A.MAG2, function() STATE.mag2 = true; update_mag_dg() end, fu
 hw_button_add(PINS_A.DG1, function() STATE.dg1 = true; update_mag_dg() end, function() STATE.dg1 = false; update_mag_dg() end)
 hw_button_add(PINS_A.DG2, function() STATE.dg2 = true; update_mag_dg() end, function() STATE.dg2 = false; update_mag_dg() end)
 
-hw_button_add(PINS_A.VALVE1, function() fsx_variable_write("L:SwvalveEng1", "Number", 0) end, function() fsx_variable_write("L:SwvalveEng1", "Number", 1) end)
-hw_button_add(PINS_A.VALVE2, function() fsx_variable_write("L:SwvalveEng2", "Number", 1) end, function() fsx_variable_write("L:SwvalveEng2", "Number", 0) end)
+hw_button_add(PINS_A.VALVE1, 
+    function() 
+        fsx_variable_write("L:SwvalveEng1", "Number", 0)
+        STATE.valve_transit_1 = true
+        update_cwp_leds()
+        timer_start(2000, function() STATE.valve_transit_1 = false; update_cwp_leds() end)
+    end, 
+    function() 
+        fsx_variable_write("L:SwvalveEng1", "Number", 1)
+        STATE.valve_transit_1 = true
+        update_cwp_leds()
+        timer_start(2000, function() STATE.valve_transit_1 = false; update_cwp_leds() end)
+    end
+)
+hw_button_add(PINS_A.VALVE2, 
+    function() 
+        fsx_variable_write("L:SwvalveEng2", "Number", 1)
+        STATE.valve_transit_2 = true
+        update_cwp_leds()
+        timer_start(2000, function() STATE.valve_transit_2 = false; update_cwp_leds() end)
+    end, 
+    function() 
+        fsx_variable_write("L:SwvalveEng2", "Number", 0)
+        STATE.valve_transit_2 = true
+        update_cwp_leds()
+        timer_start(2000, function() STATE.valve_transit_2 = false; update_cwp_leds() end)
+    end
+)
 
 hw_button_add(PINS_A.XFEED1, function() STATE.xfeed1 = true; update_xfeed() end, function() STATE.xfeed1 = false; update_xfeed() end)
 hw_button_add(PINS_A.XFEED2, function() STATE.xfeed2 = true; update_xfeed() end, function() STATE.xfeed2 = false; update_xfeed() end)
@@ -698,8 +773,28 @@ hw_button_add(PINS_B.NAV_L, function() fsx_variable_write("L:NavGpsL", "Number",
 hw_adc_input_add(PINS_C.THROTTLE1, function(val) fsx_variable_write("L:throgas1", "Number", throttle_val(val, STATE.idle1)) end)
 hw_adc_input_add(PINS_C.THROTTLE2, function(val) fsx_variable_write("L:throgas2", "Number", throttle_val(val, STATE.idle2)) end)
 
-hw_button_add(PINS_C.START1, function() print("BTN: START ENG1"); fsx_variable_write("L:starteng", "Number", 1) end, function() fsx_variable_write("L:starteng", "Number", 0) end)
-hw_button_add(PINS_C.START2, function() print("BTN: START ENG2"); fsx_variable_write("L:starteng", "Number", -1) end, function() fsx_variable_write("L:starteng", "Number", 0) end)
+hw_button_add(PINS_C.START1, 
+    function() 
+        if STATE.caution_states.rotor_brake == 1 then
+            print("ROTOR BRAKE WARNING: Cannot start with brake ON")
+        else
+            print("BTN: START ENG1")
+            fsx_variable_write("L:starteng", "Number", 1) 
+        end
+    end, 
+    function() end
+)
+hw_button_add(PINS_C.START2, 
+    function() 
+        if STATE.caution_states.rotor_brake == 1 then
+            print("ROTOR BRAKE WARNING: Cannot start with brake ON")
+        else
+            print("BTN: START ENG2")
+            fsx_variable_write("L:starteng", "Number", -1) 
+        end
+    end, 
+    function() end
+)
 
 hw_button_add(PINS_C.IDLE1, function() print("BTN: IDLE STOP ENG1"); STATE.idle1 = true; fsx_variable_write("L:idle eng", "Number", 1) end, function() STATE.idle1 = false; fsx_variable_write("L:idle eng", "Number", 0) end)
 hw_button_add(PINS_C.IDLE2, function() print("BTN: IDLE STOP ENG2"); STATE.idle2 = true; fsx_variable_write("L:idle eng", "Number", -1) end, function() STATE.idle2 = false; fsx_variable_write("L:idle eng", "Number", 0) end)
@@ -730,6 +825,8 @@ hw_button_add(PINS_C.YAW_UP_RH, function() print("BTN: YAW UP RH") end, function
 hw_button_add(PINS_C.YAW_DN_RH, function() print("BTN: YAW DOWN RH") end, function() end)
 hw_button_add(PINS_C.YAW_UP_LH, function() print("BTN: YAW UP LH") end, function() end)
 hw_button_add(PINS_C.YAW_DN_LH, function() print("BTN: YAW DOWN LH") end, function() end)
+-- Force Trim Release (Cyclic)
+hw_button_add(PINS_C.FT_RELEASE, function() fsx_variable_write("L:Sw forcetrim", "Number", 0) end, function() fsx_variable_write("L:Sw forcetrim", "Number", 1) end)
 
 -- =============================================================================
 -- SIMULATOR SUBSCRIPTIONS
@@ -739,8 +836,18 @@ fsx_variable_subscribe("L:MasterDcBus", "Number", function(val) STATE.dc_bus = (
 
 
 fsx_variable_subscribe("L:TestMC", "Number", function(val) STATE.test_mc = val or 0; update_engine_leds() end)
-fsx_variable_subscribe("TURB ENG N1:1", "Percent", function(val) STATE.rpm_n1_e1 = val or 0.0; update_engine_leds() end)
-fsx_variable_subscribe("TURB ENG N1:2", "Percent", function(val) STATE.rpm_n1_e2 = val or 0.0; update_engine_leds() end)
+fsx_variable_subscribe("TURB ENG N1:1", "Percent", function(val) 
+    STATE.rpm_n1_e1 = val or 0.0
+    update_engine_leds() 
+    -- Starter Dropout
+    if (val > 55.0) then fsx_variable_write("L:starteng", "Number", 0) end
+end)
+fsx_variable_subscribe("TURB ENG N1:2", "Percent", function(val) 
+    STATE.rpm_n1_e2 = val or 0.0
+    update_engine_leds() 
+    -- Starter Dropout (Assuming L:starteng handles both, or we check if it is -1)
+    if (val > 55.0) then fsx_variable_write("L:starteng", "Number", 0) end
+end)
 fsx_variable_subscribe("L:firethandl", "Number", function(val) STATE.fire1 = (val ~= 0) and 1 or 0; update_fire_leds(); update_oh_fire_leds() end)
 fsx_variable_subscribe("L:firethandr", "Number", function(val) STATE.fire2 = (val ~= 0) and 1 or 0; update_fire_leds(); update_oh_fire_leds() end)
 
@@ -781,11 +888,12 @@ fsx_variable_subscribe("L:Swinva", "Number", function(val) STATE.caution_states.
 fsx_variable_subscribe("L:Swinvb", "Number", function(val) STATE.caution_states.inverter2 = (val == 0) and 1 or 0; update_cwp_leds() end)
 fsx_variable_subscribe("L:Sw hydsysA", "Number", function(val) STATE.caution_states.hydraulic1 = (val == 0) and 1 or 0; update_cwp_leds() end)
 fsx_variable_subscribe("L:Sw hydsysB", "Number", function(val) STATE.caution_states.hydraulic2 = (val == 0) and 1 or 0; update_cwp_leds() end)
-fsx_variable_subscribe("L:SwGovA", "Number", function(val) STATE.caution_states.gov_man1 = (val ~= 0) and 1 or 0; update_cwp_leds() end)
-fsx_variable_subscribe("L:SwGovB", "Number", function(val) STATE.caution_states.gov_man2 = (val ~= 0) and 1 or 0; update_cwp_leds() end)
+fsx_variable_subscribe("L:SwGovA", "Number", function(val) STATE.caution_states.gov_man1 = (val == 0) and 1 or 0; update_cwp_leds() end)
+fsx_variable_subscribe("L:SwGovB", "Number", function(val) STATE.caution_states.gov_man2 = (val == 0) and 1 or 0; update_cwp_leds() end)
 fsx_variable_subscribe("L:SwpartsepA", "Number", function(val) STATE.caution_states.partsep1 = (val ~= 0) and 1 or 0; update_cwp_leds() end)
 fsx_variable_subscribe("L:SwpartsepB", "Number", function(val) STATE.caution_states.partsep2 = (val ~= 0) and 1 or 0; update_cwp_leds() end)
-fsx_variable_subscribe("L:Sw forcetrim", "Number", function(val) STATE.caution_states.ft_off = (val == 0) and 1 or 0; update_cwp_leds() end)
+fsx_variable_subscribe("L:Sw forcetrim", "Number", function(val) STATE.caution_states.ft_off = (val == 0) and 1 or 0; update_cwp_leds(); update_sas_att() end)
+fsx_variable_subscribe("L:XmsnOilPress", "Number", function(val) STATE.xmsn_press = val; update_cwp_leds() end)
 
 
 -- =============================================================================
@@ -824,7 +932,27 @@ hw_button_add(PINS_D.UTIL, function() STATE.util = true; fsx_variable_write("L:S
 
 hw_button_add(PINS_D.FIRE1, function() STATE.fire1 = 1; fsx_variable_write("L:firethandl", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire1 = 0; fsx_variable_write("L:firethandl", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
 hw_button_add(PINS_D.FIRE2, function() STATE.fire2 = 1; fsx_variable_write("L:firethandr", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire2 = 0; fsx_variable_write("L:firethandr", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
-hw_button_add(PINS_D.FIRE_TEST, function() STATE.fire_test = true; fsx_variable_write("L:Swfiretest", "Number", 1); fsx_variable_write("L:firetestbag", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire_test = false; fsx_variable_write("L:Swfiretest", "Number", 0); fsx_variable_write("L:firetestbag", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
+hw_button_add(PINS_D.FIRE_TEST, 
+    function() 
+        STATE.fire_test = true
+        fsx_variable_write("L:Swfiretest", "Number", 1)
+        fsx_variable_write("L:firetestbag", "Number", 1)
+        update_fire_leds()
+        update_oh_fire_leds()
+        -- Force Master Caution
+        hw_led_set(LEDS_B.mc_l, 1.0)
+        hw_led_set(LEDS_B.mc_r, 1.0)
+    end, 
+    function() 
+        STATE.fire_test = false
+        fsx_variable_write("L:Swfiretest", "Number", 0)
+        fsx_variable_write("L:firetestbag", "Number", 0)
+        update_fire_leds()
+        update_oh_fire_leds()
+        -- Restore Master Caution
+        if update_mc_reset then update_mc_reset() end
+    end
+)
 
 hw_button_add(PINS_D.COMPASS, function() fsx_variable_write("L:SwMagDg", "Number", 1) end, function() fsx_variable_write("L:SwMagDg", "Number", 0) end)
 hw_button_add(PINS_D.MAP_DIM_BTN, function() end, function() end)
