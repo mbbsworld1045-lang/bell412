@@ -159,6 +159,15 @@ local PINS_D = {
     FIRE_TEST = "ARDUINO_MEGA2560_D_D26",
     COMPASS = "ARDUINO_MEGA2560_D_D27",
     MAP_DIM = "ARDUINO_MEGA2560_D_A0",
+    -- Circuit Breakers
+    CB_INV1 = "ARDUINO_MEGA2560_D_D34",
+    CB_NON_ESS1 = "ARDUINO_MEGA2560_D_D29",
+    CB_NON_ESS2 = "ARDUINO_MEGA2560_D_D30",
+    CB_ITT = "ARDUINO_MEGA2560_D_D26",
+    CB_GEN1_RESET = "ARDUINO_MEGA2560_D_D22",
+    CB_IGNITION = "ARDUINO_MEGA2560_D_D23",
+    -- Rotor Brake
+    ROTOR_BRAKE = "ARDUINO_MEGA2560_D_A15",
     -- Output LEDs
     LED_GEN1_FAIL = "ARDUINO_MEGA2560_D_D30",
     LED_GEN2_FAIL = "ARDUINO_MEGA2560_D_D31",
@@ -830,6 +839,27 @@ hw_button_add(PINS_D.COMPASS, function() fsx_variable_write("L:SwMagDg", "Number
 hw_button_add(PINS_D.MAP_DIM_BTN, function() end, function() end)
 hw_adc_input_add(PINS_D.MAP_DIM, function(val) STATE.map_dim_val = val; fsx_variable_write("L:platepilolight", "Number", val * 100) end)
 
+
+
+-- Circuit Breakers
+hw_button_add(PINS_D.CB_INV1, function() print("CB: INV 1") end, function() end)
+hw_button_add(PINS_D.CB_NON_ESS1, function() print("CB: NON ESS 1") end, function() end)
+hw_button_add(PINS_D.CB_NON_ESS2, function() print("CB: NON ESS 2") end, function() end)
+hw_button_add(PINS_D.CB_ITT, function() print("CB: ITT") end, function() end)
+hw_button_add(PINS_D.CB_GEN1_RESET, function() print("CB: GEN 1 RESET") end, function() end)
+hw_button_add(PINS_D.CB_IGNITION, function() print("CB: IGNITION") end, function() end)
+
+-- Rotor Brake
+hw_button_add(PINS_D.ROTOR_BRAKE, 
+    function() 
+        print("ROTOR BRAKE: ON") 
+        fsx_event("ROTOR_BRAKE") -- Toggle brake
+    end, 
+    function() 
+        print("ROTOR BRAKE: OFF") 
+        fsx_event("ROTOR_BRAKE") 
+    end
+)
 
 -- =============================================================================
 -- CHANNEL E: CAUTION PANEL HANDLERS

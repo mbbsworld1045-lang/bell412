@@ -38,6 +38,16 @@ local PIN_FIRE_PULL2    = "ARDUINO_MEGA2560_D_D25"   -- Fire Handle 2
 local PIN_FIRE_TEST     = "ARDUINO_MEGA2560_D_D26"   -- Fire/Bag Test
 local PIN_COMPASS_SLAVE = "ARDUINO_MEGA2560_D_D27"   -- Compass Mag/Slave
 
+-- Circuit Breakers
+local PIN_CB_INV1       = "ARDUINO_MEGA2560_D_D34"
+local PIN_CB_NON_ESS1   = "ARDUINO_MEGA2560_D_D29"
+local PIN_CB_NON_ESS2   = "ARDUINO_MEGA2560_D_D30"
+local PIN_CB_ITT        = "ARDUINO_MEGA2560_D_D26"
+local PIN_CB_GEN1_RESET = "ARDUINO_MEGA2560_D_D22"
+local PIN_CB_IGNITION   = "ARDUINO_MEGA2560_D_D23"
+-- Rotor Brake
+local PIN_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_A15"
+
 -- INPUTS (Analog)
 local PIN_MAP_DIMMER    = "ARDUINO_MEGA2560_D_A0"    -- Map Light Dimmer Pot
 
@@ -335,6 +345,26 @@ fsx_variable_subscribe("L:CGener", "Number", function(val) STATE.gen2_prod = (va
 fsx_variable_subscribe("L:firethandl", "Number", function(val) STATE.fire1 = (val ~= 0) and 1 or 0; update_fire_leds() end)
 fsx_variable_subscribe("L:firethandr", "Number", function(val) STATE.fire2 = (val ~= 0) and 1 or 0; update_fire_leds() end)
 fsx_variable_subscribe("L:firetestbag", "Number", function(val) STATE.bag_fire = (val ~= 0) and 1 or 0; update_fire_leds() end)
+
+-- Circuit Breakers
+hw_button_add(PIN_CB_INV1, function() print("CB: INV 1") end, function() end)
+hw_button_add(PIN_CB_NON_ESS1, function() print("CB: NON ESS 1") end, function() end)
+hw_button_add(PIN_CB_NON_ESS2, function() print("CB: NON ESS 2") end, function() end)
+hw_button_add(PIN_CB_ITT, function() print("CB: ITT") end, function() end)
+hw_button_add(PIN_CB_GEN1_RESET, function() print("CB: GEN 1 RESET") end, function() end)
+hw_button_add(PIN_CB_IGNITION, function() print("CB: IGNITION") end, function() end)
+
+-- Rotor Brake
+hw_button_add(PIN_ROTOR_BRAKE, 
+    function() 
+        print("ROTOR BRAKE: ON") 
+        fsx_event("ROTOR_BRAKE") 
+    end, 
+    function() 
+        print("ROTOR BRAKE: OFF") 
+        fsx_event("ROTOR_BRAKE") 
+    end
+)
 
 -- =============================================================================
 -- INITIALIZATION
