@@ -39,14 +39,29 @@ local PIN_FIRE_TEST     = "ARDUINO_MEGA2560_D_D26"   -- Fire/Bag Test
 local PIN_COMPASS_SLAVE = "ARDUINO_MEGA2560_D_D27"   -- Compass Mag/Slave
 
 -- Circuit Breakers
+-- Circuit Breakers
 local PIN_CB_INV1       = "ARDUINO_MEGA2560_D_D34"
+local PIN_CB_INV2       = "ARDUINO_MEGA2560_D_A7"
 local PIN_CB_NON_ESS1   = "ARDUINO_MEGA2560_D_D29"
 local PIN_CB_NON_ESS2   = "ARDUINO_MEGA2560_D_D30"
-local PIN_CB_ITT        = "ARDUINO_MEGA2560_D_D26"
+local PIN_CB_ITT1       = "ARDUINO_MEGA2560_D_D26"
+local PIN_CB_ITT2       = "ARDUINO_MEGA2560_D_A2"
 local PIN_CB_GEN1_RESET = "ARDUINO_MEGA2560_D_D22"
-local PIN_CB_IGNITION   = "ARDUINO_MEGA2560_D_D23"
+local PIN_CB_GEN2_RESET = "ARDUINO_MEGA2560_D_A4"
+local PIN_CB_IGNITION1  = "ARDUINO_MEGA2560_D_D23"
+local PIN_CB_IGNITION2  = "ARDUINO_MEGA2560_D_A3"
+local PIN_CB_ENG_TRQ    = "ARDUINO_MEGA2560_D_A5"
+local PIN_CB_MSTR_TRQ   = "ARDUINO_MEGA2560_D_A6"
+local PIN_CB_GEN2_FIELD = "ARDUINO_MEGA2560_D_A8"
+local PIN_CB_IDLE_STOP  = "ARDUINO_MEGA2560_D_D24"
+
 -- Rotor Brake
-local PIN_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_A15"
+local PIN_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_D69"
+
+-- Instrument Lighting
+local PIN_INST_CONSOLE  = "ARDUINO_MEGA2560_D_D42"
+local PIN_INST_SEC      = "ARDUINO_MEGA2560_D_D45"
+local PIN_INST_ENG      = "ARDUINO_MEGA2560_D_D47"
 
 -- INPUTS (Analog)
 local PIN_MAP_DIMMER    = "ARDUINO_MEGA2560_D_A0"    -- Map Light Dimmer Pot
@@ -189,11 +204,6 @@ hw_button_add(PIN_GEN2_SW_ON,
     function() print("BTN: GEN 2 OFF"); STATE.gen2 = false; fsx_variable_write("L:Gener", "Number", 0); fsx_event("TOGGLE_ALTERNATOR2"); update_elec_leds() end
 )
 hw_button_add(PIN_GEN2_SW_RESET, function() print("BTN: GEN 2 RESET") end, function() end)
--- GENERATOR 2
-hw_button_add(PIN_GEN2_SW,
-    function() print("BTN: GEN 2 ON"); STATE.gen2 = true; fsx_variable_write("L:Gener", "Number", 1); fsx_event("TOGGLE_ALTERNATOR2"); update_elec_leds() end,
-    function() print("BTN: GEN 2 OFF"); STATE.gen2 = false; fsx_variable_write("L:Gener", "Number", 0); fsx_event("TOGGLE_ALTERNATOR2"); update_elec_leds() end
-)
 
 -- INVERTER 1
 hw_button_add(PIN_INV1_SW,
@@ -346,13 +356,29 @@ fsx_variable_subscribe("L:firethandl", "Number", function(val) STATE.fire1 = (va
 fsx_variable_subscribe("L:firethandr", "Number", function(val) STATE.fire2 = (val ~= 0) and 1 or 0; update_fire_leds() end)
 fsx_variable_subscribe("L:firetestbag", "Number", function(val) STATE.bag_fire = (val ~= 0) and 1 or 0; update_fire_leds() end)
 
+
+
 -- Circuit Breakers
 hw_button_add(PIN_CB_INV1, function() print("CB: INV 1") end, function() end)
+hw_button_add(PIN_CB_INV2, function() print("CB: INV 2") end, function() end)
 hw_button_add(PIN_CB_NON_ESS1, function() print("CB: NON ESS 1") end, function() end)
 hw_button_add(PIN_CB_NON_ESS2, function() print("CB: NON ESS 2") end, function() end)
-hw_button_add(PIN_CB_ITT, function() print("CB: ITT") end, function() end)
+hw_button_add(PIN_CB_ITT1, function() print("CB: ITT 1") end, function() end)
+hw_button_add(PIN_CB_ITT2, function() print("CB: ITT 2") end, function() end)
 hw_button_add(PIN_CB_GEN1_RESET, function() print("CB: GEN 1 RESET") end, function() end)
-hw_button_add(PIN_CB_IGNITION, function() print("CB: IGNITION") end, function() end)
+hw_button_add(PIN_CB_GEN2_RESET, function() print("CB: GEN 2 RESET") end, function() end)
+hw_button_add(PIN_CB_IGNITION1, function() print("CB: IGNITION 1") end, function() end)
+hw_button_add(PIN_CB_IGNITION2, function() print("CB: IGNITION 2") end, function() end)
+hw_button_add(PIN_CB_ENG_TRQ, function() print("CB: ENG TRQ") end, function() end)
+hw_button_add(PIN_CB_MSTR_TRQ, function() print("CB: MSTR TRQ") end, function() end)
+hw_button_add(PIN_CB_GEN2_FIELD, function() print("CB: GEN 2 FIELD") end, function() end)
+hw_button_add(PIN_CB_IDLE_STOP, function() print("CB: IDLE STOP") end, function() end)
+
+
+-- Instrument Lighting Buttons
+hw_button_add(PIN_INST_CONSOLE, function() print("SW: CONSOLE LIGHT") end, function() end)
+hw_button_add(PIN_INST_SEC, function() print("SW: SEC INST LIGHT") end, function() end)
+hw_button_add(PIN_INST_ENG, function() print("SW: ENG INST LIGHT") end, function() end)
 
 -- Rotor Brake
 hw_button_add(PIN_ROTOR_BRAKE, 

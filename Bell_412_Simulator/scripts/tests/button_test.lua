@@ -2,7 +2,7 @@
 -- BELL 412 - BUTTON TEST SCRIPT
 -- Platform: Air Manager + Arduino Mega 2560
 -- Purpose: Test all buttons - press to see info and light associated LED(s)
--- Channels: A (Pedestal), B (Front Panel), C (Collective), D (Caution Panel)
+-- Channels: A (Pedestal), B (Front), C (Collective), D (Overhead), E (Caution)
 -- =============================================================================
 
 print("=============================================================================")
@@ -166,13 +166,64 @@ local ALL_BUTTONS = {
     { pin = "ARDUINO_MEGA2560_C_D42", name = "GO AROUND LH",        channel = "C", leds = {} },
     
     -- =========================================================================
-    -- ARDUINO D - CAUTION PANEL (caution_panel.lua)
+    -- ARDUINO D - OVERHEAD (over_head.lua)
     -- =========================================================================
-    { pin = "ARDUINO_MEGA2560_D_D22", name = "CWP Test Switch PNL", channel = "D", leds = {} },
-    { pin = "ARDUINO_MEGA2560_D_D23", name = "CWP Test Button",     channel = "D", leds = {} },
-    { pin = "ARDUINO_MEGA2560_D_D24", name = "CWP Test Switch Pos2",channel = "D", leds = {} },
-    { pin = "ARDUINO_MEGA2560_D_D4",  name = "Bright/Dim Bright",   channel = "D", leds = {} },
-    { pin = "ARDUINO_MEGA2560_D_D5",  name = "Bright/Dim Dim",      channel = "D", leds = {} },
+    -- Switches
+    { pin = "ARDUINO_MEGA2560_D_D44", name = "BATT 1 Switch",       channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D49", name = "BATT 2 Switch",       channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D50", name = "GEN 1 ON",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D51", name = "GEN 1 RESET",         channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A9",  name = "GEN 2 ON",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A10", name = "GEN 2 RESET",         channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A12", name = "INV 1 Switch",        channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A11", name = "INV 2 Switch",        channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A13", name = "NON-ESS BUS",         channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A14", name = "EMER LOAD",           channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D10", name = "STBY ATT",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D53", name = "PITOT HEAT",          channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D15", name = "NAV LIGHTS",          channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D16", name = "ANTI-COLL LIGHTS",    channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D17", name = "WIPER PILOT",         channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D18", name = "WIPER CO-PILOT",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D43", name = "HEATER",              channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D36", name = "BLOWER",              channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D37", name = "AFT OUTLET",          channel = "D", leds = {} },
+    
+    -- Magnets/Other
+    { pin = "ARDUINO_MEGA2560_D_D27", name = "COMPASS SLAVE",       channel = "D", leds = {} },
+    
+    -- Circuit Breakers (Replacing conflicts)
+    { pin = "ARDUINO_MEGA2560_D_D34", name = "CB INV 1",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A7",  name = "CB INV 2",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D29", name = "CB NON-ESS 1",        channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D30", name = "CB NON-ESS 2",        channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D26", name = "CB ITT 1",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A2",  name = "CB ITT 2",            channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D22", name = "CB GEN 1 RESET",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A4",  name = "CB GEN 2 RESET",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D23", name = "CB IGNITION 1",       channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A3",  name = "CB IGNITION 2",       channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A5",  name = "CB ENG TORQUE",       channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A6",  name = "CB MSTR TORQUE",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_A8",  name = "CB GEN 2 FIELD",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D24", name = "CB IDLE STOP",        channel = "D", leds = {} },
+    
+    -- Rotor Brake
+    { pin = "ARDUINO_MEGA2560_D_D69", name = "ROTOR BRAKE",         channel = "D", leds = {} },
+
+    -- Instrument Lighting
+    { pin = "ARDUINO_MEGA2560_D_D42", name = "INST LIGHT CONSOLE",  channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D45", name = "INST LIGHT SEC",      channel = "D", leds = {} },
+    { pin = "ARDUINO_MEGA2560_D_D47", name = "INST LIGHT ENG",      channel = "D", leds = {} },
+
+    -- =========================================================================
+    -- ARDUINO E - CAUTION PANEL (caution_panel.lua)
+    -- =========================================================================
+    { pin = "ARDUINO_MEGA2560_E_D22", name = "CWP Test Switch PNL", channel = "E", leds = {} },
+    { pin = "ARDUINO_MEGA2560_E_D23", name = "CWP Test Button",     channel = "E", leds = {} },
+    { pin = "ARDUINO_MEGA2560_E_D24", name = "CWP Test Switch Pos2",channel = "E", leds = {} },
+    { pin = "ARDUINO_MEGA2560_E_D4",  name = "Bright/Dim Bright",   channel = "E", leds = {} },
+    { pin = "ARDUINO_MEGA2560_E_D5",  name = "Bright/Dim Dim",      channel = "E", leds = {} },
 }
 
 -- =============================================================================
@@ -279,7 +330,7 @@ print("         BUTTON TEST READY!")
 print("         Press any button to see its info and light its LED(s)")
 print(string.format("         Total Buttons: %d", #ALL_BUTTONS))
 print(string.format("         Buttons with LEDs: %d", buttons_with_leds))
-print("         Channels: A (Pedestal), B (Front), C (Collective), D (Caution)")
+print("         Channels: A (Pedestal), B (Front), C (Collective), D (Overhead), E (Caution)")
 print("=============================================================================")
 
 print("\nButton Test Script Loaded - Waiting for button presses...")

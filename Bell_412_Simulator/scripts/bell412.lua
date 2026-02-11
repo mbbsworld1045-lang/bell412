@@ -152,31 +152,43 @@ local PINS_D = {
     HEATER = "ARDUINO_MEGA2560_D_D43",
     BLOWER = "ARDUINO_MEGA2560_D_D36",
     AFT_OUTLET = "ARDUINO_MEGA2560_D_D37",
-    DOME = "ARDUINO_MEGA2560_D_D22",
-    UTIL = "ARDUINO_MEGA2560_D_D23",
-    FIRE1 = "ARDUINO_MEGA2560_D_D24",
-    FIRE2 = "ARDUINO_MEGA2560_D_D25",
-    FIRE_TEST = "ARDUINO_MEGA2560_D_D26",
+    -- DOME = "ARDUINO_MEGA2560_D_D22",
+    -- UTIL = "ARDUINO_MEGA2560_D_D23",
+    -- FIRE1 = "ARDUINO_MEGA2560_D_D24",
+    -- FIRE2 = "ARDUINO_MEGA2560_D_D25",
+    -- FIRE_TEST = "ARDUINO_MEGA2560_D_D26",
     COMPASS = "ARDUINO_MEGA2560_D_D27",
     MAP_DIM = "ARDUINO_MEGA2560_D_A0",
     -- Circuit Breakers
     CB_INV1 = "ARDUINO_MEGA2560_D_D34",
+    CB_INV2 = "ARDUINO_MEGA2560_D_A7",
     CB_NON_ESS1 = "ARDUINO_MEGA2560_D_D29",
     CB_NON_ESS2 = "ARDUINO_MEGA2560_D_D30",
-    CB_ITT = "ARDUINO_MEGA2560_D_D26",
+    CB_ITT1 = "ARDUINO_MEGA2560_D_D26",
+    CB_ITT2 = "ARDUINO_MEGA2560_D_A2",
     CB_GEN1_RESET = "ARDUINO_MEGA2560_D_D22",
-    CB_IGNITION = "ARDUINO_MEGA2560_D_D23",
+    CB_GEN2_RESET = "ARDUINO_MEGA2560_D_A4",
+    CB_IGNITION1 = "ARDUINO_MEGA2560_D_D23",
+    CB_IGNITION2 = "ARDUINO_MEGA2560_D_A3",
+    CB_ENG_TRQ = "ARDUINO_MEGA2560_D_A5",
+    CB_MSTR_TRQ = "ARDUINO_MEGA2560_D_A6",
+    CB_GEN2_FIELD = "ARDUINO_MEGA2560_D_A8",
+    CB_IDLE_STOP = "ARDUINO_MEGA2560_D_D24",
     -- Rotor Brake
-    ROTOR_BRAKE = "ARDUINO_MEGA2560_D_A15",
+    ROTOR_BRAKE = "ARDUINO_MEGA2560_D_D69",
+    -- Instrument Lighting
+    INST_CONSOLE = "ARDUINO_MEGA2560_D_D42",
+    INST_SEC = "ARDUINO_MEGA2560_D_D45",
+    INST_ENG = "ARDUINO_MEGA2560_D_D47",
     -- Output LEDs
-    LED_GEN1_FAIL = "ARDUINO_MEGA2560_D_D30",
+    -- LED_GEN1_FAIL = "ARDUINO_MEGA2560_D_D30",
     LED_GEN2_FAIL = "ARDUINO_MEGA2560_D_D31",
     LED_INV1_FAIL = "ARDUINO_MEGA2560_D_D32",
     LED_INV2_FAIL = "ARDUINO_MEGA2560_D_D33",
-    LED_BATT_CAUT = "ARDUINO_MEGA2560_D_D34",
+    -- LED_BATT_CAUT = "ARDUINO_MEGA2560_D_D34",
     LED_FIRE1 = "ARDUINO_MEGA2560_D_D35",
-    LED_FIRE2 = "ARDUINO_MEGA2560_D_D36",
-    LED_BAG_FIRE = "ARDUINO_MEGA2560_D_D37",
+    -- LED_FIRE2 = "ARDUINO_MEGA2560_D_D36",
+    -- LED_BAG_FIRE = "ARDUINO_MEGA2560_D_D37",
 }
 
 -- Channel E: Caution Panel
@@ -290,14 +302,14 @@ local LEDS_B = {
 
 -- Channel D LEDs
 local LEDS_D = {
-    gen1_fail = hw_led_add(PINS_D.LED_GEN1_FAIL, 0.0),
+    -- gen1_fail = hw_led_add(PINS_D.LED_GEN1_FAIL, 0.0),
     gen2_fail = hw_led_add(PINS_D.LED_GEN2_FAIL, 0.0),
     inv1_fail = hw_led_add(PINS_D.LED_INV1_FAIL, 0.0),
     inv2_fail = hw_led_add(PINS_D.LED_INV2_FAIL, 0.0),
-    batt_caut = hw_led_add(PINS_D.LED_BATT_CAUT, 0.0),
+    -- batt_caut = hw_led_add(PINS_D.LED_BATT_CAUT, 0.0),
     fire1 = hw_led_add(PINS_D.LED_FIRE1, 0.0),
-    fire2 = hw_led_add(PINS_D.LED_FIRE2, 0.0),
-    bag_fire = hw_led_add(PINS_D.LED_BAG_FIRE, 0.0),
+    -- fire2 = hw_led_add(PINS_D.LED_FIRE2, 0.0),
+    -- bag_fire = hw_led_add(PINS_D.LED_BAG_FIRE, 0.0),
 }
 
 -- Channel E LEDs (CWP)
@@ -512,21 +524,25 @@ local function update_elec_leds()
     local g2 = ((not STATE.gen2_prod) or (not STATE.gen2)) and 1.0 or 0.0
     local i1 = (not STATE.inv1) and 1.0 or 0.0
     local i2 = (not STATE.inv2) and 1.0 or 0.0
-    hw_led_set(LEDS_D.gen1_fail, g1); hw_led_set(LEDS_D.gen2_fail, g2)
+    -- hw_led_set(LEDS_D.gen1_fail, g1); 
+    hw_led_set(LEDS_D.gen2_fail, g2)
     hw_led_set(LEDS_D.inv1_fail, i1); hw_led_set(LEDS_D.inv2_fail, i2)
     -- Battery Caution: Batts ON but no Gens
     local batts_on = STATE.batt1 or STATE.batt2
     local gens_on = STATE.gen1_prod or STATE.gen2_prod
-    hw_led_set(LEDS_D.batt_caut, (batts_on and not gens_on) and 1.0 or 0.0)
+    -- hw_led_set(LEDS_D.batt_caut, (batts_on and not gens_on) and 1.0 or 0.0)
 end
 
 local function update_oh_fire_leds()
-    if STATE.dc_bus == 0 then hw_led_set(LEDS_D.fire1, 0.0); hw_led_set(LEDS_D.fire2, 0.0); hw_led_set(LEDS_D.bag_fire, 0.0); return end
+    if STATE.dc_bus == 0 then 
+        -- hw_led_set(LEDS_D.fire1, 0.0); hw_led_set(LEDS_D.fire2, 0.0); hw_led_set(LEDS_D.bag_fire, 0.0); 
+        return 
+    end
     local test = STATE.fire_test
-    hw_led_set(LEDS_D.fire1, (test or (STATE.fire1 == 1)) and 1.0 or 0.0)
-    hw_led_set(LEDS_D.fire2, (test or (STATE.fire2 == 1)) and 1.0 or 0.0)
-    hw_led_set(LEDS_D.bag_fire, (test or (STATE.bag_fire == 1)) and 1.0 or 0.0)
-    hw_led_set(LEDS_D.bag_fire, (test or (STATE.bag_fire == 1)) and 1.0 or 0.0)
+    -- hw_led_set(LEDS_D.fire1, (test or (STATE.fire1 == 1)) and 1.0 or 0.0)
+    -- hw_led_set(LEDS_D.fire2, (test or (STATE.fire2 == 1)) and 1.0 or 0.0)
+    -- hw_led_set(LEDS_D.bag_fire, (test or (STATE.bag_fire == 1)) and 1.0 or 0.0)
+    -- hw_led_set(LEDS_D.bag_fire, (test or (STATE.bag_fire == 1)) and 1.0 or 0.0)
 end
 
 -- Caution Panel Helper Functions
@@ -828,12 +844,12 @@ hw_button_add(PINS_D.HEATER, function() STATE.heater = true; fsx_variable_write(
 hw_button_add(PINS_D.BLOWER, function() STATE.blower = true; fsx_variable_write("L:Swblower", "Number", 1) end, function() STATE.blower = false; fsx_variable_write("L:Swblower", "Number", 0) end)
 hw_button_add(PINS_D.AFT_OUTLET, function() STATE.aft_outlet = true; fsx_variable_write("L:Swaftoutlet", "Number", 1) end, function() STATE.aft_outlet = false; fsx_variable_write("L:Swaftoutlet", "Number", 0) end)
 
-hw_button_add(PINS_D.DOME, function() STATE.dome = 1; fsx_variable_write("L:Swutilitylight", "Number", 1) end, function() STATE.dome = 0; fsx_variable_write("L:Swutilitylight", "Number", 0) end)
-hw_button_add(PINS_D.UTIL, function() STATE.util = true; fsx_variable_write("L:Swutilitylight", "Number", 1) end, function() STATE.util = false; fsx_variable_write("L:Swutilitylight", "Number", 0) end)
+-- hw_button_add(PINS_D.DOME, function() STATE.dome = 1; fsx_variable_write("L:Swutilitylight", "Number", 1) end, function() STATE.dome = 0; fsx_variable_write("L:Swutilitylight", "Number", 0) end)
+-- hw_button_add(PINS_D.UTIL, function() STATE.util = true; fsx_variable_write("L:Swutilitylight", "Number", 1) end, function() STATE.util = false; fsx_variable_write("L:Swutilitylight", "Number", 0) end)
 
-hw_button_add(PINS_D.FIRE1, function() STATE.fire1 = 1; fsx_variable_write("L:firethandl", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire1 = 0; fsx_variable_write("L:firethandl", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
-hw_button_add(PINS_D.FIRE2, function() STATE.fire2 = 1; fsx_variable_write("L:firethandr", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire2 = 0; fsx_variable_write("L:firethandr", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
-hw_button_add(PINS_D.FIRE_TEST, function() STATE.fire_test = true; fsx_variable_write("L:Swfiretest", "Number", 1); fsx_variable_write("L:firetestbag", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire_test = false; fsx_variable_write("L:Swfiretest", "Number", 0); fsx_variable_write("L:firetestbag", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
+-- hw_button_add(PINS_D.FIRE1, function() STATE.fire1 = 1; fsx_variable_write("L:firethandl", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire1 = 0; fsx_variable_write("L:firethandl", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
+-- hw_button_add(PINS_D.FIRE2, function() STATE.fire2 = 1; fsx_variable_write("L:firethandr", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire2 = 0; fsx_variable_write("L:firethandr", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
+-- hw_button_add(PINS_D.FIRE_TEST, function() STATE.fire_test = true; fsx_variable_write("L:Swfiretest", "Number", 1); fsx_variable_write("L:firetestbag", "Number", 1); update_fire_leds(); update_oh_fire_leds() end, function() STATE.fire_test = false; fsx_variable_write("L:Swfiretest", "Number", 0); fsx_variable_write("L:firetestbag", "Number", 0); update_fire_leds(); update_oh_fire_leds() end)
 
 hw_button_add(PINS_D.COMPASS, function() fsx_variable_write("L:SwMagDg", "Number", 1) end, function() fsx_variable_write("L:SwMagDg", "Number", 0) end)
 hw_button_add(PINS_D.MAP_DIM_BTN, function() end, function() end)
@@ -843,11 +859,24 @@ hw_adc_input_add(PINS_D.MAP_DIM, function(val) STATE.map_dim_val = val; fsx_vari
 
 -- Circuit Breakers
 hw_button_add(PINS_D.CB_INV1, function() print("CB: INV 1") end, function() end)
+hw_button_add(PINS_D.CB_INV2, function() print("CB: INV 2") end, function() end)
 hw_button_add(PINS_D.CB_NON_ESS1, function() print("CB: NON ESS 1") end, function() end)
 hw_button_add(PINS_D.CB_NON_ESS2, function() print("CB: NON ESS 2") end, function() end)
-hw_button_add(PINS_D.CB_ITT, function() print("CB: ITT") end, function() end)
+hw_button_add(PINS_D.CB_ITT1, function() print("CB: ITT 1") end, function() end)
+hw_button_add(PINS_D.CB_ITT2, function() print("CB: ITT 2") end, function() end)
 hw_button_add(PINS_D.CB_GEN1_RESET, function() print("CB: GEN 1 RESET") end, function() end)
-hw_button_add(PINS_D.CB_IGNITION, function() print("CB: IGNITION") end, function() end)
+hw_button_add(PINS_D.CB_GEN2_RESET, function() print("CB: GEN 2 RESET") end, function() end)
+hw_button_add(PINS_D.CB_IGNITION1, function() print("CB: IGNITION 1") end, function() end)
+hw_button_add(PINS_D.CB_IGNITION2, function() print("CB: IGNITION 2") end, function() end)
+hw_button_add(PINS_D.CB_ENG_TRQ, function() print("CB: ENG TRQ") end, function() end)
+hw_button_add(PINS_D.CB_MSTR_TRQ, function() print("CB: MSTR TRQ") end, function() end)
+hw_button_add(PINS_D.CB_GEN2_FIELD, function() print("CB: GEN 2 FIELD") end, function() end)
+hw_button_add(PINS_D.CB_IDLE_STOP, function() print("CB: IDLE STOP") end, function() end)
+
+-- Instrument Lighting Buttons (Placeholder - Assuming Switch behavior or momentary)
+hw_button_add(PINS_D.INST_CONSOLE, function() print("SW: CONSOLE LIGHT") end, function() end)
+hw_button_add(PINS_D.INST_SEC, function() print("SW: SEC INST LIGHT") end, function() end)
+hw_button_add(PINS_D.INST_ENG, function() print("SW: ENG INST LIGHT") end, function() end)
 
 -- Rotor Brake
 hw_button_add(PINS_D.ROTOR_BRAKE, 

@@ -217,7 +217,7 @@ local function update_test_state()
         test_state = new_state
         fsx_variable_write("L:CWP_TestMode", "Number", test_state)
         print("CWP TEST: State changed to " .. tostring(test_state))
-        update_all_leds()
+        if update_all_leds then update_all_leds() end
     end
 end
 
@@ -240,7 +240,7 @@ local function update_bright_dim_state()
         bright_dim_state = new_state
         fsx_variable_write("L:CWP_Brightness", "Number", bright_dim_state)
         print("CWP BRIGHTNESS: State changed to " .. tostring(bright_dim_state))
-        update_all_leds()
+        if update_all_leds then update_all_leds() end
     end
 end
 
