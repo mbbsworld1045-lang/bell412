@@ -37,6 +37,8 @@ local PIN_FIRE_PULL1    = "ARDUINO_MEGA2560_D_D24"   -- Fire Handle 1
 local PIN_FIRE_PULL2    = "ARDUINO_MEGA2560_D_D25"   -- Fire Handle 2
 local PIN_FIRE_TEST     = "ARDUINO_MEGA2560_D_D26"   -- Fire/Bag Test
 local PIN_COMPASS_SLAVE = "ARDUINO_MEGA2560_D_D27"   -- Compass Mag/Slave
+local PIN_RELAY_NON_ESS = "ARDUINO_MEGA2560_D_D40"   -- Non-Essential Bus Logic
+local PIN_RELAY_BAT1_OFF = "ARDUINO_MEGA2560_D_D41"  -- Battery 1 Off Logic
 
 -- Circuit Breakers
 -- Circuit Breakers
@@ -109,10 +111,18 @@ local STATE = {
     
     -- System
     dc_bus = 0,
+    -- SimVar State
+    gen1_sw_state = false, gen2_sw_state = false,
 }
+
+-- Relay Outputs
+local output_non_ess = hw_output_add(PIN_RELAY_NON_ESS, false)
+local output_bat1_off = hw_output_add(PIN_RELAY_BAT1_OFF, false)
 
 local last_elec_print = ""
 local last_fire_print = ""
+local last_d40_state = nil
+local last_d41_state = nil
 
 -- =============================================================================
 -- HELPER FUNCTIONS
@@ -135,6 +145,30 @@ local function update_elec_leds()
     local gens_on = STATE.gen1_prod or STATE.gen2_prod
     local b_caut = (batts_on and not gens_on) and 1.0 or 0.0
     hw_led_set(led_batt_caut, b_caut)
+
+    -- Logic for D40: Non-Essential Bus Relay
+    -- ONLY LOW (Normal) if: Gen 1 ON AND Gen 2 ON AND Switch ON (Normal)
+    -- Otherwise HIGH (Shed)
+    -- This covers:
+    -- 1. Bat only (Gens OFF) -> HIGH
+    -- 2. Switch OFF (Manual) -> HIGH
+    -- 3. Single Gen -> HIGH
+    local d40_normal = (STATE.gen1 and STATE.gen2 and STATE.non_bus)
+    local d40_state = not d40_normal -- Inverted Logic: HIGH = Shed based on user request "low/0 (Normal)"
+    
+    hw_output_set(output_non_ess, d40_state)   -- Pin 40
+
+    -- Logic for D41: Bat 1 Off Relay
+    -- If Gen 1 and Gen 2 are ON -> HIGH
+    local both_gens = (STATE.gen1 and STATE.gen2)
+    hw_output_set(output_bat1_off, both_gens)  -- Pin 41
+
+    if d40_state ~= last_d40_state or both_gens ~= last_d41_state then
+        local current_relay = string.format("RELAY LOGIC: D40=%s (Shed) D41=%s (Bat1Off)", tostring(d40_state), tostring(both_gens))
+        if current_relay ~= last_elec_print then print(current_relay) end
+        last_d40_state = d40_state
+        last_d41_state = both_gens
+    end
 
     local current_print = string.format("LED UPDATE: Gen1Fail=%.0f Gen2Fail=%.0f Inv1Fail=%.0f Inv2Fail=%.0f BattCaut=%.0f", g1, g2, i1, i2, b_caut)
     if current_print ~= last_elec_print then
@@ -294,7 +328,7 @@ hw_button_add(PIN_UTILITY_LT,
 -- MAP LIGHT DIMMER (Analog)
 hw_adc_input_add(PIN_MAP_DIMMER, function(val)
     STATE.map_dim_val = val
-    print(string.format("ADC: MAP DIMMER = %.2f", val))
+    -- print(string.format("ADC: MAP DIMMER = %.2f", val)) -- Suppressed per user request
     fsx_variable_write("L:platepilolight", "Number", val * 100) 
 end)
 hw_button_add(PIN_MAP_DIM_BTN, function() print("BTN: MAP DIM BUTTON PRESSED") end, function() end)
@@ -347,9 +381,16 @@ fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
     update_fire_leds()
 end)
 
--- Generator Status
+-- Generator Status (Production - existing)
 fsx_variable_subscribe("L:CGenel", "Number", function(val) STATE.gen1_prod = (val ~= 0); update_elec_leds() end)
 fsx_variable_subscribe("L:CGener", "Number", function(val) STATE.gen2_prod = (val ~= 0); update_elec_leds() end)
+
+-- Switch State Sync (Bi-directional)
+fsx_variable_subscribe("L:Swbatta", "Number", function(val) STATE.batt1 = (val == 1); update_elec_leds() end)
+fsx_variable_subscribe("L:Swbattb", "Number", function(val) STATE.batt2 = (val == 1); update_elec_leds() end)
+fsx_variable_subscribe("L:Genel", "Number", function(val) STATE.gen1 = (val == 1); update_elec_leds() end)
+fsx_variable_subscribe("L:Gener", "Number", function(val) STATE.gen2 = (val == 1); update_elec_leds() end)
+fsx_variable_subscribe("L:Swnonbus", "Number", function(val) STATE.non_bus = (val == 1); update_elec_leds() end)
 
 -- Fire Handle Feedback
 fsx_variable_subscribe("L:firethandl", "Number", function(val) STATE.fire1 = (val ~= 0) and 1 or 0; update_fire_leds() end)

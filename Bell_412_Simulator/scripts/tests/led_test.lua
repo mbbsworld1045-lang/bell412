@@ -2,7 +2,7 @@
 -- BELL 412 - LED TEST SCRIPT
 -- Platform: Air Manager + Arduino Mega 2560
 -- Purpose: Test all LEDs one by one (10 seconds each)
--- Channels: A (Pedestal), B (Front), D (Overhead), E (Caution)
+-- Channels: A (Pedestal), B (Front), D (Overhead), E (Caution), F (Flight Dir)
 -- =============================================================================
 
 print("=============================================================================")
@@ -126,6 +126,24 @@ local ALL_LEDS = {
     { pin = "ARDUINO_MEGA2560_E_D13", name = "54 20 FT CAUTION",     channel = "E", type = "led" },
     { pin = "ARDUINO_MEGA2560_E_D2",  name = "55 NIGHTSUN",          channel = "E", type = "led" },
     { pin = "ARDUINO_MEGA2560_E_D14", name = "56 SPARE",             channel = "E", type = "led" },
+
+    -- =========================================================================
+    -- ARDUINO F - FLIGHT DIRECTOR (flight_director.lua)
+    -- =========================================================================
+    { pin = "ARDUINO_MEGA2560_F_A4",  name = "FD1 VS Light",         channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A2",  name = "FD1 IAS Light",        channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A3",  name = "FD1 ALT Light",        channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A5",  name = "FD1 ILS Light 1",      channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A6",  name = "FD1 ILS Light 2",      channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A7",  name = "FD1 NAV Light 1",      channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A8",  name = "FD1 NAV Light 2",      channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A9",  name = "FD1 HDG Light",        channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A10", name = "FD1 GA Light",         channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A11", name = "FD1 VOR APR Light 1",  channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A12", name = "FD1 VOR APR Light 2",  channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A13", name = "FD1 BC Light 1",       channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A14", name = "FD1 BC Light 2",       channel = "F", type = "led" },
+    { pin = "ARDUINO_MEGA2560_F_A15", name = "FD1 SBY Light",        channel = "F", type = "led" },
 }
 
 -- =============================================================================
@@ -210,4 +228,4 @@ timer_start(3000, nil, function()
 end)
 
 print("\nLED Test Script Loaded")
-print("Channels: A (Pedestal), B (Front), D (Overhead), E (Caution)")
+print("Channels: A (Pedestal), B (Front), D (Overhead), E (Caution), F (Flight Dir)")
