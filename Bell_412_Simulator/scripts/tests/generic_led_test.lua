@@ -1,50 +1,34 @@
--- =============================================================================
--- BELL 412 - GENERIC LED TEST (ALL LEDS ON)
--- Platform: Air Manager + Arduino Mega 2560
--- Purpose: Turn ON *EVERY* pin (Digital 0-53, Analog A0-A15) on a selected Arduino
---          channel, treating them as LEDs.
--- WARNING: Ensure pins are connected to LEDs (via resistors) and NOT INPUTS!
--- =============================================================================
+-- Generic LED Test Script for Bell 412 Simulator
+-- Sets all Digital Pins (D2-D53) and Analog Pins (A0-A15 as Digital)
+-- on Channels A, B, C, D, E, F to HIGH (ON).
 
--- CONFIGURATION: Set the Arduino Channel you want to test (A, B, C, D, E, F, etc.)
-local CHANNEL = "F" 
+print("Starting Generic LED Tester (All ON)...")
 
--- =============================================================================
--- LOGIC
--- =============================================================================
-print("=============================================================================")
-print(string.format("         GENERIC LED TEST - CHANNEL %s", CHANNEL))
-print("         Setting all pins (0-69) to LED ON (1.0)")
-print("=============================================================================")
+-- List of channels to test
+local channels = {"A", "B", "C", "D", "E", "F"}
 
-local led_count = 0
-
--- Function to add and light an LED
-local function enable_led_pin(pin_name, arduino_id)
-    -- hw_led_add(id, initial_value) -> initial_value 1.0 = Max Brightness
-    hw_led_add(arduino_id, 1.0)
-    print(string.format("  [ON]   Pin %s -> %s", pin_name, arduino_id))
-    led_count = led_count + 1
+-- Helper function to add an LED/Output
+function add_scan_led(channel, piner)
+    local pin_name = "ARDUINO_MEGA2560_" .. channel .. "_" .. piner
+    
+    -- We use hw_output_add for universality (works for PWM pins too if used as digital on/off)
+    -- Initialize to TRUE (ON)
+    hw_output_add(pin_name, true)
 end
 
--- 1. Digital Pins D0 - D53
--- Note: D0/D1 are Serial RX/TX. If you use USB serial, this might interfere.
--- However, for a pure hardware test, we include them if requested "all pins".
-print("\nScanning Digital Pins (D0 - D53)...")
-for i = 0, 53 do
-    local pin_name = "D" .. i
-    local arduino_id = "ARDUINO_MEGA2560_" .. CHANNEL .. "_" .. pin_name
-    enable_led_pin(pin_name, arduino_id)
+-- Iterate through channels and pins
+for _, channel in ipairs(channels) do
+    -- Digital Pins D2 to D53
+    for i = 2, 53 do
+        local pin = "D" .. i
+        add_scan_led(channel, pin)
+    end
+
+    -- Analog Pins A0 to A15 (used as Digital Outputs)
+    for i = 0, 15 do
+        local pin = "A" .. i
+        add_scan_led(channel, pin)
+    end
 end
 
--- 2. Analog Pins A0 - A15 (Digital 54-69)
-print("\nScanning Analog Pins (A0 - A15)...")
-for i = 0, 15 do
-    local pin_name = "A" .. i
-    local arduino_id = "ARDUINO_MEGA2560_" .. CHANNEL .. "_" .. pin_name
-    enable_led_pin(pin_name, arduino_id)
-end
-
-print("=============================================================================")
-print(string.format("         %d LEDs turned ON on Channel %s.", led_count, CHANNEL))
-print("=============================================================================")
+print("All Pins initialized to ON. Check your panels.")
