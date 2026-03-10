@@ -13,79 +13,79 @@ print("Front Panel Script Running")
 -- =============================================================================
 -- INPUTS (Buttons)
 -- BRG PTR Switches
-local PIN_BRG_PTR           = "ARDUINO_MEGA2560_B_D38"      -- BRG PTR Switch Left (L:SwBrgPtr)
-local PIN_BRG_PTR2          = "ARDUINO_MEGA2560_B_D10"      -- BRG PTR Switch Right (L:SwBrgPtr)
+local PIN_BRG_PTR           = "ARDUINO_MEGA2560_A_D38"      -- BRG PTR Switch Left (L:SwBrgPtr)
+local PIN_BRG_PTR2          = "ARDUINO_MEGA2560_A_D10"      -- BRG PTR Switch Right (L:SwBrgPtr)
 
 -- Fire System
-local PIN_FIRE_PULL1        = "ARDUINO_MEGA2560_B_D50"      -- Fire Pull Handle Left (L:firethandl)
-local PIN_FIRE_PULL2        = "ARDUINO_MEGA2560_B_D35"      -- Fire Pull Handle Right (L:firethandr)
-local PIN_FIRE_TEST         = "ARDUINO_MEGA2560_B_D51"      -- Fire Detection Test (L:Swfiretest)
-local PIN_BAG_FIRE_TEST     = "ARDUINO_MEGA2560_B_D52"      -- Baggage Fire Test (L:firetestbag)
-local PIN_EXTINGUISHER_POS1 = "ARDUINO_MEGA2560_B_D7"       -- Fire Extinguisher Main (L:Extinguisher)
-local PIN_EXTINGUISHER_POS2 = "ARDUINO_MEGA2560_B_D8"       -- Fire Extinguisher Reserve (L:Extinguisher)
+local PIN_FIRE_PULL1        = "ARDUINO_MEGA2560_A_D50"      -- Fire Pull Handle Left (L:firethandl)
+local PIN_FIRE_PULL2        = "ARDUINO_MEGA2560_A_D35"      -- Fire Pull Handle Right (L:firethandr)
+local PIN_FIRE_TEST         = "ARDUINO_MEGA2560_A_D51"      -- Fire Detection Test (L:Swfiretest)
+local PIN_BAG_FIRE_TEST     = "ARDUINO_MEGA2560_A_D52"      -- Baggage Fire Test (L:firetestbag)
+local PIN_EXTINGUISHER_POS1 = "ARDUINO_MEGA2560_A_D7"       -- Fire Extinguisher Main (L:Extinguisher)
+local PIN_EXTINGUISHER_POS2 = "ARDUINO_MEGA2560_A_D8"       -- Fire Extinguisher Reserve (L:Extinguisher)
 
 -- Beacon Marker Tests
-local PIN_MARKER_TEST       = "ARDUINO_MEGA2560_B_D45"      -- Marker Test Left (L:TestMarker)
-local PIN_MARKER_TEST2      = "ARDUINO_MEGA2560_B_D37"      -- Marker Test Right (L:TestMarker)
+local PIN_MARKER_TEST       = "ARDUINO_MEGA2560_A_D45"      -- Marker Test Left (L:TestMarker)
+local PIN_MARKER_TEST2      = "ARDUINO_MEGA2560_A_D37"      -- Marker Test Right (L:TestMarker)
 
 -- Over Torque Tests
-local PIN_OVERTQ_TEST       = "ARDUINO_MEGA2560_B_D49"      -- Over Torque Test Left (L:Overtq)
-local PIN_OVERTQ_TEST2      = "ARDUINO_MEGA2560_B_D33"      -- Over Torque Test Right (L:Overtq)
+local PIN_OVERTQ_TEST       = "ARDUINO_MEGA2560_A_D49"      -- Over Torque Test Left (L:Overtq)
+local PIN_OVERTQ_TEST2      = "ARDUINO_MEGA2560_A_D33"      -- Over Torque Test Right (L:Overtq)
 
 -- Cyclic Center Tests
-local PIN_CYC_CTR_TEST_L    = "ARDUINO_MEGA2560_B_D40"      -- Cyclic Center Test Left (L:Cyctest)
-local PIN_CYC_CTR_TEST_R    = "ARDUINO_MEGA2560_B_D32"      -- Cyclic Center Test Right (L:Cyctest)
+local PIN_CYC_CTR_TEST_L    = "ARDUINO_MEGA2560_A_D40"      -- Cyclic Center Test Left (L:Cyctest)
+local PIN_CYC_CTR_TEST_R    = "ARDUINO_MEGA2560_A_D32"      -- Cyclic Center Test Right (L:Cyctest)
 
 -- Master Caution Buttons
-local PIN_MC_RESET_L        = "ARDUINO_MEGA2560_B_D41"      -- Master Caution Button Left
-local PIN_MC_RESET_R        = "ARDUINO_MEGA2560_B_D36"      -- Master Caution Button Right
+local PIN_MC_RESET_L        = "ARDUINO_MEGA2560_A_D41"      -- Master Caution Button Left
+local PIN_MC_RESET_R        = "ARDUINO_MEGA2560_A_D36"      -- Master Caution Button Right
 
 -- Fuel System
-local PIN_FUEL_SYS_TEST_FWD = "ARDUINO_MEGA2560_B_D53"      -- Fuel Sys Test Fwd Tank (L:FuelQuantity = -1)
-local PIN_FUEL_SYS_TEST_MID = "ARDUINO_MEGA2560_B_D34"      -- Fuel Sys Test Mid Tank (L:FuelQuantity = -1)
-local PIN_FUEL_DIGIT_TEST   = "ARDUINO_MEGA2560_B_D44"      -- Fuel Digit Test
+local PIN_FUEL_SYS_TEST_FWD = "ARDUINO_MEGA2560_A_D53"      -- Fuel Sys Test Fwd Tank (L:FuelQuantity = -1)
+local PIN_FUEL_SYS_TEST_MID = "ARDUINO_MEGA2560_A_D34"      -- Fuel Sys Test Mid Tank (L:FuelQuantity = -1)
+local PIN_FUEL_DIGIT_TEST   = "ARDUINO_MEGA2560_A_D44"      -- Fuel Digit Test
 
 -- Nav GPS Buttons
-local PIN_NAV_GPS_BTN_R     = "ARDUINO_MEGA2560_B_D11"      -- Nav GPS White Right Button
-local PIN_NAV_GPS_BTN_L     = "ARDUINO_MEGA2560_B_D25"      -- Nav GPS White Left Button 
+local PIN_NAV_GPS_BTN_R     = "ARDUINO_MEGA2560_A_D11"      -- Nav GPS White Right Button
+local PIN_NAV_GPS_BTN_L     = "ARDUINO_MEGA2560_A_D25"      -- Nav GPS White Left Button 
 
 -- =============================================================================
 -- OUTPUTS (LEDs)
 -- =============================================================================
 -- BRG PTR LEDs
-local PIN_BRG_PTR_LED       = "ARDUINO_MEGA2560_B_D3"       -- BRG PTR Switch Left LED
-local PIN_BRG_PTR2_LED      = "ARDUINO_MEGA2560_B_D13"      -- BRG PTR Switch Right LED
+local PIN_BRG_PTR_LED       = "ARDUINO_MEGA2560_A_D3"       -- BRG PTR Switch Left LED
+local PIN_BRG_PTR2_LED      = "ARDUINO_MEGA2560_A_D13"      -- BRG PTR Switch Right LED
 
 -- Fire Handle Status LEDs
-local PIN_FIRE_HANDLE1_LED  = "ARDUINO_MEGA2560_B_D5"       -- Fire Handle 1 Status LED Left
-local PIN_FIRE_HANDLE2_LED  = "ARDUINO_MEGA2560_B_D24"      -- Fire Handle 2 Status LED Right
-local PIN_BAG_FIRE_TEST_LED = "ARDUINO_MEGA2560_B_D2"       -- Baggage Fire Test LED
+local PIN_FIRE_HANDLE1_LED  = "ARDUINO_MEGA2560_A_D5"       -- Fire Handle 1 Status LED Left
+local PIN_FIRE_HANDLE2_LED  = "ARDUINO_MEGA2560_A_D24"      -- Fire Handle 2 Status LED Right
+local PIN_BAG_FIRE_TEST_LED = "ARDUINO_MEGA2560_A_D2"       -- Baggage Fire Test LED
 
 -- Beacon Marker LEDs - Right Side
-local PIN_MARKER_R_WHT      = "ARDUINO_MEGA2560_B_D26"      -- Marker Right White
-local PIN_MARKER_R_RED      = "ARDUINO_MEGA2560_B_D27"      -- Marker Right Red
-local PIN_MARKER_R_BLU      = "ARDUINO_MEGA2560_B_D28"      -- Marker Right Blue
+local PIN_MARKER_R_WHT      = "ARDUINO_MEGA2560_A_D26"      -- Marker Right White
+local PIN_MARKER_R_RED      = "ARDUINO_MEGA2560_A_D27"      -- Marker Right Red
+local PIN_MARKER_R_BLU      = "ARDUINO_MEGA2560_A_D28"      -- Marker Right Blue
 
 -- Beacon Marker LEDs - Left Side
-local PIN_MARKER_L_WHT      = "ARDUINO_MEGA2560_B_D46"      -- Marker Left White (right)
-local PIN_MARKER_L_BLU      = "ARDUINO_MEGA2560_B_D47"      -- Marker Left Blue (left)
-local PIN_MARKER_L_RED      = "ARDUINO_MEGA2560_B_D48"      -- Marker Left Red (middle)
+local PIN_MARKER_L_WHT      = "ARDUINO_MEGA2560_A_D46"      -- Marker Left White (right)
+local PIN_MARKER_L_BLU      = "ARDUINO_MEGA2560_A_D47"      -- Marker Left Blue (left)
+local PIN_MARKER_L_RED      = "ARDUINO_MEGA2560_A_D48"      -- Marker Left Red (middle)
 
 -- Over Torque LEDs
-local PIN_OVERTQ_LED_L      = "ARDUINO_MEGA2560_B_D39"      -- Over Torque LED Left
-local PIN_OVERTQ_LED_R      = "ARDUINO_MEGA2560_B_D9"       -- Over Torque LED Right
+local PIN_OVERTQ_LED_L      = "ARDUINO_MEGA2560_A_D39"      -- Over Torque LED Left
+local PIN_OVERTQ_LED_R      = "ARDUINO_MEGA2560_A_D9"       -- Over Torque LED Right
 
 -- Cyclic Center LEDs
-local PIN_CYC_CTR_LED_L     = "ARDUINO_MEGA2560_B_D42"      -- Cyclic Center LED Left
-local PIN_CYC_CTR_LED_R     = "ARDUINO_MEGA2560_B_D30"      -- Cyclic Center LED Right
+local PIN_CYC_CTR_LED_L     = "ARDUINO_MEGA2560_A_D42"      -- Cyclic Center LED Left
+local PIN_CYC_CTR_LED_R     = "ARDUINO_MEGA2560_A_D30"      -- Cyclic Center LED Right
 
 -- Master Caution LEDs
-local PIN_MC_LED_L          = "ARDUINO_MEGA2560_B_D43"      -- Master Caution LED Left
-local PIN_MC_LED_R          = "ARDUINO_MEGA2560_B_D31"      -- Master Caution LED Right
+local PIN_MC_LED_L          = "ARDUINO_MEGA2560_A_D43"      -- Master Caution LED Left
+local PIN_MC_LED_R          = "ARDUINO_MEGA2560_A_D31"      -- Master Caution LED Right
 
 -- Engine Warning LEDs
-local PIN_ENG1_LED          = "ARDUINO_MEGA2560_B_D4"       -- Engine 1 Warning LED
-local PIN_ENG2_LED          = "ARDUINO_MEGA2560_B_D12"      -- Engine 2 Warning LED
+local PIN_ENG1_LED          = "ARDUINO_MEGA2560_A_D4"       -- Engine 1 Warning LED
+local PIN_ENG2_LED          = "ARDUINO_MEGA2560_A_D12"      -- Engine 2 Warning LED
 
 -- =============================================================================
 -- 2. INITIALIZE HARDWARE LEDS

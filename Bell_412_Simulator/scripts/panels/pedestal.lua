@@ -14,75 +14,75 @@ print("Pedestal Script Running")
 -- -------------------------
 -- AFCS & Autopilot Inputs (Mega A)
 -- -------------------------
-local PIN_AP1_SW            = "ARDUINO_MEGA2560_A_D13"
-local PIN_AP2_SW            = "ARDUINO_MEGA2560_A_D12"
-local PIN_AFCS_SAS_SW       = "ARDUINO_MEGA2560_A_D10"
-local PIN_AFCS_TEST_SW      = "ARDUINO_MEGA2560_A_D9"
-local PIN_AFCS_TRIM_FD_SW   = "ARDUINO_MEGA2560_A_D7"
-local PIN_AFCS_CPL_SW       = "ARDUINO_MEGA2560_A_D6"
-local PIN_AFCS_SYS2         = "ARDUINO_MEGA2560_A_D43"
+local PIN_AP1_SW            = "ARDUINO_MEGA2560_B_D13"
+local PIN_AP2_SW            = "ARDUINO_MEGA2560_B_D12"
+local PIN_AFCS_SAS_SW       = "ARDUINO_MEGA2560_B_D10"
+local PIN_AFCS_TEST_SW      = "ARDUINO_MEGA2560_B_D9"
+local PIN_AFCS_TRIM_FD_SW   = "ARDUINO_MEGA2560_B_D7"
+local PIN_AFCS_CPL_SW       = "ARDUINO_MEGA2560_B_D6"
+local PIN_AFCS_SYS2         = "ARDUINO_MEGA2560_B_D43"
 
 -- -------------------------
 -- AFCS & Autopilot LEDs (Mega A)
 -- -------------------------
-local PIN_AP1_LED           = "ARDUINO_MEGA2560_A_D5"
-local PIN_AP2_LED           = "ARDUINO_MEGA2560_A_D4"
-local PIN_AFCS_SAS_LED      = "ARDUINO_MEGA2560_A_D2"
-local PIN_AFCS_ATT_LED      = "ARDUINO_MEGA2560_A_D3"
-local PIN_AFCS_TRIM_LED     = "ARDUINO_MEGA2560_A_A1"      -- Analog as Digital
-local PIN_AFCS_TEST_LED     = "ARDUINO_MEGA2560_A_A2"      -- Analog as Digital
-local PIN_AFCS_FD_LED       = "ARDUINO_MEGA2560_A_A3"      -- Analog as Digital
-local PIN_AFCS_CPL_LED      = "ARDUINO_MEGA2560_A_A4"      -- Analog as Digital
+local PIN_AP1_LED           = "ARDUINO_MEGA2560_B_D5"
+local PIN_AP2_LED           = "ARDUINO_MEGA2560_B_D4"
+local PIN_AFCS_SAS_LED      = "ARDUINO_MEGA2560_B_D2"
+local PIN_AFCS_ATT_LED      = "ARDUINO_MEGA2560_B_D3"
+local PIN_AFCS_TRIM_LED     = "ARDUINO_MEGA2560_B_A1"      -- Analog as Digital
+local PIN_AFCS_TEST_LED     = "ARDUINO_MEGA2560_B_A2"      -- Analog as Digital
+local PIN_AFCS_FD_LED       = "ARDUINO_MEGA2560_B_A3"      -- Analog as Digital
+local PIN_AFCS_CPL_LED      = "ARDUINO_MEGA2560_B_A4"      -- Analog as Digital
 
 -- -------------------------
 -- AHRS & Mag/DG (Mega A)
 -- -------------------------
-local PIN_AHRS_TEST_1       = "ARDUINO_MEGA2560_A_D53"
-local PIN_AHRS_TEST_2       = "ARDUINO_MEGA2560_A_D49"
-local PIN_MAG_DG_MAG1       = "ARDUINO_MEGA2560_A_D51"
-local PIN_MAG_DG_MAG2       = "ARDUINO_MEGA2560_A_D47"
-local PIN_MAG_DG_DG1        = "ARDUINO_MEGA2560_A_D52"
-local PIN_MAG_DG_DG2        = "ARDUINO_MEGA2560_A_D48"
-local PIN_AHRS_SERVO        = "ARDUINO_MEGA2560_A_D60"     -- Placeholder for Servo
+local PIN_AHRS_TEST_1       = "ARDUINO_MEGA2560_B_D53"
+local PIN_AHRS_TEST_2       = "ARDUINO_MEGA2560_B_D49"
+local PIN_MAG_DG_MAG1       = "ARDUINO_MEGA2560_B_D51"
+local PIN_MAG_DG_MAG2       = "ARDUINO_MEGA2560_B_D47"
+local PIN_MAG_DG_DG1        = "ARDUINO_MEGA2560_B_D52"
+local PIN_MAG_DG_DG2        = "ARDUINO_MEGA2560_B_D48"
+local PIN_AHRS_SERVO        = "ARDUINO_MEGA2560_B_D60"     -- Placeholder for Servo
 
 -- -------------------------
 -- Fuel & Hydraulics (Mega A)
 -- -------------------------
-local PIN_VALVE1            = "ARDUINO_MEGA2560_A_D30"
-local PIN_VALVE2            = "ARDUINO_MEGA2560_A_D32"
-local PIN_XFEED             = "ARDUINO_MEGA2560_A_D28"      -- XFEED Bus Test 1 (L:Swxfeedbus = 1)
-local PIN_XFEED_POS2        = "ARDUINO_MEGA2560_A_D31"      -- XFEED Bus Test 2 (L:Swxfeedbus = 2), Ground = 0
-local PIN_FUEL_XFEED        = "ARDUINO_MEGA2560_A_D33"      -- Fuel Crossfeed (0=Normal, 1=Over Close)
-local PIN_FUEL_TRANS1       = "ARDUINO_MEGA2560_A_D34"      -- Trans Fuel 1 (L:SwfueltransengA)
-local PIN_BOOST1            = "ARDUINO_MEGA2560_A_D35"      -- Boost Pump 1 (L:SwboostpuEng1)
-local PIN_FUEL_INTCON       = "ARDUINO_MEGA2560_A_D36"      -- Fuel Intercon (L:Swfuelintcon)
-local PIN_FUEL_TRANS2       = "ARDUINO_MEGA2560_A_D37"      -- Trans Fuel 2 (L:SwfueltransengB)
-local PIN_BOOST2            = "ARDUINO_MEGA2560_A_D38"      -- Boost Pump 2 (L:SwboostpuEng2)
-local PIN_HYD1_SW           = "ARDUINO_MEGA2560_A_D39"
-local PIN_HYD2_SW           = "ARDUINO_MEGA2560_A_D42"
+local PIN_VALVE1            = "ARDUINO_MEGA2560_B_D30"
+local PIN_VALVE2            = "ARDUINO_MEGA2560_B_D32"
+local PIN_XFEED             = "ARDUINO_MEGA2560_B_D28"      -- XFEED Bus Test 1 (L:Swxfeedbus = 1)
+local PIN_XFEED_POS2        = "ARDUINO_MEGA2560_B_D31"      -- XFEED Bus Test 2 (L:Swxfeedbus = 2), Ground = 0
+local PIN_FUEL_XFEED        = "ARDUINO_MEGA2560_B_D33"      -- Fuel Crossfeed (0=Normal, 1=Over Close)
+local PIN_FUEL_TRANS1       = "ARDUINO_MEGA2560_B_D34"      -- Trans Fuel 1 (L:SwfueltransengA)
+local PIN_BOOST1            = "ARDUINO_MEGA2560_B_D35"      -- Boost Pump 1 (L:SwboostpuEng1)
+local PIN_FUEL_INTCON       = "ARDUINO_MEGA2560_B_D36"      -- Fuel Intercon (L:Swfuelintcon)
+local PIN_FUEL_TRANS2       = "ARDUINO_MEGA2560_B_D37"      -- Trans Fuel 2 (L:SwfueltransengB)
+local PIN_BOOST2            = "ARDUINO_MEGA2560_B_D38"      -- Boost Pump 2 (L:SwboostpuEng2)
+local PIN_HYD1_SW           = "ARDUINO_MEGA2560_B_D39"
+local PIN_HYD2_SW           = "ARDUINO_MEGA2560_B_D42"
 
 -- -------------------------
 -- Gov, Trim, & Misc (Mega A)
 -- -------------------------
-local PIN_GOV_ENG1          = "ARDUINO_MEGA2560_A_D23"
-local PIN_GOV_ENG2          = "ARDUINO_MEGA2560_A_D29"
-local PIN_PARTSEP1          = "ARDUINO_MEGA2560_A_D25"
-local PIN_PARTSEP2          = "ARDUINO_MEGA2560_A_D27"
-local PIN_FORCE_TRIM        = "ARDUINO_MEGA2560_A_D40"
-local PIN_RPM_AUDIO         = "ARDUINO_MEGA2560_A_D41"
+local PIN_GOV_ENG1          = "ARDUINO_MEGA2560_B_D23"
+local PIN_GOV_ENG2          = "ARDUINO_MEGA2560_B_D29"
+local PIN_PARTSEP1          = "ARDUINO_MEGA2560_B_D25"
+local PIN_PARTSEP2          = "ARDUINO_MEGA2560_B_D27"
+local PIN_FORCE_TRIM        = "ARDUINO_MEGA2560_B_D40"
+local PIN_RPM_AUDIO         = "ARDUINO_MEGA2560_B_D41"
 
 -- =============================================================================
 -- 2. LED HANDLES
 -- =============================================================================
-local led_trim_h = hw_output_add("ARDUINO_MEGA2560_A_A1", false)
-local led_test_h = hw_output_add("ARDUINO_MEGA2560_A_A2", false)
-local led_fd_h   = hw_output_add("ARDUINO_MEGA2560_A_A3", false)
-local led_cpl_h  = hw_output_add("ARDUINO_MEGA2560_A_A4", false)
+local led_trim_h = hw_output_add("ARDUINO_MEGA2560_B_A1", false)
+local led_test_h = hw_output_add("ARDUINO_MEGA2560_B_A2", false)
+local led_fd_h   = hw_output_add("ARDUINO_MEGA2560_B_A3", false)
+local led_cpl_h  = hw_output_add("ARDUINO_MEGA2560_B_A4", false)
 
-local led_sas_h  = hw_led_add("ARDUINO_MEGA2560_A_D2", 0.0)
-local led_att_h  = hw_led_add("ARDUINO_MEGA2560_A_D3", 0.0)
-local led_ap2_h  = hw_led_add("ARDUINO_MEGA2560_A_D4", 0.0)
-local led_ap1_h  = hw_led_add("ARDUINO_MEGA2560_A_D5", 0.0)
+local led_sas_h  = hw_led_add("ARDUINO_MEGA2560_B_D2", 0.0)
+local led_att_h  = hw_led_add("ARDUINO_MEGA2560_B_D3", 0.0)
+local led_ap2_h  = hw_led_add("ARDUINO_MEGA2560_B_D4", 0.0)
+local led_ap1_h  = hw_led_add("ARDUINO_MEGA2560_B_D5", 0.0)
 
 -- AHRS Servo (PWM)
 local servo_ahrs_h      = hw_output_pwm_add(PIN_AHRS_SERVO, 50, 0.075)
@@ -215,7 +215,7 @@ end
 -- -------------------------
 
 -- PIN 3: AP1 BUTTON
-hw_button_add("ARDUINO_MEGA2560_A_D13", function()
+hw_button_add("ARDUINO_MEGA2560_B_D13", function()
     -- Check if ANY AP was already on before this press
     local any_ap_already_on = state_ap1 or state_ap2
     
@@ -231,7 +231,7 @@ hw_button_add("ARDUINO_MEGA2560_A_D13", function()
 end)
 
 -- PIN 2: AP2 BUTTON
-hw_button_add("ARDUINO_MEGA2560_A_D12", function()
+hw_button_add("ARDUINO_MEGA2560_B_D12", function()
     -- Check if ANY AP was already on before this press
     local any_ap_already_on = state_ap1 or state_ap2
     
@@ -247,7 +247,7 @@ hw_button_add("ARDUINO_MEGA2560_A_D12", function()
 end)
 
 -- PIN 1: SAS/ATT BUTTON (Alternative Toggle)
-hw_button_add("ARDUINO_MEGA2560_A_D10", function()
+hw_button_add("ARDUINO_MEGA2560_B_D10", function()
     -- Only allow toggle if at least one AP is active
     if state_ap1 or state_ap2 then
         if sas_mode == "SAS" then
@@ -260,20 +260,20 @@ hw_button_add("ARDUINO_MEGA2560_A_D10", function()
 end)
 
 -- PIN 5: TRIM / FD BUTTON (Cycle: Trim -> FD -> Off)
-hw_button_add("ARDUINO_MEGA2560_A_D7", function()
+hw_button_add("ARDUINO_MEGA2560_B_D7", function()
     trim_cycle = (trim_cycle + 1) % 3
     hw_output_set(led_trim_h, trim_cycle == 1)
     hw_output_set(led_fd_h, trim_cycle == 2)
 end)
 
 -- PIN 4: CPL BUTTON (Simple Toggle)
-hw_button_add("ARDUINO_MEGA2560_A_D6", function()
+hw_button_add("ARDUINO_MEGA2560_B_D6", function()
     state_cpl = not state_cpl
     hw_output_set(led_cpl_h, state_cpl)
 end)
 
 -- PIN 6: TEST BUTTON (30s Timer)
-hw_button_add("ARDUINO_MEGA2560_A_D9", function()
+hw_button_add("ARDUINO_MEGA2560_B_D9", function()
     hw_output_set(led_test_h, true)
     if test_timer ~= nil then timer_stop(test_timer) end
     test_timer = timer_start(30000, function()
