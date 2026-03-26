@@ -35,6 +35,10 @@ local PIN_SRCH_LT_RETR      = "ARDUINO_MEGA2560_C_D40"      -- SRCH LT RETR (Ret
 local PIN_IDLE_STOP_ENG1    = "ARDUINO_MEGA2560_C_D28"      -- IDLE STOP ENG1
 local PIN_IDLE_STOP_ENG2    = "ARDUINO_MEGA2560_C_D29"      -- IDLE STOP ENG2
 
+-- Idle Stop Solenoids (Outputs)
+local PIN_SOLENOID_ENG1     = "ARDUINO_MEGA2560_C_D52"      -- SOLENOID ENG1
+local PIN_SOLENOID_ENG2     = "ARDUINO_MEGA2560_C_D53"      -- SOLENOID ENG2
+
 -- Start Switches
 local PIN_START_ENG1        = "ARDUINO_MEGA2560_C_D31"      -- START ENG1
 local PIN_START_ENG2        = "ARDUINO_MEGA2560_C_D30"      -- START ENG2
@@ -72,6 +76,10 @@ local PIN_GO_AROUND_LH      = "ARDUINO_MEGA2560_C_D42"      -- GO AROUND
 -- =============================================================================
 local idle_stop_1_active = false
 local idle_stop_2_active = false
+
+-- Solenoid output handles
+local solenoid_eng1 = hw_output_add(PIN_SOLENOID_ENG1, false)
+local solenoid_eng2 = hw_output_add(PIN_SOLENOID_ENG2, false)
 
 -- Timers for repeating events while held
 local yaw_timer_rh = nil
@@ -123,12 +131,34 @@ hw_button_add(PIN_START_ENG2,
 )
 
 hw_button_add(PIN_IDLE_STOP_ENG1,
-    function() print("BTN: IDLE STOP ENG1"); idle_stop_1_active = true; fsx_variable_write("L:idle eng", "Number", 1) end,
-    function() idle_stop_1_active = false; fsx_variable_write("L:idle eng", "Number", 0) end
+    function()
+        idle_stop_1_active = not idle_stop_1_active
+        if idle_stop_1_active then
+            print("BTN: IDLE STOP ENG1 ON (toggle)")
+            hw_output_set(solenoid_eng1, true)
+            fsx_variable_write("L:idle eng", "Number", 1)
+        else
+            print("BTN: IDLE STOP ENG1 OFF (toggle)")
+            hw_output_set(solenoid_eng1, false)
+            fsx_variable_write("L:idle eng", "Number", 0)
+        end
+    end,
+    function() end  -- toggle: release does nothing
 )
 hw_button_add(PIN_IDLE_STOP_ENG2,
-    function() print("BTN: IDLE STOP ENG2"); idle_stop_2_active = true; fsx_variable_write("L:idle eng", "Number", -1) end,
-    function() idle_stop_2_active = false; fsx_variable_write("L:idle eng", "Number", 0) end
+    function()
+        idle_stop_2_active = not idle_stop_2_active
+        if idle_stop_2_active then
+            print("BTN: IDLE STOP ENG2 ON (toggle)")
+            hw_output_set(solenoid_eng2, true)
+            fsx_variable_write("L:idle eng", "Number", -1)
+        else
+            print("BTN: IDLE STOP ENG2 OFF (toggle)")
+            hw_output_set(solenoid_eng2, false)
+            fsx_variable_write("L:idle eng", "Number", 0)
+        end
+    end,
+    function() end  -- toggle: release does nothing
 )
 
 -- -----------------------------------------------------------------------------
