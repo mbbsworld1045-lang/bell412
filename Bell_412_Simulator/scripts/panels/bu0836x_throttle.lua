@@ -22,31 +22,82 @@ local BU0836X_INTERFACE_NAME = "BU0836X Interface"
 -- Debug: print axis values to console (set false to reduce spam)
 local DEBUG_VERBOSE = true
 
+-- Idle Stop Status
+local idle_stop_1 = false
+local idle_stop_2 = false
+
+-- =============================================================================
+-- CALIBRATION TABLES (Raw % from BU0836X -> Sim %)
+-- =============================================================================
+-- Format: { {raw, sim}, {raw, sim}, ... }
+local CALIBRATION_ENG1 = {
+    { 0.2,   0.0 },    -- Off/Cutoff
+    { 11.9,  61.0 },   -- Idle Stop
+    { 38.5,  100.0 }   -- Full
+}
+
+local CALIBRATION_ENG2 = {
+    { 79.5,  0.0 },    -- Off/Cutoff (Reversed wiring)
+    { 65.6,  61.0 },   -- Idle Stop
+    { 55.0,  100.0 }   -- Full
+}
+
+-- HELPER: Multi-point Linear Interpolation
+local function interpolate_axis(val, table)
+    -- Clamp to table bounds
+    if val <= table[1][1] and val <= table[#table][1] then
+        -- Handle reversed vs normal tables for at-bound clamping
+        if table[1][1] < table[#table][1] then return table[1][2] else return table[#table][2] end
+    end
+    if val >= table[1][1] and val >= table[#table][1] then
+        if table[1][1] > table[#table][1] then return table[1][2] else return table[#table][2] end
+    end
+
+    -- Find the segment
+    for i = 1, #table - 1 do
+        local p1 = table[i]
+        local p2 = table[i+1]
+        
+        -- Check if val is between p1[1] and p2[1]
+        local min_raw = math.min(p1[1], p2[1])
+        local max_raw = math.max(p1[1], p2[1])
+        
+        if val >= min_raw and val <= max_raw then
+            -- Linear interpolation formula: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+            local raw_range = p2[1] - p1[1]
+            local sim_range = p2[2] - p1[2]
+            if raw_range == 0 then return p1[2] end
+            return p1[2] + (val - p1[1]) * (sim_range / raw_range)
+        end
+    end
+    return 0
+end
+
 -- =============================================================================
 -- THROTTLE HANDLER
 -- =============================================================================
 function bu0836x_handler(type, index, value)
-    -- Type 0 = Axes, Type 1 = Buttons
+    -- Type 0 = Axes
     if type == 0 then
-        -- Normalize axis (-1..1) to 0-100%
-        local percent_val = ((value + 1) / 2) * 100
-        if percent_val < 0 then percent_val = 0 end
-        if percent_val > 100 then percent_val = 100 end
+        -- Raw value from axis is -1..1, convert to 0-100% raw
+        local raw_pct = ((value + 1) / 2) * 100
 
-        -- ENGINE 1 THROTTLE (Axis X / Index 0)
+        -- ENGINE 1 THROTTLE (Axis 0)
         if index == 0 then
-            fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:2", "percent", percent_val)
-            fsx_variable_write("L:throgas1", "percent", percent_val)
+            local cal_val = interpolate_axis(raw_pct, CALIBRATION_ENG1)
+            fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:2", "percent", cal_val)
+            fsx_variable_write("L:throgas1", "percent", cal_val)
             if DEBUG_VERBOSE then
-                print(string.format("THROTTLE1: axis=%.3f -> %.1f%%", value, percent_val))
+                print(string.format("THROTTLE1: raw=%.1f%% -> cal=%.1f%%", raw_pct, cal_val))
             end
 
-        -- ENGINE 2 THROTTLE (Axis Y / Index 1)
+        -- ENGINE 2 THROTTLE (Axis 1)
         elseif index == 1 then
-            fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:3", "percent", percent_val)
-            fsx_variable_write("L:throgas2", "percent", percent_val)
+            local cal_val = interpolate_axis(raw_pct, CALIBRATION_ENG2)
+            fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:3", "percent", cal_val)
+            fsx_variable_write("L:throgas2", "percent", cal_val)
             if DEBUG_VERBOSE then
-                print(string.format("THROTTLE2: axis=%.3f -> %.1f%%", value, percent_val))
+                print(string.format("THROTTLE2: raw=%.1f%% -> cal=%.1f%%", raw_pct, cal_val))
             end
 
         -- Log other axes for discovery
@@ -54,8 +105,35 @@ function bu0836x_handler(type, index, value)
             print(string.format("  OTHER axis %d = %.3f", index, value))
         end
 
-    elseif type == 1 and DEBUG_VERBOSE then
-        print(string.format("  BUTTON %d = %s", index, tostring(value)))
+    -- Type 1 = Buttons
+    elseif type == 1 then
+        -- SWAPPED IDLE STOP BUTTONS (User's reversed hardware)
+        -- Button index 0 -> ENGINE 2 IDLE STOP
+        if index == 0 then
+            idle_stop_2 = (value == 1)
+            if idle_stop_2 then
+                print("BU0836X: IDLE STOP ENG 2 ON")
+                fsx_variable_write("L:idle eng", "Number", -1)
+            else
+                print("BU0836X: IDLE STOP ENG 2 OFF")
+                fsx_variable_write("L:idle eng", "Number", 0)
+            end
+
+        -- Button index 1 -> ENGINE 1 IDLE STOP
+        elseif index == 1 then
+            idle_stop_1 = (value == 1)
+            if idle_stop_1 then
+                print("BU0836X: IDLE STOP ENG 1 ON")
+                fsx_variable_write("L:idle eng", "Number", 1)
+            else
+                print("BU0836X: IDLE STOP ENG 1 OFF")
+                fsx_variable_write("L:idle eng", "Number", 0)
+            end
+        end
+
+        if DEBUG_VERBOSE then
+            print(string.format("  BUTTON %d = %s", index, tostring(value)))
+        end
     end
 end
 

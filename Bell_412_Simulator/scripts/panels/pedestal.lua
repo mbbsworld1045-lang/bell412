@@ -43,7 +43,10 @@ local PIN_MAG_DG_MAG1       = "ARDUINO_MEGA2560_B_D51"
 local PIN_MAG_DG_MAG2       = "ARDUINO_MEGA2560_B_D47"
 local PIN_MAG_DG_DG1        = "ARDUINO_MEGA2560_B_D52"
 local PIN_MAG_DG_DG2        = "ARDUINO_MEGA2560_B_D48"
-local PIN_AHRS_SERVO        = "ARDUINO_MEGA2560_B_D60"     -- Placeholder for Servo
+local PIN_AHRS_SERVO        = "ARDUINO_MEGA2560_B_D60"     -- Placeholder for AHRS
+local PIN_SERVO_YAW         = "ARDUINO_MEGA2560_B_D44"     -- Yaw servo
+local PIN_SERVO_ROLL        = "ARDUINO_MEGA2560_B_D45"     -- Roll servo
+local PIN_SERVO_PITCH       = "ARDUINO_MEGA2560_B_D46"     -- Pitch servo
 
 -- -------------------------
 -- Fuel & Hydraulics (Mega A)
@@ -84,8 +87,11 @@ local led_att_h  = hw_led_add("ARDUINO_MEGA2560_B_D3", 0.0)
 local led_ap2_h  = hw_led_add("ARDUINO_MEGA2560_B_D4", 0.0)
 local led_ap1_h  = hw_led_add("ARDUINO_MEGA2560_B_D5", 0.0)
 
--- AHRS Servo (PWM)
+-- Servos (PWM)
 local servo_ahrs_h      = hw_output_pwm_add(PIN_AHRS_SERVO, 50, 0.075)
+local servo_yaw_h       = hw_output_pwm_add(PIN_SERVO_YAW, 50, 0.075)
+local servo_roll_h      = hw_output_pwm_add(PIN_SERVO_ROLL, 50, 0.075)
+local servo_pitch_h     = hw_output_pwm_add(PIN_SERVO_PITCH, 50, 0.075)
 
 -- =============================================================================
 -- 3. STATE TRACKING
@@ -692,6 +698,25 @@ end)
 fsx_variable_subscribe("A:INDICATED HEADING", "Degrees", function(val)
     local heading_norm = ((val % 360.0) + 360.0) % 360.0 / 360.0
     set_servo_position(servo_ahrs_h, heading_norm)
+end)
+
+-- Yaw Servo (Pedals)
+fsx_variable_subscribe("RUDDER POSITION", "Position", function(val)
+    -- -1.0 to 1.0 mapped to 0.0 to 1.0 (servo PWM duty cycle)
+    local norm = (val + 1.0) / 2.0
+    set_servo_position(servo_yaw_h, norm)
+end)
+
+-- Roll Servo (Cyclic L/R)
+fsx_variable_subscribe("AILERON POSITION", "Position", function(val)
+    local norm = (val + 1.0) / 2.0
+    set_servo_position(servo_roll_h, norm)
+end)
+
+-- Pitch Servo (Cyclic Fwd/Aft)
+fsx_variable_subscribe("ELEVATOR POSITION", "Position", function(val)
+    local norm = (val + 1.0) / 2.0
+    set_servo_position(servo_pitch_h, norm)
 end)
 
 -- =============================================================================
