@@ -1,6 +1,6 @@
 -- =============================================================================
--- BELL 412 - RADAR ALTIMETER GAUGE
--- Encoder: Channel G, Radar ALT Meter Right: D2 & D51
+-- RECEIVER: BELL 412 - RADAR ALTIMETER GAUGE
+-- Receives bug encoder value via si_variable from Sender gauge
 -- =============================================================================
 
 -- =============================================================================
@@ -16,12 +16,7 @@ img_flag   = img_add_fullscreen("flag.png")
 visible(img_flag, false)
 
 -- =============================================================================
--- 2. STATE
--- =============================================================================
-local current_radiobug = 0
-
--- =============================================================================
--- 3. HELPER FUNCTIONS
+-- 2. HELPER FUNCTIONS
 -- =============================================================================
 
 -- Convert altitude to degrees (non-linear scale matching real radar altimeter)
@@ -37,12 +32,6 @@ local function alt_to_degrees(altitude)
     end
 end
 
--- Update the bug needle position
-local function update_radiobug(value)
-    value = var_cap(value, 0, 1500)
-    rotate(img_bug, alt_to_degrees(value))
-end
-
 -- Update the altitude needle position
 local function update_radioaltitude(altitude)
     altitude = var_cap(altitude, 0, 1500)
@@ -50,22 +39,17 @@ local function update_radioaltitude(altitude)
 end
 
 -- =============================================================================
--- 4. ENCODER INPUT (Channel G, Radar ALT Meter Right: D2 & D51)
+-- 3. SI VARIABLE SUBSCRIPTION (from Sender gauge)
 -- =============================================================================
-hw_dial_add("ARDUINO_MEGA2560_G_D2", "ARDUINO_MEGA2560_G_D51", "TYPE_1_DETENT_PER_PULSE", function(direction)
-    if direction == 1 then
-        current_radiobug = current_radiobug + 10
-        print("Radar Alt Bug: CW  -> " .. current_radiobug .. " ft")
-    elseif direction == -1 then
-        current_radiobug = current_radiobug - 10
-        print("Radar Alt Bug: CCW -> " .. current_radiobug .. " ft")
-    end
-    current_radiobug = var_cap(current_radiobug, 0, 1500)
-    update_radiobug(current_radiobug)
-end)
+function on_radalt_bug_received(bug_val)
+    bug_val = var_cap(bug_val, 0, 1500)
+    rotate(img_bug, alt_to_degrees(bug_val))
+end
+
+si_variable_subscribe("si_radalt_bug", "INT", on_radalt_bug_received)
 
 -- =============================================================================
--- 5. POWER FLAG LOGIC
+-- 4. POWER FLAG LOGIC
 -- =============================================================================
 local function power_flag_callback(powerflag)
     if powerflag == true then
@@ -76,8 +60,11 @@ local function power_flag_callback(powerflag)
 end
 
 -- =============================================================================
--- 6. SIM DATA SUBSCRIPTIONS
+-- 5. SIM DATA SUBSCRIPTIONS
 -- =============================================================================
 fsx_variable_subscribe("RADIO HEIGHT", "FEET", update_radioaltitude)
-fsx_variable_subscribe("DECISION HEIGHT", "FEET", update_radiobug)
+fsx_variable_subscribe("DECISION HEIGHT", "FEET", function(dh)
+    dh = var_cap(dh, 0, 1500)
+    rotate(img_bug, alt_to_degrees(dh))
+end)
 fsx_variable_subscribe("CIRCUIT AVIONICS ON", "BOOL", power_flag_callback)

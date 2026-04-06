@@ -719,28 +719,6 @@ fsx_variable_subscribe("ELEVATOR POSITION", "Position", function(val)
     set_servo_position(servo_pitch_h, norm)
 end)
 
--- Bi-directional Sync: Fuel / Hydraulic / Governor / Misc Switches
--- (If virtual cockpit changes these, physical STATE updates)
-fsx_variable_subscribe("L:SwvalveEng1", "Number", function(val) valve1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwvalveEng2", "Number", function(val) valve2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Swxfeedbus", "Number", function(val) xfeed_state = val or 0 end)
-fsx_variable_subscribe("L:SwFuelxfeed", "Number", function(val) fuel_xfeed_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwfueltransengA", "Number", function(val) fuel_trans1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwfueltransengB", "Number", function(val) fuel_trans2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwboostpuEng1", "Number", function(val) boost1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwboostpuEng2", "Number", function(val) boost2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Swfuelintcon", "Number", function(val) fuel_intcon_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw hydsysA", "Number", function(val) hyd1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw hydsysB", "Number", function(val) hyd2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwGovA", "Number", function(val) gov_eng1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwGovB", "Number", function(val) gov_eng2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwpartsepA", "Number", function(val) partsep1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwpartsepB", "Number", function(val) partsep2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw forcetrim", "Number", function(val) force_trim_held = (val ~= 0) end)
-fsx_variable_subscribe("L:Sw RPMAudio", "Number", function(val) rpm_audio_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwMagDg", "Number", function(val) mag_dg_state = val or 0 end)
-fsx_variable_subscribe("L:AHRSTest", "Number", function(val) ahrs_test_state = (val ~= 0) and 1 or 0 end)
-
 -- =============================================================================
 -- 7. STARTUP INITIALIZATION
 -- =============================================================================

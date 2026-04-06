@@ -1,6 +1,6 @@
 -- =============================================================================
--- BELL 412 - ALTIMETER GAUGE (Fixed)
--- Encoder: Channel G, Pin D2 & D51
+-- RECEIVER: BELL 412 - ALTIMETER GAUGE (Fixed)
+-- Receives bug encoder value via si_variable from Sender gauge
 -- =============================================================================
 
 -- =============================================================================
@@ -36,29 +36,16 @@ local function update_bug()
 end
 
 -- =============================================================================
--- 4. ENCODER INPUTS (Channel G)
---    Alt Meter Right: D15 & D16
---    Alt Meter Left:  A7  & D8
+-- 4. SI VARIABLE SUBSCRIPTION (replaces hw_dial_add encoders)
+--    Alt Meter Right: D15 & D16  -> now via si_variable
+--    Alt Meter Left:  A7  & D8   -> now via si_variable
 -- =============================================================================
-
--- Shared callback for both encoders (both control the same bug)
-local function bug_dial_callback(direction)
-    if direction == 1 then
-        current_bug_position = current_bug_position + 50
-        print("Altimeter Bug: CW  -> " .. current_bug_position .. " ft")
-    elseif direction == -1 then
-        current_bug_position = current_bug_position - 50
-        print("Altimeter Bug: CCW -> " .. current_bug_position .. " ft")
-    end
-    current_bug_position = var_cap(current_bug_position, 0, 20000)
+function on_alt_bug_received(bug_val)
+    current_bug_position = bug_val
     update_bug()
 end
 
--- Alt Meter Right Encoder
-hw_dial_add("ARDUINO_MEGA2560_G_D15", "ARDUINO_MEGA2560_G_D16", "TYPE_1_DETENT_PER_PULSE", bug_dial_callback)
-
--- Alt Meter Left Encoder
-hw_dial_add("ARDUINO_MEGA2560_G_A7", "ARDUINO_MEGA2560_G_D8", "TYPE_1_DETENT_PER_PULSE", bug_dial_callback)
+si_variable_subscribe("si_alt_bug", "INT", on_alt_bug_received)
 
 -- =============================================================================
 -- 5. SIM DATA CALLBACK

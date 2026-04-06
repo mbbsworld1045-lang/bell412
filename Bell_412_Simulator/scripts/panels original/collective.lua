@@ -354,26 +354,3 @@ fsx_variable_write("L:idle eng", "Number", 0)
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
 
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
-
--- =============================================================================
--- 8. BI-DIRECTIONAL SYNC (Virtual Cockpit -> Physical)
--- =============================================================================
-
--- Idle Stop Sync: If virtual cockpit changes L:idle eng, update solenoids
-fsx_variable_subscribe("L:idle eng", "Number", function(val)
-    if val == 1 then
-        idle_stop_1_active = true
-        hw_output_set(solenoid_eng1, true)
-    elseif val == -1 then
-        idle_stop_2_active = true
-        hw_output_set(solenoid_eng2, true)
-    else
-        idle_stop_1_active = false
-        idle_stop_2_active = false
-        hw_output_set(solenoid_eng1, false)
-        hw_output_set(solenoid_eng2, false)
-    end
-end)
-
--- Start Engine Sync
-fsx_variable_subscribe("L:starteng", "Number", function(val) end) -- State tracking

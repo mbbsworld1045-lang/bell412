@@ -397,23 +397,7 @@ fsx_variable_subscribe("L:firethandl", "Number", function(val) STATE.fire1 = (va
 fsx_variable_subscribe("L:firethandr", "Number", function(val) STATE.fire2 = (val ~= 0) and 1 or 0; update_fire_leds() end)
 fsx_variable_subscribe("L:firetestbag", "Number", function(val) STATE.bag_fire = (val ~= 0) and 1 or 0; update_fire_leds() end)
 
--- Bi-directional Sync: Remaining Overhead Switches
--- (If virtual cockpit changes these, physical STATE updates)
-fsx_variable_subscribe("L:Swinva", "Number", function(val) STATE.inv1 = (val == 1); update_elec_leds() end)
-fsx_variable_subscribe("L:Swinvb", "Number", function(val) STATE.inv2 = (val == 1); update_elec_leds() end)
-fsx_variable_subscribe("L:Swemerload", "Number", function(val) STATE.emer_load = (val == 1) end)
-fsx_variable_subscribe("L:Swstbyatt", "Number", function(val) STATE.stby_att = (val == 1) end)
-fsx_variable_subscribe("L:Swpitot", "Number", function(val) STATE.pitot = (val == 1) end)
-fsx_variable_subscribe("L:Swposition", "Number", function(val) STATE.nav = (val == 1) end)
-fsx_variable_subscribe("L:Swanticoll", "Number", function(val) STATE.anticoll = (val == 1) end)
-fsx_variable_subscribe("L:Swpiwiper", "Number", function(val) STATE.wiper_pi = (val == 1) end)
-fsx_variable_subscribe("L:Swcowiper", "Number", function(val) STATE.wiper_co = (val == 1) end)
-fsx_variable_subscribe("L:SwHeater", "Number", function(val) STATE.heater = (val == 1) end)
-fsx_variable_subscribe("L:Swblower", "Number", function(val) STATE.blower = (val == 1) end)
-fsx_variable_subscribe("L:Swaftoutlet", "Number", function(val) STATE.aft_outlet = (val == 1) end)
-fsx_variable_subscribe("L:Swutilitylight", "Number", function(val) STATE.util = (val == 1) end)
-fsx_variable_subscribe("L:SwMagDg", "Number", function(val) end) -- Sync compass state
-fsx_variable_subscribe("L:Swfiretest", "Number", function(val) STATE.fire_test = (val == 1); update_fire_leds() end)
+
 
 -- Circuit Breakers
 hw_button_add(PIN_CB_INV1, function() print("CB: INV 1") end, function() end)

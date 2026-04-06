@@ -9,6 +9,16 @@ local THROTTLE1_AXIS = 0
 local THROTTLE2_AXIS = 1 
 
 -- =============================================================================
+-- JITTER FILTER (DEADBAND)
+-- Prevents the hardware analog needle from flickering visually in the simulator.
+-- Increase this value (e.g. 1.0 or 1.5) if the needle continues to flicker.
+-- =============================================================================
+local DEADBAND_PCT = 1.0 
+
+local last_t1_sent = -999.0
+local last_t2_sent = -999.0
+
+-- =============================================================================
 -- HELPER FUNCTIONS
 -- =============================================================================
 
@@ -17,7 +27,7 @@ local function map_range(x, in_min, in_max, out_min, out_max)
     return out_min + (x - in_min) * (out_max - out_min) / (in_max - in_min)
 end
 
--- Ensures the final output never exceeds the safe 0 to 100 limits
+-- Ensures the final output never exceeds the safe limits
 local function clamp(val, min_val, max_val)
     if val < min_val then return min_val end
     if val > max_val then return max_val end
@@ -25,22 +35,24 @@ local function clamp(val, min_val, max_val)
 end
 
 -- =============================================================================
--- THROTTLE CALIBRATION PROFILES
+-- THROTTLE CALIBRATION PROFILES (Per User Specs)
 -- =============================================================================
 
 -- Engine 1 (Wired Normally)
 local function calibrate_throttle_1(raw_pct)
-    -- Maps your physical 0.2% - 38.5% directly to 0% - 100%
+    -- Maps physical 0.2% - 38.5% directly to 0% - 100%
     local out = map_range(raw_pct, 0.2, 38.5, 0, 100)
-    return clamp(out, 0, 100)
+    -- Cutoff below 4.99 per request
+    return clamp(out, 4.99, 100)
 end
 
 -- Engine 2 (Wired Backwards)
 local function calibrate_throttle_2(raw_pct)
-    -- Maps your physical 79.5% - 55.0% directly to 0% - 100%
+    -- Maps physical 92.0% - 84.0% directly to 0% - 100%
     -- (The math automatically handles the inversion)
-    local out = map_range(raw_pct, 79.5, 55.0, 0, 100)
-    return clamp(out, 0, 100)
+    local out = map_range(raw_pct, 92, 84, 0, 100)
+    -- Cutoff below 4.99 per request
+    return clamp(out, 4.99, 100)
 end
 
 -- =============================================================================
@@ -59,35 +71,53 @@ function bu0836x_master_handler(type, index, value)
         -- ENGINE 1
         -- ==========================================
         if index == THROTTLE1_AXIS then
-            -- Run through linear calibration
             local final_sim_pct = calibrate_throttle_1(raw_pct)
             
-            -- Calculate 0-16384 scale for Prepar3D
-            local sim_axis_val = math.floor((final_sim_pct / 100) * 16384)
-            
-            -- Print to console for debugging
-            print(string.format("ENG 1: Raw %.1f%% -> Linear Sim: %.1f%%", raw_pct, final_sim_pct))
-            
-            -- Send to Sim
-            fsx_variable_write("L:throgas1", "Number", final_sim_pct)
-            fsx_event("PROP_PITCH2_SET", sim_axis_val)
+            -- Deadband check to eliminate flickering
+            if math.abs(final_sim_pct - last_t1_sent) >= DEADBAND_PCT then
+                last_t1_sent = final_sim_pct
+                
+                print(string.format("ENG 1: Raw %.1f%% -> Filtered Sim: %.1f%%", raw_pct, final_sim_pct))
+                
+                -- Custom Bell 412 L: Variables
+                fsx_variable_write("L:throgas1", "percent", final_sim_pct)
+                fsx_variable_write("L:Powern2E1", "percent", final_sim_pct)
+                
+                -- Force Air Manager to simulate the A: vars the XML reads
+                fsx_variable_write("GENERAL ENG THROTTLE LEVER POSITION:1", "percent", final_sim_pct)
+                fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:2", "percent", final_sim_pct)
+                
+                -- Core Prepar3D Axis Events (0 to 16384 range)
+                local sim_axis_val = math.floor((final_sim_pct / 100) * 16384)
+                fsx_event("THROTTLE1_SET", sim_axis_val)
+                fsx_event("PROP_PITCH2_SET", sim_axis_val)
+            end
 
         -- ==========================================
         -- ENGINE 2
         -- ==========================================
         elseif index == THROTTLE2_AXIS then
-            -- Run through linear calibration (fixes the backwards wiring)
             local final_sim_pct = calibrate_throttle_2(raw_pct)
             
-            -- Calculate 0-16384 scale for Prepar3D
-            local sim_axis_val = math.floor((final_sim_pct / 100) * 16384)
-            
-            -- Print to console for debugging
-            print(string.format("ENG 2: Raw %.1f%% -> Linear Sim: %.1f%%", raw_pct, final_sim_pct))
-            
-            -- Send to Sim
-            fsx_variable_write("L:throgas2", "Number", final_sim_pct)
-            fsx_event("PROP_PITCH3_SET", sim_axis_val)
+            -- Deadband check to eliminate flickering
+            if math.abs(final_sim_pct - last_t2_sent) >= DEADBAND_PCT then
+                last_t2_sent = final_sim_pct
+                
+                print(string.format("ENG 2: Raw %.1f%% -> Filtered Sim: %.1f%%", raw_pct, final_sim_pct))
+                
+                -- Custom Bell 412 L: Variables
+                fsx_variable_write("L:throgas2", "percent", final_sim_pct)
+                fsx_variable_write("L:Powern2E2", "percent", final_sim_pct)
+                
+                -- Force Air Manager to simulate the A: vars the XML reads
+                fsx_variable_write("GENERAL ENG THROTTLE LEVER POSITION:2", "percent", final_sim_pct)
+                fsx_variable_write("GENERAL ENG PROPELLER LEVER POSITION:3", "percent", final_sim_pct)
+                
+                -- Core Prepar3D Axis Events (0 to 16384 range)
+                local sim_axis_val = math.floor((final_sim_pct / 100) * 16384)
+                fsx_event("THROTTLE2_SET", sim_axis_val)
+                fsx_event("PROP_PITCH3_SET", sim_axis_val)
+            end
         end
     end
 end
@@ -98,7 +128,7 @@ end
 local controllers = game_controller_list()
 for _, name in pairs(controllers) do
     if name == BU0836X_INTERFACE_NAME then
-        print("--- Bell 412: Linear 0-100% Throttles Connected ---")
+        print("--- Bell 412: Filtered 0-100% Throttles Connected ---")
         game_controller_add(name, bu0836x_master_handler)
     end
 end

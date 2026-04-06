@@ -1,8 +1,6 @@
 -- =============================================================================
--- BELL 412 - ADI (Attitude Direction Indicator)
--- Encoders (Channel G):
---   ADI Right: Right Enc (D52 & D17), Left Enc (D14 & A15)
---   ADI Left:  Right Enc (A6  & A2),  Left Enc (D12 & unknown)
+-- RECEIVER: BELL 412 - ADI (Attitude Direction Indicator)
+-- Receives encoder values via si_variable from Sender gauge
 -- =============================================================================
 
 -- =============================================================================
@@ -31,51 +29,21 @@ img_slip_glass    = img_add_fullscreen("side_slip_glass.png")
 img_slip_ball     = img_add_fullscreen("side_slip_ball.png")
 
 -- =============================================================================
--- 3. ENCODER STATE & INPUTS (Channel G)
---    Based on XML gauge definition:
---    att_cage.bmp (top knob)  = G:Var1, range -12 to 12, step 1
---      -> Moves aircraft symbol vertically (pitch trim)
---    att_knob.bmp (bottom knob) = G:Var2, range -30 to 30, step 1
---      -> Rotates bank pointer offset (heading adjust)
+-- 3. SI VARIABLE SUBSCRIPTIONS (from Sender gauge)
 -- =============================================================================
-local gvar1 = 0   -- Cage knob (XML: G:Var1), range -12 to +12
-local gvar2 = 0   -- Heading knob (XML: G:Var2), range -30 to +30
 
--- Shared callback: CAGE KNOB (Right Encoders on both sides)
--- XML: (G:Var1) controls aircraft symbol Y-shift and cage knob rotation
-local function cage_knob_callback(direction)
-    gvar1 = gvar1 + direction
-    gvar1 = var_cap(gvar1, -12, 12)
-    -- Write to L:Var so the sim gauge stays in sync
-    fsx_variable_write("L:ATT_CAGE_VAR", "Number", gvar1)
-    -- Visually move the FD horizontal bar (aircraft symbol shift)
-    move(img_fd_horizontal, nil, gvar1 * -5, nil, nil)
-    print("Cage Knob (G:Var1): " .. (direction == 1 and "CW" or "CCW") .. " -> " .. gvar1)
+-- Cage knob -> moves aircraft symbol vertically (pitch trim)
+function on_cage_received(gvar1_val)
+    move(img_fd_horizontal, nil, gvar1_val * -5, nil, nil)
 end
 
--- Shared callback: HEADING KNOB (Left Encoders on both sides)
--- XML: (G:Var2) controls bank pointer rotation offset and knob rotation
-local function heading_knob_callback(direction)
-    gvar2 = gvar2 + direction
-    gvar2 = var_cap(gvar2, -30, 30)
-    -- Write to L:Var so the sim gauge stays in sync
-    fsx_variable_write("L:ATT_KNOB_VAR", "Number", gvar2)
-    -- Visually rotate the bank pointer by the offset (XML: G:Var2 * 1 * dgrd)
-    rotate(img_ring, gvar2)
-    print("Heading Knob (G:Var2): " .. (direction == 1 and "CW" or "CCW") .. " -> " .. gvar2)
+-- Heading knob -> rotates bank pointer offset
+function on_heading_received(gvar2_val)
+    rotate(img_ring, gvar2_val)
 end
 
--- ADI Right - Right Encoder (Cage Knob): D52 & D17
-hw_dial_add("ARDUINO_MEGA2560_G_D52", "ARDUINO_MEGA2560_G_D17", "TYPE_1_DETENT_PER_PULSE", cage_knob_callback)
-
--- ADI Right - Left Encoder (Heading Knob): D14 & A15
-hw_dial_add("ARDUINO_MEGA2560_G_D14", "ARDUINO_MEGA2560_G_A15", "TYPE_1_DETENT_PER_PULSE", heading_knob_callback)
-
--- ADI Left - Right Encoder (Cage Knob): A6 & A2
-hw_dial_add("ARDUINO_MEGA2560_G_A6", "ARDUINO_MEGA2560_G_A2", "TYPE_1_DETENT_PER_PULSE", cage_knob_callback)
-
--- ADI Left - Left Encoder (Heading Knob): D12 & DUMMY D13 (replace D13 when known)
-hw_dial_add("ARDUINO_MEGA2560_G_D12", "ARDUINO_MEGA2560_G_D13", "TYPE_1_DETENT_PER_PULSE", heading_knob_callback)
+si_variable_subscribe("si_adi_cage",    "INT", on_cage_received)
+si_variable_subscribe("si_adi_heading", "INT", on_heading_received)
 
 -- =============================================================================
 -- 4. ATTITUDE DISPLAY LOGIC

@@ -1,10 +1,6 @@
 -- =============================================================================
--- BELL 412 - HSI (Horizontal Situation Indicator)
--- Encoders (Channel G):
---   HSI Right: Right Enc (A13 & A14) = Heading Bug
---              Left  Enc (D19 & A11) = OBS / Course Needle
---   HSI Left:  Right Enc (A4  & D9)  = Heading Bug
---              Left  Enc (D7  & DUMMY D13) = OBS / Course Needle
+-- RECEIVER: BELL 412 - HSI (Horizontal Situation Indicator)
+-- Receives encoder values via si_variable from Sender gauge
 -- =============================================================================
 
 -- USER PROPERTIES --
@@ -46,44 +42,27 @@ img_bug = img_add_fullscreen("5. HSI_headingbug.png")
 mytext1 = txt_add("360", "font:digital-7 (italic).ttf; size:40; color: White; halign:left;", 675, 188, 300, 300)
 
 -- =============================================================================
--- ENCODER INPUTS (Channel G) - Direct visual control
+-- SI VARIABLE SUBSCRIPTIONS (from Sender gauge)
 -- =============================================================================
 
--- Shared callback: Heading Bug (Right Encoders on both sides)
-local function bug_dial_callback(direction)
-    current_bug = current_bug + (direction * 5)
-    current_bug = current_bug % 360
-    -- Write to sim AND move the bug image directly
-    fsx_variable_write("AUTOPILOT HEADING LOCK DIR", "Degrees", current_bug)
+-- Heading Bug received from sender
+function on_hsi_bug_received(bug_val)
+    current_bug = bug_val
     rotate(img_bug, current_bug, "LINEAR", 0.1)
-    print("Heading Bug: " .. (direction == 1 and "CW" or "CCW") .. " -> " .. current_bug .. " deg")
 end
 
--- Shared callback: OBS/Course Needle (Left Encoders on both sides)
-local function obs_dial_callback(direction)
-    current_obs = current_obs + (direction * 5)
-    current_obs = current_obs % 360
-    -- Write to sim AND move the OBS needle directly
-    fsx_variable_write("NAV OBS:1", "Degrees", current_obs)
+-- OBS/Course Needle received from sender
+function on_hsi_obs_received(obs_val)
+    current_obs = obs_val
     rotate(img_needle, current_obs, "LINEAR", 0.1)
     rotate(img_cntr_needle, current_obs, "LINEAR", 0.1)
     rotate(img_cntr, current_obs, "LINEAR", 0.1)
     rotate(img_cntr_to, current_obs, "LINEAR", 0.1)
     rotate(img_cntr_from, current_obs, "LINEAR", 0.1)
-    print("OBS Course: " .. (direction == 1 and "CW" or "CCW") .. " -> " .. current_obs .. " deg")
 end
 
--- HSI Right - Right Encoder (Heading Bug): A13 & A14
-hw_dial_add("ARDUINO_MEGA2560_G_A13", "ARDUINO_MEGA2560_G_A14", "TYPE_1_DETENT_PER_PULSE", bug_dial_callback)
-
--- HSI Right - Left Encoder (OBS Needle): D19 & A11
-hw_dial_add("ARDUINO_MEGA2560_G_D19", "ARDUINO_MEGA2560_G_A11", "TYPE_1_DETENT_PER_PULSE", obs_dial_callback)
-
--- HSI Left - Right Encoder (Heading Bug): A4 & D9
-hw_dial_add("ARDUINO_MEGA2560_G_A4", "ARDUINO_MEGA2560_G_D9", "TYPE_1_DETENT_PER_PULSE", bug_dial_callback)
-
--- HSI Left - Left Encoder (OBS Needle): D7 & DUMMY D13 (replace D13 when known)
-hw_dial_add("ARDUINO_MEGA2560_G_D7", "ARDUINO_MEGA2560_G_D13", "TYPE_1_DETENT_PER_PULSE", obs_dial_callback)
+si_variable_subscribe("si_hsi_bug", "INT", on_hsi_bug_received)
+si_variable_subscribe("si_hsi_obs", "INT", on_hsi_obs_received)
 
 -- =============================================================================
 -- SIM DATA CALLBACK
