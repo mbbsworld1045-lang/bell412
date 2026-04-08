@@ -218,7 +218,7 @@ fsx_variable_subscribe("L:CSepP1", "Bool", function(val) STATE.CSepP1 = val and 
 fsx_variable_subscribe("L:SwGovA", "Bool", function(val) STATE.SwGovA = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:CGenel", "Bool", function(val) STATE.CGenel = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:CGener", "Bool", function(val) STATE.CGener = val and 1 or 0; update_leds() end)
-fsx_variable_subscribe("A:Rotor Brake Active", "Bool", function(val) STATE.RotorBrake = val; update_leds() end)
+si_variable_subscribe("bell412_rotor_brake", "INT", function(val) STATE.RotorBrake = (val == 1); update_leds() end)
 fsx_variable_subscribe("L:Swinva", "Bool", function(val) STATE.Swinva = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:Swinvb", "Bool", function(val) STATE.Swinvb = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:SwHeater", "Bool", function(val) STATE.SwHeater = val and 1 or 0; update_leds() end)

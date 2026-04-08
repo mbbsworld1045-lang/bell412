@@ -5,6 +5,11 @@ local cur_eng1, tgt_eng1 = 0, 0
 local cur_eng2, tgt_eng2 = 0, 0
 local factor = 0.03  -- Smoothing factor for gradual needle movement (0 = no movement, 1 = instant jump)
 
+local overtq_test_active = 0
+si_variable_subscribe("bell412_overtq_test", "INT", function(val)
+    overtq_test_active = val
+end)
+
 -- === Image Loading ===
 -- Adds background and needle images. Needle origins are aligned at center (236,129) with size 28x242.
 img_add_fullscreen("B412_Faceplate_Tq.png")
@@ -45,8 +50,16 @@ end
 -- Runs every 50ms to update the needle positions gradually toward target
 function timer_callback()
     -- Mast needle
+    local actual_tgt_mast = tgt_mast
+    local actual_factor = factor
+    
+    if overtq_test_active == 1 then
+        actual_tgt_mast = 105
+        actual_factor = 0.20 -- Faster movement when testing
+    end
+
     rotate(img_needle_M, mast_to_angle(cur_mast))
-    cur_mast = cur_mast + ((tgt_mast - cur_mast) * factor)
+    cur_mast = cur_mast + ((actual_tgt_mast - cur_mast) * actual_factor)
 
     -- Engine 1 needle
     rotate(img_needle_1, eng_to_angle(cur_eng1))

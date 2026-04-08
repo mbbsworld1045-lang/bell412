@@ -144,6 +144,7 @@ local test_marker_state       = 0  -- Global marker test (L:TestMarker)
 
 -- Over Torque State
 local overtq_state          = 0
+local si_var_overtq         = si_variable_create("bell412_overtq_test", "INT", 0)
 
 -- Cyclic Center Test State
 local cyc_test_state        = 0
@@ -460,13 +461,13 @@ hw_button_add(PIN_OVERTQ_TEST,
     function() -- PRESSED
         print("ACTION: Over Torque Test Left PRESSED")
         overtq_state = 1
-        fsx_variable_write("L:Overtq", "Number", 1)
+        si_variable_write(si_var_overtq, 1)
         update_overtq_led()
     end,
     function() -- RELEASED
         print("ACTION: Over Torque Test Left RELEASED")
         overtq_state = 0
-        fsx_variable_write("L:Overtq", "Number", 0)
+        si_variable_write(si_var_overtq, 0)
         update_overtq_led()
     end
 )
@@ -476,13 +477,13 @@ hw_button_add(PIN_OVERTQ_TEST2,
     function() -- PRESSED
         print("ACTION: Over Torque Test Right PRESSED")
         overtq_state = 1
-        fsx_variable_write("L:Overtq", "Number", 1)
+        si_variable_write(si_var_overtq, 1)
         update_overtq_led()
     end,
     function() -- RELEASED
         print("ACTION: Over Torque Test Right RELEASED")
         overtq_state = 0
-        fsx_variable_write("L:Overtq", "Number", 0)
+        si_variable_write(si_var_overtq, 0)
         update_overtq_led()
     end
 )
@@ -699,7 +700,7 @@ fsx_variable_write("L:Swfiretest", "Number", 0)
 fsx_variable_write("L:firetestbag", "Number", 0)
 fsx_variable_write("L:Extinguisher", "Number", 0)
 fsx_variable_write("L:TestMarker", "Number", 0)
-fsx_variable_write("L:Overtq", "Number", 0)
+si_variable_write(si_var_overtq, 0)
 fsx_variable_write("L:Cyctest", "Number", 0)
 fsx_variable_write("L:ResetMC", "Number", 0)
 fsx_variable_write("L:SwBrgPtr", "Number", 0)

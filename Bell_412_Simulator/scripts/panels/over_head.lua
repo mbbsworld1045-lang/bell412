@@ -58,7 +58,7 @@ local PIN_CB_GEN2_FIELD = "ARDUINO_MEGA2560_D_A8"
 local PIN_CB_IDLE_STOP  = "ARDUINO_MEGA2560_D_D24"
 
 -- Rotor Brake
-local PIN_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_D69"
+local PIN_ROTOR_BRAKE   = "ARDUINO_MEGA2560_D_A15"
 
 -- Instrument Lighting
 local PIN_INST_CONSOLE  = "ARDUINO_MEGA2560_D_D42"
@@ -114,6 +114,8 @@ local STATE = {
     -- SimVar State
     gen1_sw_state = false, gen2_sw_state = false,
 }
+
+local si_var_rotor_brake = si_variable_create("bell412_rotor_brake", "INT", 0)
 
 -- Relay Outputs
 local output_non_ess = hw_output_add(PIN_RELAY_NON_ESS, false)
@@ -440,12 +442,16 @@ hw_button_add(PIN_INST_ENG, function() print("SW: ENG INST LIGHT") end, function
 -- Rotor Brake
 hw_button_add(PIN_ROTOR_BRAKE, 
     function() 
-        print("ROTOR BRAKE: ON") 
-        fsx_event("ROTOR_BRAKE") 
+        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) PRESSED: ROTOR_BRAKE ON <<<<<<<<") 
+        -- Physical Simulator Physics Command
+        fsx_event("AXIS_ROTOR_BRAKE_SET", 16383) 
+        si_variable_write(si_var_rotor_brake, 1)
     end, 
     function() 
-        print("ROTOR BRAKE: OFF") 
-        fsx_event("ROTOR_BRAKE") 
+        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) RELEASED: ROTOR_BRAKE OFF <<<<<<<<") 
+        -- Physical Simulator Physics Command
+        fsx_event("AXIS_ROTOR_BRAKE_SET", 0) 
+        si_variable_write(si_var_rotor_brake, 0)
     end
 )
 

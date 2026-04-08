@@ -33,8 +33,6 @@ local target_nr = 0
 local target_n2_1 = 0
 local target_n2_2 = 0
 
-local rotor_brake_active = false
-
 -- Smoothing variables (current positions)
 local current_nr_angle = -5
 local current_n2_1_angle = -5
@@ -84,20 +82,6 @@ end
 
 -- Animation Loop (Runs continuously every 50ms)
 function update_needles()
-    -- Apply mechanical deceleration directly to the Eng Rotor Rpm variable when brake is active
-    if rotor_brake_active then
-        if target_nr > 0 then
-            -- Decrease 10% of max RPM (32.4 RPM) per second:
-            -- 32.4 RPM / 20 ticks (50ms) = 1.62 per tick.
-            target_nr = target_nr - 1.62
-            if target_nr < 0 then
-                target_nr = 0
-            end
-        end
-        local adjusted_percent = (target_nr * 100) / 324
-        fsx_variable_write("Eng Rotor Rpm", "percent", adjusted_percent)
-    end
-
     -- Calculate target angles based on global variables
     local target_nr_angle = interpolate(target_nr, NR_CALIBRATION)
     local target_n2_1_angle = interpolate(target_n2_1, N2_CALIBRATION)
@@ -130,16 +114,12 @@ function data_fsx(NR_percent, N21, N22)
     -- Add the -0.4 RPM adjustment
     local adjusted_rpm = actual_rpm - 0.4 
     
-    -- If the brake is NOT active, take the value from the simulator normally
-    if not rotor_brake_active then
-        target_nr = adjusted_rpm
-        
-        -- Write back to simulator 
-        local adjusted_percent = (adjusted_rpm * 100) / 324
-        fsx_variable_write("Eng Rotor Rpm", "percent", adjusted_percent)
-    end
+    -- Write back to simulator 
+    local adjusted_percent = (adjusted_rpm * 100) / 324
+    fsx_variable_write("Eng Rotor Rpm", "percent", adjusted_percent)
     
-    -- Update the global target N2 variables
+    -- Update the global target variables for the timer loop to use
+    target_nr = adjusted_rpm
     target_n2_1 = N21
     target_n2_2 = N22
 end
@@ -148,8 +128,3 @@ end
 fsx_variable_subscribe("Eng Rotor Rpm", "percent",
                        "L:Eng1N2", "percent",
                        "L:Eng2N2", "percent", data_fsx)
-
-si_variable_subscribe("bell412_rotor_brake", "INT", function(val)
-    print("-------- SI VARIABLE FEEDBACK: bell412_rotor_brake is now: " .. tostring(val) .. " --------")
-    rotor_brake_active = (val == 1)
-end)

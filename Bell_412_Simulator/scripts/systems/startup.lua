@@ -19,8 +19,6 @@ local PIN_IDLE_STOP_POS2 = "ARDUINO_MEGA2560_C_D7"  -- Idle Stop Position 2 (Sta
 local PIN_PARTSEP1          = "ARDUINO_MEGA2560_A_D25"
 local PIN_PARTSEP2          = "ARDUINO_MEGA2560_A_D27"
 
--- INPUTS (Rotor Brake) D24
-local PIN_ROTOR_BRAKE_SW  = "ARDUINO_MEGA2560_C_D24"
 
 -- INPUTS (Analog - Throttles) A0..A1
 local PIN_THROTTLE1   = "ARDUINO_MEGA2560_C_A0"
@@ -346,26 +344,6 @@ hw_button_add(PIN_PARTSEP2,
     end
 )
 
--- ROTOR BRAKE SWITCH
--- Per Flight Manual: "Apply at or below 40% ROTOR RPM."
-hw_button_add(PIN_ROTOR_BRAKE_SW,
-    function() -- PRESSED (Brake ON)
-        print("ACTION: Rotor Brake ON")
-        
-        -- Safety Check: Warn if applied above 40% RPM
-        if rotor_rpm_pct > ROTOR_BRAKE_MAX_RPM then
-            print("WARNING: ROTOR BRAKE APPLIED ABOVE 40% RPM! (Current: " .. 
-                  string.format("%.1f", rotor_rpm_pct) .. "%)")
-        end
-        
-        -- Execute brake regardless (log pilot error, don't block)
-        fsx_event("ROTOR_BRAKE", 100)
-    end,
-    function() -- RELEASED (Brake OFF)
-        print("ACTION: Rotor Brake OFF")
-        fsx_event("ROTOR_BRAKE", 0)
-    end
-)
 
 -- =============================================================================
 -- 5b. THROTTLE ANALOG INPUTS (ADC)
