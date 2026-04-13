@@ -150,6 +150,5 @@ fsx_variable_subscribe("Eng Rotor Rpm", "percent",
                        "L:Eng2N2", "percent", data_fsx)
 
 si_variable_subscribe("bell412_rotor_brake", "INT", function(val)
-    print("-------- SI VARIABLE FEEDBACK: bell412_rotor_brake is now: " .. tostring(val) .. " --------")
     rotor_brake_active = (val == 1)
 end)

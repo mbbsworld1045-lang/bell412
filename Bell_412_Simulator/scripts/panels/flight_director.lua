@@ -77,25 +77,34 @@ local fd1_state = {
     nav = false, ils = false, bc = false, vor_apr = false,
     ga = false, sby = false
 }
+local lamp_test_active = 0
+
 
 -- =============================================================================
 -- 4. LED UPDATE FUNCTION
 -- =============================================================================
 local function update_fd1_leds()
-    hw_led_set(led_fd1_alt, fd1_state.alt and 1.0 or 0.0)
-    hw_led_set(led_fd1_ias, fd1_state.ias and 1.0 or 0.0)
-    hw_led_set(led_fd1_vs, fd1_state.vs and 1.0 or 0.0)
-    hw_led_set(led_fd1_hdg, fd1_state.hdg and 1.0 or 0.0)
-    hw_led_set(led_fd1_nav_1, fd1_state.nav and 1.0 or 0.0)
-    hw_led_set(led_fd1_nav_2, fd1_state.nav and 1.0 or 0.0)
-    hw_led_set(led_fd1_ils_1, fd1_state.ils and 1.0 or 0.0)
-    hw_led_set(led_fd1_ils_2, fd1_state.ils and 1.0 or 0.0)
-    hw_led_set(led_fd1_bc_1, fd1_state.bc and 1.0 or 0.0)
-    hw_led_set(led_fd1_bc_2, fd1_state.bc and 1.0 or 0.0)
-    hw_led_set(led_fd1_vor_apr_1, fd1_state.vor_apr and 1.0 or 0.0)
-    hw_led_set(led_fd1_vor_apr_2, fd1_state.vor_apr and 1.0 or 0.0)
-    hw_led_set(led_fd1_ga, fd1_state.ga and 1.0 or 0.0)
-    hw_led_set(led_fd1_sby, fd1_state.sby and 1.0 or 0.0)
+    local lt = (lamp_test_active == 1)
+    
+    -- Print status if Lamp Test is active
+    if lt then
+        print("FD1_LOGIC: Lamp Test ACTIVE - Forcing all LEDs ON")
+    end
+    
+    hw_led_set(led_fd1_alt, (fd1_state.alt or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_ias, (fd1_state.ias or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_vs,  (fd1_state.vs  or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_hdg, (fd1_state.hdg or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_nav_1, (fd1_state.nav or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_nav_2, (fd1_state.nav or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_ils_1, (fd1_state.ils or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_ils_2, (fd1_state.ils or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_bc_1, (fd1_state.bc or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_bc_2, (fd1_state.bc or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_vor_apr_1, (fd1_state.vor_apr or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_vor_apr_2, (fd1_state.vor_apr or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_ga, (fd1_state.ga or lt) and 1.0 or 0.0)
+    hw_led_set(led_fd1_sby, (fd1_state.sby or lt) and 1.0 or 0.0)
 end
 
 -- =============================================================================
@@ -148,6 +157,14 @@ fsx_variable_subscribe("L:FD1_BC_Switch", "Number", function(val) fd1_state.bc =
 fsx_variable_subscribe("L:FD1_VORAPR_Switch", "Number", function(val) fd1_state.vor_apr = (val ~= 0); update_fd1_leds() end)
 fsx_variable_subscribe("L:FD1_GA_Switch", "Number", function(val) fd1_state.ga = (val ~= 0); update_fd1_leds() end)
 fsx_variable_subscribe("L:FD1_SBY_Switch", "Number", function(val) fd1_state.sby = (val ~= 0); update_fd1_leds() end)
+
+-- Synchronized Lamp Test Subscription
+si_variable_subscribe("bell412_lamp_test", "INT", function(val)
+    local state = val or 0
+    print("FD1_SI: Lamp Test signal changed to " .. tostring(state))
+    lamp_test_active = state
+    update_fd1_leds()
+end)
 
 -- =============================================================================
 -- 7. INITIALIZATION

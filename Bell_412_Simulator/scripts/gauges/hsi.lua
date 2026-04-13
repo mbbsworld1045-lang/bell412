@@ -61,8 +61,8 @@ function on_hsi_obs_received(obs_val)
     rotate(img_cntr_from, current_obs, "LINEAR", 0.1)
 end
 
-si_variable_subscribe("si_hsi_bug", "INT", on_hsi_bug_received)
-si_variable_subscribe("si_hsi_obs", "INT", on_hsi_obs_received)
+-- si_variable_subscribe("si_hsi_bug", "INT", on_hsi_bug_received)
+-- si_variable_subscribe("si_hsi_obs", "INT", on_hsi_obs_received)
 
 -- =============================================================================
 -- SIM DATA CALLBACK

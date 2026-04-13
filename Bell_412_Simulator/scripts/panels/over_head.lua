@@ -442,13 +442,13 @@ hw_button_add(PIN_INST_ENG, function() print("SW: ENG INST LIGHT") end, function
 -- Rotor Brake
 hw_button_add(PIN_ROTOR_BRAKE, 
     function() 
-        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) PRESSED: ROTOR_BRAKE ON <<<<<<<<") 
+        print("SW: ROTOR BRAKE ON") 
         -- Physical Simulator Physics Command
         fsx_event("AXIS_ROTOR_BRAKE_SET", 16383) 
         si_variable_write(si_var_rotor_brake, 1)
     end, 
     function() 
-        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) RELEASED: ROTOR_BRAKE OFF <<<<<<<<") 
+        print("SW: ROTOR BRAKE OFF") 
         -- Physical Simulator Physics Command
         fsx_event("AXIS_ROTOR_BRAKE_SET", 0) 
         si_variable_write(si_var_rotor_brake, 0)

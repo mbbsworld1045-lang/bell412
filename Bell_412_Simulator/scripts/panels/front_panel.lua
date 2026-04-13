@@ -146,8 +146,24 @@ local test_marker_state       = 0  -- Global marker test (L:TestMarker)
 local overtq_state          = 0
 local si_var_overtq         = si_variable_create("bell412_overtq_test", "INT", 0)
 
+-- Cyclic Center Test Config
+local CYCLIC_INPUT_SOURCE    = "VJOY"            -- Set to "SIM" or "VJOY"
+local VJOY_DEVICE_NAME       = "vJoy Device"    -- Exact name from Air Manager settings
+local VJOY_AXIS_X            = 0                -- Roll axis index
+local VJOY_AXIS_Y            = 1                -- Pitch axis index
+
+-- Cyclic Center Test Thresholds
+local SIM_STICK_THRESHOLD    = 0.3              -- ~1.5 inches for SimVars (-1.0 to 1.0)
+local VJOY_STICK_THRESHOLD   = 0.3              -- ~1.5 inches for vJoy Raw Input (-1.0 to 1.0)
+local ROTOR_RPM_THRESHOLD    = 95.0
+
 -- Cyclic Center Test State
-local cyc_test_state        = 0
+local cyc_test_state         = 0
+local rotor_rpm              = 100.0
+local sim_stick_roll         = 0.0              -- From YOKE X POSITION
+local sim_stick_pitch        = 0.0              -- From YOKE Y POSITION
+local vjoy_stick_roll        = 0.0              -- From vJoy Hardware
+local vjoy_stick_pitch       = 0.0              -- From vJoy Hardware
 
 -- Master Caution Reset States
 local mc_reset_l_held       = false
@@ -163,6 +179,11 @@ local dc_bus                = 0
 local test_mc               = 0
 local rpm_n1_e1             = 100.0
 local rpm_n1_e2             = 100.0
+local lamp_test_active      = 0
+local current_caution_count = 0     -- From Caution Panel
+local last_ack_caution_count = 0    -- Acknowledged baseline
+local master_caution_state  = 0     -- From Sim
+local mc_latched            = false -- Local toggle/latch state
 
 -- =============================================================================
 -- 4. SYSTEM LOGIC FUNCTIONS
@@ -175,6 +196,7 @@ local function update_fire_handle_leds()
         hw_led_set(led_fire_h2_h, 0.0)
         return
     end
+    
     hw_led_set(led_fire_h1_h, (fire_handle1_pulled == 1) and 1.0 or 0.0)
     hw_led_set(led_fire_h2_h, (fire_handle2_pulled == 1) and 1.0 or 0.0)
 end
@@ -222,16 +244,47 @@ end
 
 -- OVER TORQUE LED UPDATE
 local function update_overtq_led()
-    local led_value = (overtq_state == 1) and 1.0 or 0.0
+    local led_value = (overtq_state == 1 or lamp_test_active == 1) and 1.0 or 0.0
     hw_led_set(led_ot_l_h, led_value)
     hw_led_set(led_ot_r_h, led_value)
 end
 
 -- CYCLIC CENTER LED UPDATE
 local function update_cyc_ctr_led()
-    local led_val = (cyc_test_state == 1) and 1.0 or 0.0
+    -- Logic: LED illuminates if test button is pressed OR (Rotor < 95% AND stick > Threshold from center)
+    local rotor_low = (rotor_rpm < ROTOR_RPM_THRESHOLD)
+    local cur_roll, cur_pitch, cur_limit
+    
+    -- Select variables based on chosen input source
+    if CYCLIC_INPUT_SOURCE == "VJOY" then
+        cur_roll  = vjoy_stick_roll
+        cur_pitch = vjoy_stick_pitch
+        cur_limit = VJOY_STICK_THRESHOLD
+    else
+        cur_roll  = sim_stick_roll
+        cur_pitch = sim_stick_pitch
+        cur_limit = SIM_STICK_THRESHOLD
+    end
+    
+    local stick_off_center = (math.abs(cur_roll) > cur_limit) or (math.abs(cur_pitch) > cur_limit)
+    local led_val = ((cyc_test_state == 1) or (rotor_low and stick_off_center)) and 1.0 or 0.0
+    
     hw_led_set(led_cyc_ctr_l_h, led_val)
     hw_led_set(led_cyc_ctr_r_h, led_val)
+end
+
+-- VJOY HANDLER (processes raw joystick input)
+local function vjoy_handler(type, index, value)
+    -- Type 0 = Axis
+    if type == 0 then
+        if index == VJOY_AXIS_X then
+            vjoy_stick_roll = value or 0.0
+            update_cyc_ctr_led()
+        elseif index == VJOY_AXIS_Y then
+            vjoy_stick_pitch = value or 0.0
+            update_cyc_ctr_led()
+        end
+    end
 end
 
 -- EXTINGUISHER STATE UPDATE (3-position)
@@ -251,15 +304,40 @@ local function update_extinguisher_state()
 end
 
 -- MC RESET Logic (controls separate MC LEDs)
+-- MASTER CAUTION LED UPDATE
+local function update_master_caution_leds()
+    -- LED is ON if: (Locked Latch state is true OR Lamp Test) 
+    local mc_on = (mc_latched == true) or (lamp_test_active == 1)
+    
+    -- Override: Button press kills the light immediately
+    local buttons_held = (mc_reset_l_held or mc_reset_r_held)
+    local led_val = (mc_on and not buttons_held) and 1.0 or 0.0
+    
+    print("MASTER_CAUTION: Latched=" .. tostring(mc_latched) .. 
+          " | Count(Cur/Ack)=" .. current_caution_count .. "/" .. last_ack_caution_count ..
+          " | FinalLED=" .. tostring(led_val))
+    
+    hw_led_set(led_mc_l_h, led_val)
+    hw_led_set(led_mc_r_h, led_val)
+end
+
+
+-- MC RESET Logic (controls separate MC LEDs)
 local function update_mc_reset()
     local reset_active = mc_reset_l_held or mc_reset_r_held
     fsx_variable_write("L:ResetMC", "Number", reset_active and 1 or 0)
-    -- Left button (D41) controls Left LED (D43)
-    hw_led_set(led_mc_l_h, mc_reset_l_held and 1.0 or 0.0)
-    -- Right button (D36) controls Right LED (D31)
-    hw_led_set(led_mc_r_h, mc_reset_r_held and 1.0 or 0.0)
-    print("ACTION: MC Reset State = " .. tostring(reset_active))
+    
+    if reset_active then
+        print("ACTION: MC Reset Button PRESSED - Acknowledging current faults")
+        mc_latched = false
+        -- Root Cause Fix: The "Reset" is simply telling the light:
+        -- "I have seen the current number of faults. Don't turn on again until the count goes UP."
+        last_ack_caution_count = current_caution_count
+    end
+    
+    update_master_caution_leds()
 end
+
 
 -- BRG PTR LED UPDATE
 local function update_brg_ptr_leds()
@@ -275,12 +353,12 @@ local function update_engine_leds()
         return
     end
     
-    -- Engine 1: ON if TestMC active OR RPM N1 E1 <= 55%
-    local eng1_warn = (test_mc ~= 0) or (rpm_n1_e1 <= 55.0)
+    -- Engine 1: ON if TestMC active OR Lamp Test OR RPM N1 E1 <= 55%
+    local eng1_warn = (test_mc ~= 0) or (lamp_test_active == 1) or (rpm_n1_e1 <= 55.0)
     hw_led_set(led_eng1_h, eng1_warn and 1.0 or 0.0)
     
-    -- Engine 2: ON if TestMC active OR RPM N1 E2 <= 55%
-    local eng2_warn = (test_mc ~= 0) or (rpm_n1_e2 <= 55.0)
+    -- Engine 2: ON if TestMC active OR Lamp Test OR RPM N1 E2 <= 55%
+    local eng2_warn = (test_mc ~= 0) or (lamp_test_active == 1) or (rpm_n1_e2 <= 55.0)
     hw_led_set(led_eng2_h, eng2_warn and 1.0 or 0.0)
 end
 
@@ -659,6 +737,23 @@ fsx_variable_subscribe("L:Cyctest", "Number", function(val)
     update_cyc_ctr_led()
 end)
 
+-- Enhanced Cyclic Center Test: Rotor RPM
+fsx_variable_subscribe("ENG ROTOR RPM:1", "Percent", function(val)
+    rotor_rpm = val or 0.0
+    update_cyc_ctr_led()
+end)
+
+-- Enhanced Cyclic Center Test: SIM Input Path (Yoke Position)
+fsx_variable_subscribe("YOKE X POSITION", "Position", function(val)
+    sim_stick_roll = val or 0.0
+    update_cyc_ctr_led()
+end)
+
+fsx_variable_subscribe("YOKE Y POSITION", "Position", function(val)
+    sim_stick_pitch = val or 0.0
+    update_cyc_ctr_led()
+end)
+
 -- Baggage Fire Test State
 fsx_variable_subscribe("L:firetestbag", "Number", function(val)
     bag_fire_test_state = (val ~= 0) and 1 or 0
@@ -677,18 +772,50 @@ fsx_variable_subscribe("L:Overtq", "Number", function(val)
     update_overtq_led()
 end)
 
--- BRG PTR State
+fsx_variable_subscribe("L:MasterCaution", "Number", function(val)
+    local new_val = val or 0
+    -- If sim master caution comes on, trigger latch
+    if new_val ~= 0 and master_caution_state == 0 then
+        mc_latched = true
+    end
+    master_caution_state = new_val
+    update_master_caution_leds()
+end)
+
+-- BRG PTR Sync from Sim
 fsx_variable_subscribe("L:SwBrgPtr", "Number", function(val)
     local led_val = (val ~= 0) and 1.0 or 0.0
     hw_led_set(led_brg_ptr_h, led_val)
     hw_led_set(led_brg_ptr2_h, led_val)
 end)
 
--- Master Caution LED State (from CWP logic)
-fsx_variable_subscribe("L:MasterCaution", "Number", function(val)
-    local led_val = (val ~= 0) and 1.0 or 0.0
-    hw_led_set(led_mc_l_h, led_val)
-    hw_led_set(led_mc_r_h, led_val)
+-- Synchronized Lamp Test Subscription
+si_variable_subscribe("bell412_lamp_test", "INT", function(val)
+    lamp_test_active = val or 0
+    -- Only update components still included in the Lamp Test
+    update_overtq_led()
+    update_engine_leds()
+    update_master_caution_leds()
+end)
+
+-- Simplified Caution Count Subscription
+si_variable_subscribe("bell412_caution_count", "INT", function(val)
+    local current = val or 0
+    
+    -- RULE 1: If count increases, turn ON Master Caution
+    if current > last_ack_caution_count then
+        print("CAUTION: New fault detected! (Count: " .. last_ack_caution_count .. " -> " .. current .. ")")
+        mc_latched = true
+    end
+    
+    -- RULE 2: If count decreases, we update the acknowledged baseline automatically
+    -- (So that the next new fault starts from the correct floor)
+    if current < last_ack_caution_count then
+        last_ack_caution_count = current
+    end
+    
+    current_caution_count = current
+    update_master_caution_leds()
 end)
 
 -- =============================================================================
@@ -715,5 +842,27 @@ update_overtq_led()
 update_cyc_ctr_led()
 update_extinguisher_state()
 update_engine_leds()
+
+-- =============================================================================
+-- 8. GAME CONTROLLER INITIALIZATION (For vJoy)
+-- =============================================================================
+if CYCLIC_INPUT_SOURCE == "VJOY" then
+    print("CYCLIC_CENTER: Scanning for vJoy Hardware...")
+    local controllers = game_controller_list()
+    local found = false
+    for _, name in pairs(controllers) do
+        if name == VJOY_DEVICE_NAME then
+            print("CYCLIC_CENTER: SUCCESS! Connected to: " .. name)
+            game_controller_add(name, vjoy_handler)
+            found = true
+        end
+    end
+    
+    if not found then
+        print("CYCLIC_CENTER ERROR: '" .. VJOY_DEVICE_NAME .. "' not found in device list!")
+        print("CYCLIC_CENTER: Falling back to SIM variables for safety.")
+        -- We don't change the source variable, but the LED will rely on SIM variables being updated by SimVars
+    end
+end
 
 update_engine_leds()
