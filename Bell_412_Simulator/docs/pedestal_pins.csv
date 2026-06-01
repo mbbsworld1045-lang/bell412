@@ -1,0 +1,41 @@
+Category,Function,Pin Variable,Arduino ID,Pin,L-Var,Type,Values,Input Method,LED Handle,Notes
+AFCS,Autopilot 1 Switch,PIN_AP1_SW,ARDUINO_MEGA2560_A_D13,D13,L:AutoPilot,Number,0/1,hw_button_add,led_ap1_h,Toggle on/off
+AFCS,Autopilot 2 Switch,PIN_AP2_SW,ARDUINO_MEGA2560_A_D12,D12,L:AutoPilot2,Number,0/1,hw_button_add,led_ap2_h,Toggle on/off
+AFCS,SAS/ATT Switch,PIN_AFCS_SAS_SW,ARDUINO_MEGA2560_A_D10,D10,L:SASATT,Number,0=SAS 1=ATT,hw_button_add,led_sas_h/led_att_h,Toggle between SAS and ATT modes
+AFCS,Test Switch,PIN_AFCS_TEST_SW,ARDUINO_MEGA2560_A_D9,D9,L:AFCSTest,Number,0/1,hw_button_add,led_test_h,30s timer LED
+AFCS,Trim/FD Switch,PIN_AFCS_TRIM_FD_SW,ARDUINO_MEGA2560_A_D7,D7,-,Number,0=Off 1=Trim 2=FD,hw_button_add,led_trim_h/led_fd_h,Cycle: Off->Trim->FD->Off
+AFCS,CPL Switch,PIN_AFCS_CPL_SW,ARDUINO_MEGA2560_A_D6,D6,L:CplActive,Number,0/1,hw_button_add,led_cpl_h,Toggle on/off
+AFCS,SYS 2,PIN_AFCS_SYS2,ARDUINO_MEGA2560_A_D43,D43,L:AFCSSys2,Number,0/1,hw_button_add,-,System 2 switch
+AFCS LED,AP1 LED,PIN_AP1_LED,ARDUINO_MEGA2560_A_D5,D5,-,-,-,hw_led_add,led_ap1_h,LED output only
+AFCS LED,AP2 LED,PIN_AP2_LED,ARDUINO_MEGA2560_A_D4,D4,-,-,-,hw_led_add,led_ap2_h,LED output only
+AFCS LED,SAS LED,PIN_AFCS_SAS_LED,ARDUINO_MEGA2560_A_D2,D2,-,-,-,hw_led_add,led_sas_h,LED output only
+AFCS LED,ATT LED,PIN_AFCS_ATT_LED,ARDUINO_MEGA2560_A_D3,D3,-,-,-,hw_led_add,led_att_h,LED output only
+AFCS LED,Trim LED,PIN_AFCS_TRIM_LED,ARDUINO_MEGA2560_A_A1,A1,-,-,-,hw_output_add,led_trim_h,Analog as Digital
+AFCS LED,Test LED,PIN_AFCS_TEST_LED,ARDUINO_MEGA2560_A_A2,A2,-,-,-,hw_output_add,led_test_h,Analog as Digital
+AFCS LED,FD LED,PIN_AFCS_FD_LED,ARDUINO_MEGA2560_A_A3,A3,-,-,-,hw_output_add,led_fd_h,Analog as Digital
+AFCS LED,CPL LED,PIN_AFCS_CPL_LED,ARDUINO_MEGA2560_A_A4,A4,-,-,-,hw_output_add,led_cpl_h,Analog as Digital
+AHRS,AHRS Test 1,PIN_AHRS_TEST_1,ARDUINO_MEGA2560_A_D53,D53,L:AHRSTest,Number,0/1,hw_button_add,-,Momentary
+AHRS,AHRS Test 2,PIN_AHRS_TEST_2,ARDUINO_MEGA2560_A_D49,D49,L:AHRSTest,Number,0/1,hw_button_add,-,Momentary
+AHRS,Mag/DG MAG1,PIN_MAG_DG_MAG1,ARDUINO_MEGA2560_A_D51,D51,L:SwMagDg,Number,0=Norm 1=Mag 2=DG,hw_button_add,-,3-position
+AHRS,Mag/DG MAG2,PIN_MAG_DG_MAG2,ARDUINO_MEGA2560_A_D47,D47,L:SwMagDg,Number,0=Norm 1=Mag 2=DG,hw_button_add,-,3-position
+AHRS,Mag/DG DG1,PIN_MAG_DG_DG1,ARDUINO_MEGA2560_A_D52,D52,L:SwMagDg,Number,0=Norm 1=Mag 2=DG,hw_button_add,-,3-position
+AHRS,Mag/DG DG2,PIN_MAG_DG_DG2,ARDUINO_MEGA2560_A_D48,D48,L:SwMagDg,Number,0=Norm 1=Mag 2=DG,hw_button_add,-,3-position
+AHRS,AHRS Servo,PIN_AHRS_SERVO,ARDUINO_MEGA2560_A_D60,D60,A:INDICATED HEADING,Degrees,0-360,hw_output_pwm_add,servo_ahrs_h,PWM Servo output
+Fuel,Valve 1,PIN_VALVE1,ARDUINO_MEGA2560_A_D30,D30,L:SwvalveEng1,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,Valve 2,PIN_VALVE2,ARDUINO_MEGA2560_A_D32,D32,L:SwvalveEng2,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,XFEED Bus Test 1,PIN_XFEED,ARDUINO_MEGA2560_A_D28,D28,L:Swxfeedbus,Number,0=Gnd 1=Pos1 2=Pos2,hw_button_add,-,3-position switch
+Fuel,XFEED Bus Test 2,PIN_XFEED_POS2,ARDUINO_MEGA2560_A_D31,D31,L:Swxfeedbus,Number,0=Gnd 1=Pos1 2=Pos2,hw_button_add,-,3-position switch
+Fuel,Fuel Crossfeed,PIN_FUEL_XFEED,ARDUINO_MEGA2560_A_D33,D33,L:SwFuelxfeed,Number,0=Normal 1=OverClose,hw_button_add,-,Toggle switch
+Fuel,Trans Fuel 1,PIN_FUEL_TRANS1,ARDUINO_MEGA2560_A_D34,D34,L:SwfueltransengA,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,Boost Pump 1,PIN_BOOST1,ARDUINO_MEGA2560_A_D35,D35,L:SwboostpuEng1,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,Fuel Intercon,PIN_FUEL_INTCON,ARDUINO_MEGA2560_A_D36,D36,L:Swfuelintcon,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,Trans Fuel 2,PIN_FUEL_TRANS2,ARDUINO_MEGA2560_A_D37,D37,L:SwfueltransengB,Number,0/1,hw_button_add,-,Toggle switch
+Fuel,Boost Pump 2,PIN_BOOST2,ARDUINO_MEGA2560_A_D38,D38,L:SwboostpuEng2,Number,0/1,hw_button_add,-,Toggle switch
+Hydraulics,Hydraulic 1,PIN_HYD1_SW,ARDUINO_MEGA2560_A_D39,D39,L:Sw hydsysA,Number,0/1,hw_button_add,-,Toggle switch
+Hydraulics,Hydraulic 2,PIN_HYD2_SW,ARDUINO_MEGA2560_A_D42,D42,L:Sw hydsysB,Number,0/1,hw_button_add,-,Toggle switch
+Governor,Governor Eng 1,PIN_GOV_ENG1,ARDUINO_MEGA2560_A_D23,D23,L:SwGovA,Number,0/1,hw_button_add,-,Toggle switch
+Governor,Governor Eng 2,PIN_GOV_ENG2,ARDUINO_MEGA2560_A_D29,D29,L:SwGovB,Number,0/1,hw_button_add,-,Toggle switch
+Governor,Part Sep 1,PIN_PARTSEP1,ARDUINO_MEGA2560_A_D25,D25,L:SwpartsepA,Number,0/1,hw_button_add,-,Toggle switch
+Governor,Part Sep 2,PIN_PARTSEP2,ARDUINO_MEGA2560_A_D27,D27,L:SwpartsepB,Number,0/1,hw_button_add,-,Toggle switch
+Misc,Force Trim,PIN_FORCE_TRIM,ARDUINO_MEGA2560_A_D40,D40,L:Sw forcetrim,Number,0/1,hw_button_add,-,Momentary + ROTOR_TRIM_RESET
+Misc,RPM Audio,PIN_RPM_AUDIO,ARDUINO_MEGA2560_A_D41,D41,L:Sw RPMAudio,Number,0/1,hw_button_add,-,Toggle switch

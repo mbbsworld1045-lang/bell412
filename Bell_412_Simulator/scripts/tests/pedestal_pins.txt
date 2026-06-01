@@ -1,0 +1,40 @@
+AP1_SW            = "ARDUINO_MEGA2560_A_D13"
+AP2_SW            = "ARDUINO_MEGA2560_A_D12"
+AFCS_SAS_SW       = "ARDUINO_MEGA2560_A_D10"
+AFCS_TEST_SW      = "ARDUINO_MEGA2560_A_D9"
+AFCS_TRIM_FD_SW   = "ARDUINO_MEGA2560_A_D7"
+AFCS_CPL_SW       = "ARDUINO_MEGA2560_A_D6"
+AFCS_SYS2         = "ARDUINO_MEGA2560_A_D43"
+AP1_LED           = "ARDUINO_MEGA2560_A_D5"
+AP2_LED           = "ARDUINO_MEGA2560_A_D4"
+AFCS_SAS_LED      = "ARDUINO_MEGA2560_A_D2"
+AFCS_ATT_LED      = "ARDUINO_MEGA2560_A_D3"
+AFCS_TRIM_LED     = "ARDUINO_MEGA2560_A_A1"      -- Analog as Digital
+AFCS_TEST_LED     = "ARDUINO_MEGA2560_A_A2"      -- Analog as Digital
+AFCS_FD_LED       = "ARDUINO_MEGA2560_A_A3"      -- Analog as Digital
+AFCS_CPL_LED      = "ARDUINO_MEGA2560_A_A4"      -- Analog as Digital
+AHRS_TEST_1       = "ARDUINO_MEGA2560_A_D53"
+AHRS_TEST_2       = "ARDUINO_MEGA2560_A_D49"
+MAG_DG_MAG1       = "ARDUINO_MEGA2560_A_D51"
+MAG_DG_MAG2       = "ARDUINO_MEGA2560_A_D47"
+MAG_DG_DG1        = "ARDUINO_MEGA2560_A_D52"
+MAG_DG_DG2        = "ARDUINO_MEGA2560_A_D48"
+AHRS_SERVO        = "ARDUINO_MEGA2560_A_D60"     -- Placeholder for Servo
+VALVE1            = "ARDUINO_MEGA2560_A_D30"
+VALVE2            = "ARDUINO_MEGA2560_A_D32"
+XFEED             = "ARDUINO_MEGA2560_A_D28"      -- XFEED Bus Test 1 (L:Swxfeedbus = 1)
+XFEED_POS2        = "ARDUINO_MEGA2560_A_D31"      -- XFEED Bus Test 2 (L:Swxfeedbus = 2), Ground = 0
+FUEL_XFEED        = "ARDUINO_MEGA2560_A_D33"      -- Fuel Crossfeed (0=Normal, 1=Over Close)
+FUEL_TRANS1       = "ARDUINO_MEGA2560_A_D34"      -- Trans Fuel 1 (L:SwfueltransengA)
+BOOST1            = "ARDUINO_MEGA2560_A_D35"      -- Boost Pump 1 (L:SwboostpuEng1)
+FUEL_INTCON       = "ARDUINO_MEGA2560_A_D36"      -- Fuel Intercon (L:Swfuelintcon)
+FUEL_TRANS2       = "ARDUINO_MEGA2560_A_D37"      -- Trans Fuel 2 (L:SwfueltransengB)
+BOOST2            = "ARDUINO_MEGA2560_A_D38"      -- Boost Pump 2 (L:SwboostpuEng2)
+HYD1_SW           = "ARDUINO_MEGA2560_A_D39"
+HYD2_SW           = "ARDUINO_MEGA2560_A_D42"
+GOV_ENG1          = "ARDUINO_MEGA2560_A_D23"
+GOV_ENG2          = "ARDUINO_MEGA2560_A_D29"
+PARTSEP1          = "ARDUINO_MEGA2560_A_D25"
+PARTSEP2          = "ARDUINO_MEGA2560_A_D27"
+FORCE_TRIM        = "ARDUINO_MEGA2560_A_D40"
+RPM_AUDIO         = "ARDUINO_MEGA2560_A_D41"
