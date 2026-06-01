@@ -86,6 +86,7 @@ local PIN_MC_LED_R          = "ARDUINO_MEGA2560_A_D31"      -- Master Caution LE
 -- Engine Warning LEDs
 local PIN_ENG1_LED          = "ARDUINO_MEGA2560_A_D4"       -- Engine 1 Warning LED
 local PIN_ENG2_LED          = "ARDUINO_MEGA2560_A_D12"      -- Engine 2 Warning LED
+local PIN_RPM_LED           = "ARDUINO_MEGA2560_A_D23"      -- RPM Warning LED
 
 -- =============================================================================
 -- 2. INITIALIZE HARDWARE LEDS
@@ -122,6 +123,7 @@ local led_mc_r_h            = hw_led_add(PIN_MC_LED_R, 0.0)
 -- Engine Warning LEDs
 local led_eng1_h            = hw_led_add(PIN_ENG1_LED, 0.0)
 local led_eng2_h            = hw_led_add(PIN_ENG2_LED, 0.0)
+local led_rpm_h             = hw_led_add(PIN_RPM_LED, 0.0)
 
 -- =============================================================================
 -- 3. INTERNAL VARIABLES & CONSTANTS
@@ -203,6 +205,11 @@ end
 
 -- FIRE TEST LED UPDATE
 local function update_fire_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_fire_h1_h, 0.0)
+        hw_led_set(led_fire_h2_h, 0.0)
+        return
+    end
     if fire_test_active == 1 then
         hw_led_set(led_fire_h1_h, 1.0)
         hw_led_set(led_fire_h2_h, 1.0)
@@ -213,11 +220,24 @@ end
 
 -- BAGGAGE FIRE TEST LED UPDATE
 local function update_bag_fire_test_led()
+    if dc_bus == 0 then
+        hw_led_set(led_bag_fire_test_h, 0.0)
+        return
+    end
     hw_led_set(led_bag_fire_test_h, (bag_fire_test_state == 1) and 1.0 or 0.0)
 end
 
 -- MARKER LED UPDATE (separate left and right, or all if L:TestMarker=1)
 local function update_marker_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_mk_l_wht, 0.0)
+        hw_led_set(led_mk_l_blu, 0.0)
+        hw_led_set(led_mk_l_red, 0.0)
+        hw_led_set(led_mk_r_wht, 0.0)
+        hw_led_set(led_mk_r_red, 0.0)
+        hw_led_set(led_mk_r_blu, 0.0)
+        return
+    end
     -- If global test marker is active, light ALL beacon LEDs
     if test_marker_state == 1 then
         hw_led_set(led_mk_l_wht, 1.0)
@@ -244,6 +264,11 @@ end
 
 -- OVER TORQUE LED UPDATE
 local function update_overtq_led()
+    if dc_bus == 0 then
+        hw_led_set(led_ot_l_h, 0.0)
+        hw_led_set(led_ot_r_h, 0.0)
+        return
+    end
     local led_value = (overtq_state == 1 or lamp_test_active == 1) and 1.0 or 0.0
     hw_led_set(led_ot_l_h, led_value)
     hw_led_set(led_ot_r_h, led_value)
@@ -251,6 +276,11 @@ end
 
 -- CYCLIC CENTER LED UPDATE
 local function update_cyc_ctr_led()
+    if dc_bus == 0 then
+        hw_led_set(led_cyc_ctr_l_h, 0.0)
+        hw_led_set(led_cyc_ctr_r_h, 0.0)
+        return
+    end
     -- Logic: LED illuminates if test button is pressed OR (Rotor < 95% AND stick > Threshold from center)
     local rotor_low = (rotor_rpm < ROTOR_RPM_THRESHOLD)
     local cur_roll, cur_pitch, cur_limit
@@ -306,6 +336,11 @@ end
 -- MC RESET Logic (controls separate MC LEDs)
 -- MASTER CAUTION LED UPDATE
 local function update_master_caution_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_mc_l_h, 0.0)
+        hw_led_set(led_mc_r_h, 0.0)
+        return
+    end
     -- LED is ON if: (Locked Latch state is true OR Lamp Test) 
     local mc_on = (mc_latched == true) or (lamp_test_active == 1)
     
@@ -345,11 +380,12 @@ local function update_brg_ptr_leds()
 end
 
 -- ENGINE WARNING LED UPDATE
--- Logic: LED ON when DC Bus ON AND (TestMC active OR RPM N1 <= 55%)
+-- Logic: LED ON when DC Bus ON AND (TestMC active OR Lamp Test active OR RPM warnings)
 local function update_engine_leds()
     if dc_bus == 0 then
         hw_led_set(led_eng1_h, 0.0)
         hw_led_set(led_eng2_h, 0.0)
+        hw_led_set(led_rpm_h, 0.0)
         return
     end
     
@@ -360,6 +396,10 @@ local function update_engine_leds()
     -- Engine 2: ON if TestMC active OR Lamp Test OR RPM N1 E2 <= 55%
     local eng2_warn = (test_mc ~= 0) or (lamp_test_active == 1) or (rpm_n1_e2 <= 55.0)
     hw_led_set(led_eng2_h, eng2_warn and 1.0 or 0.0)
+
+    -- RPM LED: ON if TestMC active OR Lamp Test OR Rotor RPM < 95% OR Rotor RPM > 105%
+    local rpm_warn = (test_mc ~= 0) or (lamp_test_active == 1) or (rotor_rpm < 95.0) or (rotor_rpm > 105.0)
+    hw_led_set(led_rpm_h, rpm_warn and 1.0 or 0.0)
 end
 
 -- =============================================================================
@@ -371,7 +411,7 @@ hw_button_add(PIN_BRG_PTR,
     function() -- PRESSED
         print("ACTION: BRG PTR Left PRESSED")
         fsx_variable_write("L:SwBrgPtr", "Number", 1)
-        hw_led_set(led_brg_ptr_h, 1.0)
+        hw_led_set(led_brg_ptr_h, (dc_bus == 1) and 1.0 or 0.0)
     end,
     function() -- RELEASED
         print("ACTION: BRG PTR Left RELEASED")
@@ -385,7 +425,7 @@ hw_button_add(PIN_BRG_PTR2,
     function() -- PRESSED
         print("ACTION: BRG PTR Right PRESSED")
         fsx_variable_write("L:SwBrgPtr", "Number", 1)
-        hw_led_set(led_brg_ptr2_h, 1.0)
+        hw_led_set(led_brg_ptr2_h, (dc_bus == 1) and 1.0 or 0.0)
     end,
     function() -- RELEASED
         print("ACTION: BRG PTR Right RELEASED")
@@ -700,6 +740,15 @@ fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
     update_fire_leds()
     update_fire_handle_leds()
     update_engine_leds()
+    update_bag_fire_test_led()
+    update_marker_leds()
+    update_overtq_led()
+    update_cyc_ctr_led()
+    update_master_caution_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_brg_ptr_h, 0.0)
+        hw_led_set(led_brg_ptr2_h, 0.0)
+    end
 end)
 
 -- Test MC State (for Engine Warning LEDs)
@@ -709,13 +758,13 @@ fsx_variable_subscribe("L:TestMC", "Number", function(val)
 end)
 
 -- Engine 1 RPM N1 (for Engine 1 Warning LED)
-fsx_variable_subscribe("TURB ENG N1:1", "Percent", function(val)
+fsx_variable_subscribe("L:BELL_CUSTOM_N1_1", "percent", function(val)
     rpm_n1_e1 = val or 0.0
     update_engine_leds()
 end)
 
 -- Engine 2 RPM N1 (for Engine 2 Warning LED)
-fsx_variable_subscribe("TURB ENG N1:2", "Percent", function(val)
+fsx_variable_subscribe("L:BELL_CUSTOM_N1_2", "percent", function(val)
     rpm_n1_e2 = val or 0.0
     update_engine_leds()
 end)
@@ -741,6 +790,7 @@ end)
 fsx_variable_subscribe("ENG ROTOR RPM:1", "Percent", function(val)
     rotor_rpm = val or 0.0
     update_cyc_ctr_led()
+    update_engine_leds()
 end)
 
 -- Enhanced Cyclic Center Test: SIM Input Path (Yoke Position)
@@ -784,7 +834,7 @@ end)
 
 -- BRG PTR Sync from Sim
 fsx_variable_subscribe("L:SwBrgPtr", "Number", function(val)
-    local led_val = (val ~= 0) and 1.0 or 0.0
+    local led_val = (val ~= 0 and dc_bus == 1) and 1.0 or 0.0
     hw_led_set(led_brg_ptr_h, led_val)
     hw_led_set(led_brg_ptr2_h, led_val)
 end)

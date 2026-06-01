@@ -145,6 +145,12 @@ local dc_bus            = 0
 -- 4. HELPER LOGIC: SAS/ATT MASTER CONTROL
 -- =============================================================================
 local function update_sas_att()
+    -- Power gate: no LEDs without DC bus
+    if dc_bus == 0 then
+        hw_led_set(led_sas_h, 0.0)
+        hw_led_set(led_att_h, 0.0)
+        return
+    end
     -- Logic: SAS/ATT only on if AP1 OR AP2 is ON
     if state_ap1 or state_ap2 then
         if sas_mode == "SAS" then
@@ -226,7 +232,7 @@ hw_button_add("ARDUINO_MEGA2560_B_D13", function()
     local any_ap_already_on = state_ap1 or state_ap2
     
     state_ap1 = not state_ap1
-    hw_led_set(led_ap1_h, state_ap1 and 1.0 or 0.0)
+    hw_led_set(led_ap1_h, (state_ap1 and dc_bus == 1) and 1.0 or 0.0)
     
     -- Only reset to SAS if we are switching from "Everything Off" to "First AP On"
     if state_ap1 and not any_ap_already_on then 
@@ -242,7 +248,7 @@ hw_button_add("ARDUINO_MEGA2560_B_D12", function()
     local any_ap_already_on = state_ap1 or state_ap2
     
     state_ap2 = not state_ap2
-    hw_led_set(led_ap2_h, state_ap2 and 1.0 or 0.0)
+    hw_led_set(led_ap2_h, (state_ap2 and dc_bus == 1) and 1.0 or 0.0)
     
     -- Only reset to SAS if we are switching from "Everything Off" to "First AP On"
     if state_ap2 and not any_ap_already_on then 
@@ -268,19 +274,19 @@ end)
 -- PIN 5: TRIM / FD BUTTON (Cycle: Trim -> FD -> Off)
 hw_button_add("ARDUINO_MEGA2560_B_D7", function()
     trim_cycle = (trim_cycle + 1) % 3
-    hw_output_set(led_trim_h, trim_cycle == 1)
-    hw_output_set(led_fd_h, trim_cycle == 2)
+    hw_output_set(led_trim_h, trim_cycle == 1 and dc_bus == 1)
+    hw_output_set(led_fd_h, trim_cycle == 2 and dc_bus == 1)
 end)
 
 -- PIN 4: CPL BUTTON (Simple Toggle)
 hw_button_add("ARDUINO_MEGA2560_B_D6", function()
     state_cpl = not state_cpl
-    hw_output_set(led_cpl_h, state_cpl)
+    hw_output_set(led_cpl_h, state_cpl and dc_bus == 1)
 end)
 
 -- PIN 6: TEST BUTTON (30s Timer)
 hw_button_add("ARDUINO_MEGA2560_B_D9", function()
-    hw_output_set(led_test_h, true)
+    hw_output_set(led_test_h, dc_bus == 1)
     if test_timer ~= nil then timer_stop(test_timer) end
     test_timer = timer_start(30000, function()
         hw_output_set(led_test_h, false)
@@ -580,13 +586,13 @@ hw_button_add(PIN_GOV_ENG1,
 hw_button_add(PIN_GOV_ENG2,
     function()
         print("GOV ENG2: ON")
-        gov_eng2_state = 0
-        fsx_variable_write("L:SwGovB", "Number", 0)
+        gov_eng2_state = 1
+        fsx_variable_write("L:SwGovB", "Number", 1)
     end,
     function()
         print("GOV ENG2: OFF")
-        gov_eng2_state = 1
-        fsx_variable_write("L:SwGovB", "Number", 1)
+        gov_eng2_state = 0
+        fsx_variable_write("L:SwGovB", "Number", 0)
     end
 )
 
@@ -655,6 +661,13 @@ hw_button_add(PIN_RPM_AUDIO,
 fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
     dc_bus = (val ~= 0) and 1 or 0
     update_sas_att()
+    -- Refresh all toggle LEDs on power change
+    hw_led_set(led_ap1_h, (state_ap1 and dc_bus == 1) and 1.0 or 0.0)
+    hw_led_set(led_ap2_h, (state_ap2 and dc_bus == 1) and 1.0 or 0.0)
+    hw_output_set(led_trim_h, trim_cycle == 1 and dc_bus == 1)
+    hw_output_set(led_fd_h, trim_cycle == 2 and dc_bus == 1)
+    hw_output_set(led_cpl_h, state_cpl and dc_bus == 1)
+    hw_output_set(led_test_h, test_timer ~= nil and dc_bus == 1)
 end)
 
 -- AP States (from sim) - Update local state from sim when changed externally
@@ -662,7 +675,7 @@ fsx_variable_subscribe("L:AutoPilot", "Number", function(val)
     local new_state = (val ~= 0)
     if state_ap1 ~= new_state then
         state_ap1 = new_state
-        hw_led_set(led_ap1_h, state_ap1 and 1.0 or 0.0)
+        hw_led_set(led_ap1_h, (state_ap1 and dc_bus == 1) and 1.0 or 0.0)
         update_sas_att()
     end
 end)
@@ -671,7 +684,7 @@ fsx_variable_subscribe("L:AutoPilot2", "Number", function(val)
     local new_state = (val ~= 0)
     if state_ap2 ~= new_state then
         state_ap2 = new_state
-        hw_led_set(led_ap2_h, state_ap2 and 1.0 or 0.0)
+        hw_led_set(led_ap2_h, (state_ap2 and dc_bus == 1) and 1.0 or 0.0)
         update_sas_att()
     end
 end)
@@ -690,7 +703,7 @@ fsx_variable_subscribe("L:CplActive", "Number", function(val)
     local new_state = (val ~= 0)
     if state_cpl ~= new_state then
         state_cpl = new_state
-        hw_output_set(led_cpl_h, state_cpl)
+        hw_output_set(led_cpl_h, state_cpl and dc_bus == 1)
     end
 end)
 
@@ -719,28 +732,6 @@ fsx_variable_subscribe("ELEVATOR POSITION", "Position", function(val)
     set_servo_position(servo_pitch_h, norm)
 end)
 
--- Bi-directional Sync: Fuel / Hydraulic / Governor / Misc Switches
--- (If virtual cockpit changes these, physical STATE updates)
-fsx_variable_subscribe("L:SwvalveEng1", "Number", function(val) valve1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwvalveEng2", "Number", function(val) valve2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Swxfeedbus", "Number", function(val) xfeed_state = val or 0 end)
-fsx_variable_subscribe("L:SwFuelxfeed", "Number", function(val) fuel_xfeed_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwfueltransengA", "Number", function(val) fuel_trans1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwfueltransengB", "Number", function(val) fuel_trans2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwboostpuEng1", "Number", function(val) boost1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwboostpuEng2", "Number", function(val) boost2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Swfuelintcon", "Number", function(val) fuel_intcon_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw hydsysA", "Number", function(val) hyd1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw hydsysB", "Number", function(val) hyd2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwGovA", "Number", function(val) gov_eng1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwGovB", "Number", function(val) gov_eng2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwpartsepA", "Number", function(val) partsep1_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwpartsepB", "Number", function(val) partsep2_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:Sw forcetrim", "Number", function(val) force_trim_held = (val ~= 0) end)
-fsx_variable_subscribe("L:Sw RPMAudio", "Number", function(val) rpm_audio_state = (val ~= 0) and 1 or 0 end)
-fsx_variable_subscribe("L:SwMagDg", "Number", function(val) mag_dg_state = val or 0 end)
-fsx_variable_subscribe("L:AHRSTest", "Number", function(val) ahrs_test_state = (val ~= 0) and 1 or 0 end)
-
 -- =============================================================================
 -- 7. STARTUP INITIALIZATION
 -- =============================================================================
@@ -759,9 +750,9 @@ fsx_variable_write("L:SwvalveEng1", "Number", 1)
 fsx_variable_write("L:SwvalveEng2", "Number", 1)
 fsx_variable_write("L:Swxfeedbus", "Number", 0)
 fsx_variable_write("L:Sw hydsysA", "Number", 1)
-fsx_variable_write("L:Sw hydsysB", "Number", 0)
+fsx_variable_write("L:Sw hydsysB", "Number", 1)
 fsx_variable_write("L:SwGovA", "Number", 1)
-fsx_variable_write("L:SwGovB", "Number", 0)
+fsx_variable_write("L:SwGovB", "Number", 1)
 fsx_variable_write("L:SwpartsepA", "Number", 1)
 fsx_variable_write("L:SwpartsepB", "Number", 1)
 fsx_variable_write("L:Sw RPMAudio", "Number", 1)

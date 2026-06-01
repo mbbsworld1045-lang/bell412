@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Gauge Name="NAV_GPS" Version="1.0">
+ <Image Name="nav_background.bmp"/>
+
+   <Element>
+      <Select>
+         <Value>(L:MasterDcBus,bool) if{ (A:GPS drives nav1,bool) }</Value>
+         <Case Value="1">
+            <Image Name="nav_on.bmp" Bright="Yes"/>
+         </Case>
+      </Select>
+   </Element>
+   
+   <Mouse>
+    <Help ID="HELPID_GAUGE_NAV_GPS_SWITCH"/>
+    <Cursor Type="Hand"/>
+    <Click Event="TOGGLE_GPS_DRIVES_NAV1"/>
+   </Mouse>
+
+  <Element>
+    <Select>
+       <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+       <Value>0</Value>
+    </Select>
+  </Element>   
+
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>  
+  
+  <Element>
+    <Select>
+       <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+       (A:Turb eng2 N1, percent) s0 1 &gt; if{ l0 95 / s1 100 * } (&gt;L:OILE1,psi)  
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+        (A:General Eng2 Oil Temperature, celsius) (&gt;L:OILE1T,celsius)
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+		 (A:Turb eng3 N1, percent) s0 1 &gt; if{ l0 95 / s1 100 * } (&gt;L:OILE2,psi)
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+        (L:Sw hydsysA,bool) 0 == (A:Turb eng1 N1, percent) 10 &gt;= &amp;&amp; if{ 1005 (&gt;L:HYDRS1,psi) } els{ 0 (&gt;L:HYDRS1,psi) }
+        (L:Sw hydsysB,bool) 0 == (A:Turb eng1 N1, percent) 10 &gt;= &amp;&amp; if{ 1005 (&gt;L:HYDRS2,psi) } els{ 0 (&gt;L:HYDRS2,psi) }
+	  </Value>
+    </Select>
+  </Element>
+    
+  <Element>
+    <Select>
+      <Value>
+	    34 (&gt;L:EngHydTemp, celsius)
+        (A:General Eng1 Oil Temperature,celsius) (L:EngHydTemp,celsius) - (&gt;L:HYDRT,celsius)
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+	    (L:SwboostpuEng1,bool) (L:SwvalveEng1,bool) 1 == &amp;&amp; if{ 14 (&gt;L:fuelp1,psi) } els{ 0 (&gt;L:fuelp1,psi) }
+	    (L:SwboostpuEng2,bool) (L:SwvalveEng2,bool) 1 == &amp;&amp; if{ 14 (&gt;L:fuelp2,psi) } els{ 0 (&gt;L:fuelp2,psi) }
+	  </Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+      <Value>
+	    (L:Digitstest,bool) 1 == if{ 2200 (&gt;L:fuelqtc,pound) } els{ 0 (&gt;L:fuelqtc,pound) }
+        (L:Digitstest,bool) 1 == if{ 8888 (&gt;L:fuelqt,enum) } els{ 0 (&gt;L:fuelqt,enum) }	  
+	    (L:FuelQuantity, enum) -1 == if{ (A:FUEL TOTAL QUANTITY WEIGHT, pound) 1.5 / }		
+	    (L:FuelQuantity, enum) 0 == if{ (A:FUEL TOTAL QUANTITY WEIGHT, pound) }
+		(L:FuelQuantity, enum) 1 == if{ (A:FUEL TOTAL QUANTITY WEIGHT, pound) 2 / }
+		(&gt;L:fuelq,pound)
+	  </Value>
+    </Select>
+  </Element>
+
+ <Element>
+   <Select>
+    <Value>
+     (L:RPM N1 E1,percent) 72 &lt; (A:Eng3 Combustion,bool) 0 == &amp;&amp; (L:ENG1Stater,bool) 1 = &amp;&amp; if{ 280 (&gt;L:OAmps1,amp) } els{ 0 (&gt;L:OAmps1,amp) }
+	 (L:CGenel,bool) 1 == if{ 75 (&gt;L:CAmps1,amp) } els{ 0 (&gt;L:CAmps1,amp) }
+	 (L:CAmps1,amp) (L:OAmps1,amp) + (&gt;L:Ampsg1,amp)
+	</Value>
+   </Select>
+ </Element>
+ 
+ <Element>
+   <Select>
+    <Value>
+	(L:RPM N1 E2,percent) 72 &lt; (A:Eng2 Combustion,bool) 0 == &amp;&amp; (L:ENG2Stater,bool) 1 = &amp;&amp; if{ 280 (&gt;L:OAmps2,amp) } els{ 0 (&gt;L:OAmps2,amp) }
+    (L:CGener,bool) 1 == if{ 75 (&gt;L:CAmps2,amp) } els{ 0 (&gt;L:CAmps2,amp) }
+	(L:CAmps2,amp) (L:OAmps2,amp) + (&gt;L:Ampsg2,amp)
+	</Value>
+   </Select>
+ </Element>
+ 
+ <Element>
+   <Select>
+    <Value>
+     (L:MasterDcBus,bool) 1 == (L:starteng,enum) 1 == &amp;&amp; (L:RPM N1 E1,percent) 58 &lt;= &amp;&amp; if{ 1 (&gt;L:ENG1Stater,bool) } els{ 0 (&gt;L:ENG1Stater,bool) }
+     (L:MasterDcBus,bool) 1 == (L:starteng,enum) -1 == &amp;&amp; (L:RPM N1 E2,percent) 58 &lt;= &amp;&amp; if{ 1 (&gt;L:ENG2Stater,bool) } els{ 0 (&gt;L:ENG2Stater,bool) }
+	</Value>
+   </Select>
+ </Element>
+ 
+   <Element>
+    <Select>
+      <Value>
+        (L:ENG1Stater,bool) if{ (A:GENERAL ENG STARTER:2,bool) ! if{ (&gt;K:TOGGLE_STARTER2) } }
+		(L:ENG1Stater,bool) ! if{ (A:GENERAL ENG STARTER:2,bool) if{ (&gt;K:TOGGLE_STARTER2) } }
+	 </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+		(L:ENG1Stater,bool) (A:Eng3 Combustion,bool) 0 == &amp;&amp; || (L:ENG2Stater,bool) (A:Eng2 Combustion,bool) 0 == &amp;&amp; || if{ 1 (&gt;L:MStater,bool) } els{ 0 (&gt;L:MStater,bool) } 
+	 </Value>
+    </Select>
+  </Element>
+
+
+  <Element>
+    <Select>
+      <Value>
+		(L:MasterDcBus,bool) 1 == (L:Swinva, bool) 1 == &amp;&amp; if{ 115 (&gt;L:VoltAC1,volt) } els{ 0 (&gt;L:VoltAC1,volt) }
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+		(L:MasterDcBus,bool) 1 == if{ 24 (&gt;L:BVoltDC1,volt) } els{ 0 (&gt;L:BVoltDC1,volt) }
+		(L:Genmast,bool) 1 == if{ 4 (&gt;L:GVoltDC1,volt) } els{ 0 (&gt;L:GVoltDC1,volt) }
+        (A:Eng3 Combustion,bool) 0 == (L:MStater,bool) 1 == &amp;&amp; if{ 6 (&gt;L:OVoltDC1,volt) } els{ 0 (&gt;L:OVoltDC1,volt) }
+		(L:BVoltDC1,volt) (L:GVoltDC1,volt) + (L:OVoltDC1,volt) - (&gt;L:VoltDC1,volt)
+	  </Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+      <Value>
+		(L:MasterDcBus,bool) 1 == (L:Swinvb, bool) 1 == &amp;&amp; if{ 115 (&gt;L:VoltAC2,volt) } els{ 0 (&gt;L:VoltAC2,volt) }
+	  </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+      <Value>
+		(L:MasterDcBus,bool) 1 == if{ 24 (&gt;L:BVoltDC2,volt) } els{ 0 (&gt;L:BVoltDC2,volt) }
+		(L:Genmast,bool) 1 == if{ 4 (&gt;L:GVoltDC2,volt) } els{ 0 (&gt;L:GVoltDC2,volt) }
+        (A:Eng2 Combustion,bool) 0 == (L:MStater,bool) 1 == &amp;&amp; if{ 6 (&gt;L:OVoltDC2,volt) } els{ 0 (&gt;L:OVoltDC2,volt) }
+		(L:BVoltDC2,volt) (L:GVoltDC2,volt) + (L:OVoltDC2,volt) - (&gt;L:VoltDC2,volt)
+	  </Value>
+    </Select>
+  </Element>
+  
+  <!--
+  <Element>
+    <Select>
+     <Value>
+	   (A:Eng2 Combustion,bool) if{ 58 (&gt;L:Eng1N2,percent) } els{ 0 (&gt;L:Eng1N2,percent) }
+	   (A:Eng2 Combustion,bool) (A:Eng Rotor Rpm,percent) 98 &gt; &amp;&amp; if{ 5 (&gt;L:GovRPM1,percent) } els{ 0 (&gt;L:GovRPM1,percent) }
+	 </Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+     <Value>(A:Eng2 Combustion,bool) if{ (L:Eng1N2,percent) (L:throgas1,percent) 2.58 / + (L:GovRPM1,percent) + } (&gt;L:Eng1N2,percent)</Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+     <Value>
+	   (A:Eng3 Combustion,bool) if{ 58 (&gt;L:Eng2N2,percent) } els{ 0 (&gt;L:Eng2N2,percent) }
+	   (A:Eng3 Combustion,bool) (A:Eng Rotor Rpm,percent) 98 &gt; &amp;&amp; if{ 5 (&gt;L:GovRPM2,percent) } els{ 0 (&gt;L:GovRPM2,percent) }
+	 </Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+     <Value>(A:Eng3 Combustion,bool) if{ (L:Eng2N2,percent) (L:throgas2,percent) 2.58 / + (L:GovRPM2,percent) + } (&gt;L:Eng2N2,percent)</Value>
+    </Select>
+  </Element>
+  -->
+
+  <!--
+  <Element>
+    <Select>
+     <Value>
+		(L:Combustionm,bool) if{ 10 (&gt;L:TRQrotor,percent) } els{ 0 (&gt;L:TRQrotor,percent) }
+		(L:Trotor,percent) 19 &gt;= if{ (A:general eng throttle lever position:1,percent) (&gt;L:torque,percent) }
+		(L:Combustionm,bool) if{ (A:GENERAL ENG PROPELLER LEVER POSITION:1,percent) (&gt;L:Powern2,percent) }
+		(L:TRQrotor,percent) (L:Powern2,percent) 11 / + (L:torque,percent) + (&gt;L:Trotor,percent)
+     </Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+     <Value>
+		(A:Eng2 Combustion,bool) if{ 2 (&gt;L:TRQeng1,percent) } els{ 0 (&gt;L:TRQeng1,percent) }
+		(L:Eng1TQ,percent) 9 &gt;= if{ (A:general eng throttle lever position:1,percent) (&gt;L:E1torque,percent) }
+        (A:GENERAL ENG PROPELLER LEVER POSITION:2,percent) (&gt;L:Powern2E1,percent)
+		(L:RPM N1 E1,percent) 72 &gt;= (L:OEIE1,bool) 1 == &amp;&amp; if{ 20 (&gt;L:OEITRQeng1,percent) } els{ 0 (&gt;L:OEITRQeng1,percent) }		
+		(L:TRQeng1,percent) (L:Powern2E1,percent) 12.5 / + (L:E1torque,percent) 1.38 / + (L:OEITRQeng1,percent) + (&gt;L:Eng1TQ,percent)
+	 </Value>
+    </Select>   
+  </Element>
+
+  <Element>
+    <Select>
+     <Value>
+		(A:Eng3 Combustion,bool) if{ 2 (&gt;L:TRQeng2,percent) } els{ 0 (&gt;L:TRQeng2,percent) }
+		(L:Eng2TQ,percent) 9 &gt;= if{ (A:general eng throttle lever position:1,percent) (&gt;L:E2torque,percent) }
+        (A:GENERAL ENG PROPELLER LEVER POSITION:3,percent) (&gt;L:Powern2E2,percent)
+		(L:RPM N1 E2,percent) 72 &gt;= (L:OEIE2,bool) 1 == &amp;&amp; if{ 20 (&gt;L:OEITRQeng2,percent) } els{ 0 (&gt;L:OEITRQeng2,percent) }	
+		(L:TRQeng2,percent) (L:Powern2E2,percent) 12.5 / + (L:E2torque,percent) 1.38 / + (L:OEITRQeng2,percent) + (&gt;L:Eng2TQ,percent)
+	 </Value>
+    </Select>   
+  </Element>
+  -->
+  
+  <Element>
+   <Select>
+     <Value>
+       (L:MasterDcBus,bool) (L:stbatt,bool) 1 == &amp;&amp; (L:Swstbyatt,bool) 1 == &amp;&amp; if{ 1 (&gt;L:Masterstbatt,bool) } els{ 0 (&gt;L:Masterstbatt,bool) }
+	 </Value>
+   </Select>   
+  </Element>
+  
+  <Element>
+   <Select>
+     <Value>
+       (L:MasterACDC, bool) 1 == (A:NAV HAS GLIDE SLOPE:1,bool) 0 == &amp;&amp; if{ 198 (&gt;L:Mlocnav, number) } els{ 0 (&gt;L:Mlocnav, number) }
+	   (L:MasterACDC, bool) 1 == (A:NAV HAS GLIDE SLOPE:1,bool) 0 == &amp;&amp; if{ -580 (&gt;L:Mgsnav, number) } els{ 0 (&gt;L:Mgsnav, number) }
+	 </Value>
+   </Select>
+  </Element>
+ 
+  <Element>
+    <Select>
+     <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+     <Value>0</Value>
+    </Select>
+  </Element>
+
+ <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+
+   <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+     <Value>0</Value>
+    </Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	 <Value>0</Value>
+    </Select>
+  </Element>
+
+  <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>0</Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+		(L:Swposition,bool) if{ (A:LIGHT NAV,bool) ! if{ (&gt;K:TOGGLE_NAV_LIGHTS) } } 
+		(L:Swposition,bool) ! if{ (A:LIGHT NAV,bool) if{ (&gt;K:TOGGLE_NAV_LIGHTS) } }
+	  </Value>
+	</Select>
+  </Element>
+
+  <Element>
+    <Select>
+	  <Value>
+		(L:Swanticoll,bool) if{ (A:LIGHT BEACON,bool) ! if{ (&gt;K:TOGGLE_BEACON_LIGHTS) } } 
+		(L:Swanticoll,bool) ! if{ (A:LIGHT BEACON,bool) if{ (&gt;K:TOGGLE_BEACON_LIGHTS) } }
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+	  (L:Swbatta,bool) || (L:Swbattb,bool) || (L:ExternalPower,bool) || if{ (A:ELECTRICAL MASTER BATTERY,bool) ! if{ (&gt;K:TOGGLE_MASTER_BATTERY) } } 
+	  (L:Swbatta,bool) ! (L:Swbattb,bool) ! &amp;&amp; (L:ExternalPower,bool) ! &amp;&amp; if{ (A:ELECTRICAL MASTER BATTERY,bool) if{ (&gt;K:TOGGLE_MASTER_BATTERY) } }
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+	   (L:SwpartsepA,bool) || (L:SepP1,bool) == 0 || if{ 1 (&gt;L:CSepP1,bool) } els{ 0 (&gt;L:CSepP1,bool) }
+	   (L:SwpartsepB,bool) || (L:SepP2,bool) == 0 || if{ 1 (&gt;L:CSepP2,bool) } els{ 0 (&gt;L:CSepP2,bool) } 
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+	   (L:CGenel,bool) 1 == (L:CGener,bool) 1 == &amp;&amp; if{ 0 (&gt;L:Swbatta,bool) } 
+	  </Value>
+	</Select>
+  </Element>
+
+  <Element>
+    <Select>
+	  <Value>
+	    (L:Genmast,bool) if{ (A:GENERAL ENG GENERATOR SWITCH:1,bool) ! if{ (&gt;K:TOGGLE_MASTER_ALTERNATOR) } }
+		(L:Genmast,bool) ! if{ (A:GENERAL ENG GENERATOR SWITCH:1,bool) if{ (&gt;K:TOGGLE_MASTER_ALTERNATOR) } }
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+	    (L:MasterACDC,bool) if{ (A:AVIONICS MASTER SWITCH,bool) ! if{ (&gt;K:TOGGLE_AVIONICS_MASTER) } }
+		(L:MasterACDC,bool) ! if{ (A:AVIONICS MASTER SWITCH,bool) if{ (&gt;K:TOGGLE_AVIONICS_MASTER) } }
+	  </Value>
+	</Select>
+  </Element> 
+  
+  <Element>
+    <Select>
+	  <Value>
+		(L:Genel,bool) 1 == (A:Eng2 Combustion,bool) 1 == &amp;&amp; if{ 1 (&gt;L:CGenel,bool) } els{ 0 (&gt;L:CGenel,bool) }
+		(L:Gener,bool) 1 == (A:Eng3 Combustion,bool) 1 == &amp;&amp; if{ 1 (&gt;L:CGener,bool) } els{ 0 (&gt;L:CGener,bool) }
+		(L:CGenel,bool) || (L:CGener,bool) || if{ 1 (&gt;L:Genmast,bool) } els{ 0 (&gt;L:Genmast,bool) }
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+		(L:Swbatta,bool) || (L:Swbattb,bool) || (L:Genmast,bool) || (L:ExternalPower,bool) || if{ 1 (&gt;L:MasterDcBus,bool) } els{ 0 (&gt;L:MasterDcBus,bool) }
+	  </Value>
+	</Select>
+  </Element>
+  
+  <Element>
+    <Select>
+	  <Value>
+		(L:Swinva, bool) || (L:Swinvb, bool) || if{ 1 (&gt;L:ACBus, bool) } els{ 0 (&gt;L:ACBus, bool) }
+		(L:ACBus, bool) (L:MasterDcBus, bool) 1 == &amp;&amp; if{ 1 (&gt;L:MasterACDC, bool) } els{ 0 (&gt;L:MasterACDC, bool) }
+	  </Value>
+	</Select>
+  </Element>     
+   
+</Gauge>

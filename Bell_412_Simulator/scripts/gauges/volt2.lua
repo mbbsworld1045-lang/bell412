@@ -56,9 +56,9 @@ local function interpolate(tbl, value)
 end
 
 -- Get data from Simulator
-function data(ac2, dc2, batt2_on)
-    -- Gauge only responds when Battery 2 switch (L:Swbattb) is ON
-    if not batt2_on or batt2_on == 0 then
+function data(ac2, dc2, batt1_on, batt2_on)
+    -- Gauge activates if ANY battery is ON (or if values are nil, e.g. from a different subscription)
+    if (batt1_on == 0) and (batt2_on == 0) then
         tgt_angle_ac2 = interpolate(ac2_table, 100)
         tgt_angle_dc2 = interpolate(dc2_table, 15)
         return
@@ -107,6 +107,8 @@ xpl_dataref_subscribe(
 fsx_variable_subscribe(
     "L:VoltAC2", "volt",                        
     "L:VoltDC2", "volt",
+    "L:Swbatta", "Bool",
     "L:Swbattb", "Bool",
+
     data
 )

@@ -95,9 +95,9 @@ xpl_dataref_subscribe("sim/cockpit2/engine/indicators/oil_pressure_psi", "FLOAT[
 						"412/electrical/gauge_AC2_volts", "FLOAT",
 						"412/electrical/gauge_DC1_volts", "FLOAT",
 						"412/electrical/gauge_DC2_volts", "FLOAT",data)
-fsx_variable_subscribe("GENERAL ENG OIL PRESSURE:2", "PSI",
-                       "GENERAL ENG OIL TEMPERATURE:2", "Celsius",
+fsx_variable_subscribe("L:OILE1", "psi",
+                       "L:OILE1T", "celsius",
 					   "ELECTRICAL MAIN BUS VOLTAGE", "Volts", data_fsx)
-fs2020_variable_subscribe("GENERAL ENG OIL PRESSURE:2", "PSI",
-                          "GENERAL ENG OIL TEMPERATURE:2", "Celsius",
+fs2020_variable_subscribe("L:OILE1", "psi",
+                          "L:OILE1T", "celsius",
 					      "ELECTRICAL MAIN BUS VOLTAGE", "Volts", data_fsx)					   

@@ -32,12 +32,12 @@ local PIN_SRCH_LT_R         = "ARDUINO_MEGA2560_C_D38"      -- SRCH LT R (Right)
 local PIN_SRCH_LT_RETR      = "ARDUINO_MEGA2560_C_D40"      -- SRCH LT RETR (Retract)
 
 -- Idle Stop
-local PIN_IDLE_STOP_ENG1    = "ARDUINO_MEGA2560_C_D28"      -- IDLE STOP ENG1
-local PIN_IDLE_STOP_ENG2    = "ARDUINO_MEGA2560_C_D29"      -- IDLE STOP ENG2
+local PIN_IDLE_STOP_ENG1    = "ARDUINO_MEGA2560_C_D28"      -- IDLE STOP ENG1 (Swapped from D29)
+local PIN_IDLE_STOP_ENG2    = "ARDUINO_MEGA2560_C_D29"      -- IDLE STOP ENG2 (Swapped from D28)
 
 -- Idle Stop Solenoids (Outputs)
-local PIN_SOLENOID_ENG1     = "ARDUINO_MEGA2560_C_D52"      -- SOLENOID ENG1
-local PIN_SOLENOID_ENG2     = "ARDUINO_MEGA2560_C_D53"      -- SOLENOID ENG2
+local PIN_SOLENOID_ENG1     = "ARDUINO_MEGA2560_C_D53"      -- SOLENOID ENG1 (Swapped from D52)
+local PIN_SOLENOID_ENG2     = "ARDUINO_MEGA2560_C_D52"      -- SOLENOID ENG2 (Swapped from D53)
 
 -- Start Switches
 local PIN_START_ENG1        = "ARDUINO_MEGA2560_C_D31"      -- START ENG1
@@ -73,13 +73,24 @@ local PIN_GO_AROUND_LH      = "ARDUINO_MEGA2560_C_D42"      -- GO AROUND
 
 -- =============================================================================
 -- 2. INTERNAL VARIABLES & STATE
--- =============================================================================
-local idle_stop_1_active = false
-local idle_stop_2_active = false
+local rpm_n1_e1 = 0.0
+local rpm_n1_e2 = 0.0
+-- State is now handled in throttle.lua via L-variables
+local btn_idle_1      = false
+local btn_idle_2      = false
 
 -- Solenoid output handles
-local solenoid_eng1 = hw_output_add(PIN_SOLENOID_ENG1, false)
-local solenoid_eng2 = hw_output_add(PIN_SOLENOID_ENG2, false)
+local solenoid_eng1 = hw_output_add(PIN_SOLENOID_ENG1, true)
+local solenoid_eng2 = hw_output_add(PIN_SOLENOID_ENG2, true)
+
+-- Create SI Variables for communication
+local si_sol1 = si_variable_create("bell412_solenoid1", "BOOL", false)
+local si_sol2 = si_variable_create("bell412_solenoid2", "BOOL", false)
+
+local last_sol_1 = nil
+local last_sol_2 = nil
+
+-- Solenoid control moved to subscriptions at the bottom of the file
 
 -- Timers for repeating events while held
 local yaw_timer_rh = nil
@@ -89,30 +100,21 @@ local yaw_timer_lh = nil
 -- 3. UTILITY FUNCTIONS
 -- =============================================================================
 
--- Throttle Logic (Clamped to 12% unless Idle Stop pressed)
-local function process_throttle_input(raw_val, is_release_active)
-    if is_release_active then
-        return raw_val -- Full range (0.0 - 1.0)
-    else
-        if raw_val < 0.12 then return 0.12 else return raw_val end -- Clamped min 0.12
-    end
-end
-
 -- =============================================================================
 -- 4. HARDWARE INPUTS (ANALOG)
 -- =============================================================================
 
--- THROTTLE 1
-hw_adc_input_add(PIN_THROTTLE1, function(val)
-    local throttle_val = process_throttle_input(val, idle_stop_1_active)
-    fsx_variable_write("L:throgas1", "Number", throttle_val)
-end)
+-- THROTTLE 1 (Commented out: throttle.lua handles this directly via Leo Bodnar)
+-- hw_adc_input_add(PIN_THROTTLE1, function(val)
+--     -- Direct pass-through of raw hardware value (0.0 - 1.0)
+--     fsx_variable_write("L:throgas1", "Number", val or 0.0)
+-- end)
 
--- THROTTLE 2
-hw_adc_input_add(PIN_THROTTLE2, function(val)
-    local throttle_val = process_throttle_input(val, idle_stop_2_active)
-    fsx_variable_write("L:throgas2", "Number", throttle_val)
-end)
+-- THROTTLE 2 (Commented out: throttle.lua handles this directly via Leo Bodnar)
+-- hw_adc_input_add(PIN_THROTTLE2, function(val)
+--     -- Direct pass-through of raw hardware value (0.0 - 1.0)
+--     fsx_variable_write("L:throgas2", "Number", val or 0.0)
+-- end)
 
 -- =============================================================================
 -- 5. HARDWARE INPUTS (DIGITAL)
@@ -132,33 +134,31 @@ hw_button_add(PIN_START_ENG2,
 
 hw_button_add(PIN_IDLE_STOP_ENG1,
     function()
-        idle_stop_1_active = not idle_stop_1_active
-        if idle_stop_1_active then
-            print("BTN: IDLE STOP ENG1 ON (toggle)")
-            hw_output_set(solenoid_eng1, true)
-            fsx_variable_write("L:idle eng", "Number", 1)
-        else
-            print("BTN: IDLE STOP ENG1 OFF (toggle)")
-            hw_output_set(solenoid_eng1, false)
-            fsx_variable_write("L:idle eng", "Number", 0)
-        end
+        btn_idle_1 = true
+        print("BTN: Idle Stop 1 Pressed")
+        -- Directly unlock the idle stop via SI variable
+        si_variable_write(si_sol1, true)
+        -- Force hardware update immediately (in case subscription ignores local write)
+        hw_output_set(solenoid_eng1, true)
     end,
-    function() end  -- toggle: release does nothing
+    function()
+        btn_idle_1 = false
+        print("BTN: Idle Stop 1 Released")
+    end
 )
 hw_button_add(PIN_IDLE_STOP_ENG2,
     function()
-        idle_stop_2_active = not idle_stop_2_active
-        if idle_stop_2_active then
-            print("BTN: IDLE STOP ENG2 ON (toggle)")
-            hw_output_set(solenoid_eng2, true)
-            fsx_variable_write("L:idle eng", "Number", -1)
-        else
-            print("BTN: IDLE STOP ENG2 OFF (toggle)")
-            hw_output_set(solenoid_eng2, false)
-            fsx_variable_write("L:idle eng", "Number", 0)
-        end
+        btn_idle_2 = true
+        print("BTN: Idle Stop 2 Pressed")
+        -- Directly unlock the idle stop via SI variable
+        si_variable_write(si_sol2, true)
+        -- Force hardware update immediately (in case subscription ignores local write)
+        hw_output_set(solenoid_eng2, true)
     end,
-    function() end  -- toggle: release does nothing
+    function()
+        btn_idle_2 = false
+        print("BTN: Idle Stop 2 Released")
+    end
 )
 
 -- -----------------------------------------------------------------------------
@@ -347,6 +347,38 @@ fsx_variable_subscribe("A:AUTOPILOT TOGA ACTIVE", "Bool", function(val)
 end)
 
 -- =============================================================================
+-- 6.5 IDLE STOP SUBSCRIPTIONS (Driven by throttle.lua)
+-- =============================================================================
+local idle_1_released = false
+local idle_2_released = false
+
+si_variable_subscribe("bell412_solenoid1", "BOOL", function(val)
+    print("DEBUG - SI Solenoid 1 changed to: " .. tostring(val))
+    idle_1_released = val
+    hw_output_set(solenoid_eng1, idle_1_released)
+    
+    -- Update L:idle eng for simulator sync
+    if idle_1_released then
+        fsx_variable_write("L:idle eng", "Number", 1)
+    elseif not idle_2_released then
+        fsx_variable_write("L:idle eng", "Number", 0)
+    end
+end)
+
+si_variable_subscribe("bell412_solenoid2", "BOOL", function(val)
+    print("DEBUG - SI Solenoid 2 changed to: " .. tostring(val))
+    idle_2_released = val
+    hw_output_set(solenoid_eng2, idle_2_released)
+    
+    -- Update L:idle eng for simulator sync
+    if idle_2_released then
+        fsx_variable_write("L:idle eng", "Number", -1)
+    elseif not idle_1_released then
+        fsx_variable_write("L:idle eng", "Number", 0)
+    end
+end)
+
+-- =============================================================================
 -- 7. INITIALIZATION
 -- =============================================================================
 fsx_variable_write("L:starteng", "Number", 0)
@@ -354,26 +386,3 @@ fsx_variable_write("L:idle eng", "Number", 0)
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
 
 fsx_variable_write("L:GOVERNOR RPM SWITCH", "Number", 0)
-
--- =============================================================================
--- 8. BI-DIRECTIONAL SYNC (Virtual Cockpit -> Physical)
--- =============================================================================
-
--- Idle Stop Sync: If virtual cockpit changes L:idle eng, update solenoids
-fsx_variable_subscribe("L:idle eng", "Number", function(val)
-    if val == 1 then
-        idle_stop_1_active = true
-        hw_output_set(solenoid_eng1, true)
-    elseif val == -1 then
-        idle_stop_2_active = true
-        hw_output_set(solenoid_eng2, true)
-    else
-        idle_stop_1_active = false
-        idle_stop_2_active = false
-        hw_output_set(solenoid_eng1, false)
-        hw_output_set(solenoid_eng2, false)
-    end
-end)
-
--- Start Engine Sync
-fsx_variable_subscribe("L:starteng", "Number", function(val) end) -- State tracking

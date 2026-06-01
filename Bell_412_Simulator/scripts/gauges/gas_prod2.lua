@@ -11,7 +11,7 @@ local tens_scale = 2.7  -- degrees per %N1 (280° full scale - capped)
 local ones_scale = 48   -- degrees per %N1 (2880° full scale)
 local tens_offset = 0    -- degrees offset for tens needle
 local ones_offset = 0    -- degrees offset for ones needle
-local tens_max_rotation = 280 -- Maximum allowed rotation for tens needle
+local tens_max_rotation = 300 -- Increased to allow for 104.5% N1 reading
 
 --Add images--
 img_add("N1_faceplate.png", 25, 75, 250, 250)

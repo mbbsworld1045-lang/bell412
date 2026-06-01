@@ -17,21 +17,22 @@ local NR_CALIBRATION = {
     {value = 389.0, angle = 325}    -- Maximum range
 }
 
--- Calibration points for engine N2 needles
+-- Calibration points for engine N2 needles (Synchronized with NR table)
 local N2_CALIBRATION = {
-    {value = 0,     angle = -5},    -- 0%
-    {value = 63.5,  angle = 169.5}, 
-    {value = 74.0,  angle = 198}, 
-    {value = 87.0,  angle = 234},   
-    {value = 93.0,  angle = 251}, 
-    {value = 100,   angle = 287},   -- 100%
-    {value = 110,   angle = 300}    -- Maximum range
+    {value = 0,      angle = -5},    -- 0%
+    {value = 64.04,  angle = 170},   -- 64.04% (Matches 207.5 RPM)
+    {value = 74.69,  angle = 201},   -- 74.69% (Matches 242.0 RPM)
+    {value = 87.65,  angle = 235},   -- 87.65% (Matches 284.0 RPM)
+    {value = 93.67,  angle = 253},   -- 93.67% (Matches 303.5 RPM)
+    {value = 100.0,  angle = 270},   -- 100% (Matches 324.0 RPM)
+    {value = 120.0,  angle = 325}    -- Max range
 }
 
 -- Global target variables (updated by the sim)
 local target_nr = 0
 local target_n2_1 = 0
 local target_n2_2 = 0
+local collective_pos = 0
 
 local rotor_brake_active = false
 
@@ -118,25 +119,23 @@ end
 timer_start(0, 50, update_needles)
 
 -- Simulator Data Update Function
-function data_fsx(NR_percent, N21, N22)
+function data_fsx(NR_percent, N21, N22, coll)
     -- Safety check: Prevent Lua crashes if variables return 'nil' when engine is off
     NR_percent = NR_percent or 0
     N21 = N21 or 0
     N22 = N22 or 0
+    collective_pos = coll or 0
 
-    -- Convert percentage to actual RPM (324 RPM = 100%)
-    local actual_rpm = (324 * NR_percent) / 100
-    
-    -- Add the -0.4 RPM adjustment
-    local adjusted_rpm = actual_rpm - 0.4 
+    -- Logging collective, rotor RPM, and N2
+    print(string.format("Rotor: %.2f%% | N2_1: %.2f%% | N2_2: %.2f%% | Coll: %.2f%%", NR_percent, N21, N22, collective_pos))
+
+    -- Convert percentages to actual RPM (324 RPM = 100%)
+    local sim_rpm = (324 * NR_percent) / 100
     
     -- If the brake is NOT active, take the value from the simulator normally
     if not rotor_brake_active then
-        target_nr = adjusted_rpm
-        
-        -- Write back to simulator 
-        local adjusted_percent = (adjusted_rpm * 100) / 324
-        fsx_variable_write("Eng Rotor Rpm", "percent", adjusted_percent)
+        -- Visual needle matches the true physics (No offsets to ensure sync with N2)
+        target_nr = sim_rpm
     end
     
     -- Update the global target N2 variables
@@ -147,7 +146,8 @@ end
 -- Subscribe to variables
 fsx_variable_subscribe("Eng Rotor Rpm", "percent",
                        "L:Eng1N2", "percent",
-                       "L:Eng2N2", "percent", data_fsx)
+                       "L:Eng2N2", "percent",
+                       "GENERAL ENG THROTTLE LEVER POSITION:1", "percent", data_fsx)
 
 si_variable_subscribe("bell412_rotor_brake", "INT", function(val)
     rotor_brake_active = (val == 1)

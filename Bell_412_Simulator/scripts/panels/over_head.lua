@@ -137,16 +137,18 @@ local function update_elec_leds()
     local i1 = (not STATE.inv1) and 1.0 or 0.0
     local i2 = (not STATE.inv2) and 1.0 or 0.0
     
-    hw_led_set(led_gen1_fail, g1)
-    hw_led_set(led_gen2_fail, g2)
-    hw_led_set(led_inv1_fail, i1)
-    hw_led_set(led_inv2_fail, i2)
+    -- Power gate: no LEDs without DC bus
+    local power = (STATE.dc_bus == 1)
+    hw_led_set(led_gen1_fail, power and g1 or 0.0)
+    hw_led_set(led_gen2_fail, power and g2 or 0.0)
+    hw_led_set(led_inv1_fail, power and i1 or 0.0)
+    hw_led_set(led_inv2_fail, power and i2 or 0.0)
     
     -- Battery Caution: Batts ON but no Gens
     local batts_on = STATE.batt1 or STATE.batt2
     local gens_on = STATE.gen1_prod or STATE.gen2_prod
     local b_caut = (batts_on and not gens_on) and 1.0 or 0.0
-    hw_led_set(led_batt_caut, b_caut)
+    hw_led_set(led_batt_caut, power and b_caut or 0.0)
 
     -- Logic for D40: Non-Essential Bus Relay
     -- ONLY LOW (Normal) if: Gen 1 ON AND Gen 2 ON AND Switch ON (Normal)
@@ -381,6 +383,7 @@ hw_button_add(PIN_FIRE_TEST,
 fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
     STATE.dc_bus = (val ~= 0) and 1 or 0
     update_fire_leds()
+    update_elec_leds()
 end)
 
 -- Generator Status (Production - existing)
@@ -442,13 +445,13 @@ hw_button_add(PIN_INST_ENG, function() print("SW: ENG INST LIGHT") end, function
 -- Rotor Brake
 hw_button_add(PIN_ROTOR_BRAKE, 
     function() 
-        print("SW: ROTOR BRAKE ON") 
+        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) PRESSED: ROTOR_BRAKE ON <<<<<<<<") 
         -- Physical Simulator Physics Command
         fsx_event("AXIS_ROTOR_BRAKE_SET", 16383) 
         si_variable_write(si_var_rotor_brake, 1)
     end, 
     function() 
-        print("SW: ROTOR BRAKE OFF") 
+        print(">>>>>>>> ARDUINO PIN D_A15 (OVERHEAD) RELEASED: ROTOR_BRAKE OFF <<<<<<<<") 
         -- Physical Simulator Physics Command
         fsx_event("AXIS_ROTOR_BRAKE_SET", 0) 
         si_variable_write(si_var_rotor_brake, 0)

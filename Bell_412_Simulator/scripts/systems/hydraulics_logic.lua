@@ -60,6 +60,11 @@ local rotor_rpm_pct = 100.0
 
 -- LED UPDATE: ON if Switch OFF OR Pressure < 600 PSI
 local function update_led_states()
+    if dc_bus == 0 then
+        hw_led_set(led_hyd1_h, 0.0)
+        hw_led_set(led_hyd2_h, 0.0)
+        return
+    end
     local hyd1_fail = (sw_hyd1 == 0) or (hyd1_pressure < HYD_PRESS_MIN)
     local hyd2_fail = (sw_hyd2 == 0) or (hyd2_pressure < HYD_PRESS_MIN)
 
@@ -69,6 +74,10 @@ end
 
 -- CYCLIC CENTERING WARNING LED: ON if stick off-center AND rotor RPM < 95%
 local function update_cyc_ctr_led()
+    if dc_bus == 0 then
+        hw_led_set(led_cyc_ctr_h, 0.0)
+        return
+    end
     local abs_x = math.abs(yoke_x_pos)
     local abs_y = math.abs(yoke_y_pos)
     local off_center = (abs_x > CYC_CTR_THRESHOLD) or (abs_y > CYC_CTR_THRESHOLD)
@@ -149,7 +158,7 @@ hw_button_add(PIN_CYC_CTR_TEST_L,
     function() -- PRESSED
         print("ACTION: Cyclic Center Test Left PRESSED")
         btn_cyc_ch1_state = 1
-        hw_led_set(led_cyc_ctr_test_l, 1.0)
+        hw_led_set(led_cyc_ctr_test_l, (dc_bus == 1) and 1.0 or 0.0)
         -- Write 1 if EITHER button is pressed
         local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
         fsx_variable_write("L:Cyctest", "Number", val)
@@ -169,7 +178,7 @@ hw_button_add(PIN_CYC_CTR_TEST_R,
     function() -- PRESSED
         print("ACTION: Cyclic Center Test Right PRESSED")
         btn_cyc_ch2_state = 1
-        hw_led_set(led_cyc_ctr_test_r, 1.0)
+        hw_led_set(led_cyc_ctr_test_r, (dc_bus == 1) and 1.0 or 0.0)
         -- Write 1 if EITHER button is pressed
         local val = (btn_cyc_ch1_state == 1 or btn_cyc_ch2_state == 1) and 1 or 0
         fsx_variable_write("L:Cyctest", "Number", val)
@@ -228,7 +237,7 @@ print("INIT: PIN_HYD2_SW = " .. PIN_HYD2_SW)
 fsx_variable_write("L:HydPressure1", "Number", 0.0)
 fsx_variable_write("L:HydPressure2", "Number", 0.0)
 fsx_variable_write("L:Sw hydsysA", "Number", 1)
-fsx_variable_write("L:Sw hydsysB", "Number", 0)
+fsx_variable_write("L:Sw hydsysB", "Number", 1)
 fsx_variable_write("L:Cyctest", "Number", 0)
 
 print("INIT: Hydraulics System - Initialization complete")

@@ -101,7 +101,7 @@ tmr_blink = timer_start(0, 50, timer_callback)
 -- 						"sim/cockpit2/engine/actuators/ignition_key", "INT[2]",
 -- 						"412/electrical/gauge_DC1_volts", "FLOAT",
 -- 						"412/electrical/gauge_DC2_volts", "FLOAT", data)
-fsx_variable_subscribe("L:ITTE1", "Celsius",
+fsx_variable_subscribe("L:ITTE1", "celsius",
                        "ELECTRICAL MAIN BUS VOLTAGE", "Volts", data_fsx)
 -- fs2020_variable_subscribe("TURB ENG ITT:1", "Celsius",
 --                           "ELECTRICAL MAIN BUS VOLTAGE", "Volts", data_fsx)					   

@@ -60,6 +60,11 @@ local PINS_E = {
     FUEL_VALVE_R    = "ARDUINO_MEGA2560_E_A12",
     ENG_CHIP_R      = "ARDUINO_MEGA2560_E_D8",
     AUTO_PILOT_2_R  = "ARDUINO_MEGA2560_E_A15",
+    EFIS_FAN_2_R    = "ARDUINO_MEGA2560_E_A3",
+    GOV_MANUAL_R    = "ARDUINO_MEGA2560_E_A9",
+    BATT_TEMP_R     = "ARDUINO_MEGA2560_E_D10",
+    FUEL_FILTER_2_R_2 = "ARDUINO_MEGA2560_E_D7",
+    EFIS_FAN_2_R_2  = "ARDUINO_MEGA2560_E_D14",
 }
 
 -- Digital Input Pins (Channel E - Switches/Buttons)
@@ -184,7 +189,7 @@ function update_leds()
     hw_output_set(LEDS.FUEL_TRANS_1_L, check("FUEL_TRANS_1_L", STATE.SwfueltransengA == 0, true)) -- mc_ca5
     hw_output_set(LEDS.BATT_TEMP_L, check("BATT_TEMP_L", false, false))                -- mc_ca6 (Test Only)
     hw_output_set(LEDS.FUEL_FILTER_1_L, check("FUEL_FILTER_1_L", false, false))            -- mc_ca7 (Test Only)
-    hw_output_set(LEDS.FUEL_LOW_L, check("FUEL_LOW_L", STATE.FuelCenter < 9.2, true)) -- mc_ca8
+    hw_output_set(LEDS.FUEL_LOW_L, check("FUEL_LOW_L", false, false)) -- mc_ca8 (Test Only)
     hw_output_set(LEDS.EFIS_FAN_1_L, check("EFIS_FAN_1_L", false, false))               -- mc_ca9 (Test Only)
     
     -- COLUMN B
@@ -229,8 +234,10 @@ function update_leds()
     hw_output_set(LEDS.FUEL_BOOST_2_R, check("FUEL_BOOST_2_R", STATE.SwboostpuEng2 == 0, true)) -- mc_cf1
     hw_output_set(LEDS.FUEL_TRANS_2_R, check("FUEL_TRANS_2_R", STATE.SwfueltransengB == 0, true)) -- mc_cf2
     
-    -- Battery R (mc_cf3): XML says (Swbatta && Swbattb == 1)
-    local batt_cond = (STATE.Swbatta == 1 and STATE.Swbattb == 1)
+    -- Battery R (mc_cf3): Both batteries ON but no generators producing
+    local batts_on = (STATE.Swbatta == 1 and STATE.Swbattb == 1)
+    local gens_on = (STATE.CGenel == 1 or STATE.CGener == 1)
+    local batt_cond = batts_on and not gens_on
     hw_output_set(LEDS.BATTERY_R, check("BATTERY_R", batt_cond, true))               -- mc_cf3
     
     hw_output_set(LEDS.FUEL_FILTER_2_R, check("FUEL_FILTER_2_R", false, false))            -- mc_cf4 (Test Only)
@@ -241,6 +248,9 @@ function update_leds()
     hw_output_set(LEDS.OIL_PRESS_R, check("OIL_PRESS_R", STATE.OILE2 < 50, true))
     hw_output_set(LEDS.FUEL_VALVE_R, check("FUEL_VALVE_R", STATE.SwvalveEng2 == 0, true))
     hw_output_set(LEDS.ENG_CHIP_R, check("ENG_CHIP_R", false, false)) -- Test Only
+    hw_output_set(LEDS.AUTO_PILOT_2_R, check("AUTO_PILOT_2_R", false, false)) -- Test Only
+    hw_output_set(LEDS.EFIS_FAN_2_R, check("EFIS_FAN_2_R", false, false)) -- Test Only
+    hw_output_set(LEDS.GOV_MANUAL_R, check("GOV_MANUAL_R", STATE.SwGovB ~= 0, true))
     -- Simplify: Just broadcast the raw count of faults
     -- Intelligence is now handled by the Front Panel
     si_variable_write(si_var_caution_count, (test_full) and 99 or current_fault_count)
@@ -270,6 +280,7 @@ fsx_variable_subscribe("L:SwFuelxfeed", "Bool", function(val) STATE.SwFuelxfeed 
 fsx_variable_subscribe("L:CSepP1", "Bool", function(val) STATE.CSepP1 = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:CSepP2", "Bool", function(val) STATE.CSepP2 = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:SwGovA", "Bool", function(val) STATE.SwGovA = val and 1 or 0; update_leds() end)
+fsx_variable_subscribe("L:SwGovB", "Bool", function(val) STATE.SwGovB = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:CGenel", "Bool", function(val) STATE.CGenel = val and 1 or 0; update_leds() end)
 fsx_variable_subscribe("L:CGener", "Bool", function(val) STATE.CGener = val and 1 or 0; update_leds() end)
 si_variable_subscribe("bell412_rotor_brake", "INT", function(val) STATE.RotorBrake = (val == 1); update_leds() end)
@@ -295,19 +306,10 @@ fsx_variable_subscribe("L:ExternalPower", "Bool", function(val) STATE.ExternalPo
 -- HARDWARE INPUTS (Test Switches/Buttons)
 -- =============================================================================
 
-local test_pos1 = false
-local test_pos2 = false
 local test_pnl  = false
 local lt_active = false
 
 local function update_test_state()
-    local val = 0
-    if test_pos1 then 
-        val = 1 
-    elseif test_pos2 then 
-        val = -1 
-    end
-    
     -- Update Global Lamp Test SI Variable (Broadcast the FULL test state)
     lamp_test_full = test_pnl
     lamp_test_lt   = lt_active
@@ -315,34 +317,24 @@ local function update_test_state()
     -- Provide a combined signal for Front Panel/FD (Full Test only for other panels)
     si_variable_write(si_var_lamp_test, lamp_test_full and 1 or 0)
     
-    -- Update Local Caution Panel Test State
-    fsx_variable_write("L:TestMC", "Number", val)
     update_leds() 
 end
 
--- TEST SWITCH POSITION 1
+-- BRIGHT SWITCH POSITION (No Function)
 hw_button_add(PINS_E_SWITCHES.TEST_SW_POS1, 
     function() 
-        print("HARDWARE: Caution Test Switch -> POS 1")
-        test_pos1 = true
-        update_test_state()
+        print("HARDWARE: Caution Switch -> BRIGHT (No function assigned)")
     end, 
     function() 
-        test_pos1 = false
-        update_test_state()
     end
 )
 
--- TEST SWITCH POSITION 2
+-- DIM SWITCH POSITION (No Function)
 hw_button_add(PINS_E_SWITCHES.TEST_SW_POS2, 
     function() 
-        print("HARDWARE: Caution Test Switch -> POS 2")
-        test_pos2 = true
-        update_test_state()
+        print("HARDWARE: Caution Switch -> DIM (No function assigned)")
     end, 
     function() 
-        test_pos2 = false
-        update_test_state()
     end
 )
 

@@ -50,6 +50,9 @@ local PIN_FD2_VOR_APR   = "ARDUINO_MEGA2560_F_D41"      -- VOR APR
 local PIN_FD2_GA        = "ARDUINO_MEGA2560_F_D43"      -- GA
 local PIN_FD2_SBY       = "ARDUINO_MEGA2560_F_D45"      -- SBY
 
+-- Autopilot
+local PIN_AP_MASTER     = "ARDUINO_MEGA2560_B_D13"      -- AP MASTER
+
 -- =============================================================================
 -- 2. LED HANDLES
 -- =============================================================================
@@ -78,12 +81,30 @@ local fd1_state = {
     ga = false, sby = false
 }
 local lamp_test_active = 0
+local dc_bus = 0
 
 
 -- =============================================================================
 -- 4. LED UPDATE FUNCTION
 -- =============================================================================
 local function update_fd1_leds()
+    if dc_bus == 0 then
+        hw_led_set(led_fd1_alt, 0.0)
+        hw_led_set(led_fd1_ias, 0.0)
+        hw_led_set(led_fd1_vs, 0.0)
+        hw_led_set(led_fd1_hdg, 0.0)
+        hw_led_set(led_fd1_nav_1, 0.0)
+        hw_led_set(led_fd1_nav_2, 0.0)
+        hw_led_set(led_fd1_ils_1, 0.0)
+        hw_led_set(led_fd1_ils_2, 0.0)
+        hw_led_set(led_fd1_bc_1, 0.0)
+        hw_led_set(led_fd1_bc_2, 0.0)
+        hw_led_set(led_fd1_vor_apr_1, 0.0)
+        hw_led_set(led_fd1_vor_apr_2, 0.0)
+        hw_led_set(led_fd1_ga, 0.0)
+        hw_led_set(led_fd1_sby, 0.0)
+        return
+    end
     local lt = (lamp_test_active == 1)
     
     -- Print status if Lamp Test is active
@@ -144,6 +165,9 @@ hw_button_add(PIN_FD2_VOR_APR, function() print("FD2 VOR APR Pressed"); fsx_vari
 hw_button_add(PIN_FD2_GA,      function() print("FD2 GA Pressed");      fsx_variable_write("L:FD2_GA_Switch", "Number", 1) end)
 hw_button_add(PIN_FD2_SBY,     function() print("FD2 SBY Pressed");     fsx_variable_write("L:FD2_SBY_Switch", "Number", 1) end)
 
+-- Autopilot Buttons
+hw_button_add(PIN_AP_MASTER,   function() print("AP MASTER Pressed");   fsx_event("AP_MASTER") end)
+
 -- =============================================================================
 -- 6. BI-DIRECTIONAL SYNC (Virtual Cockpit -> Physical LEDs)
 -- =============================================================================
@@ -163,6 +187,12 @@ si_variable_subscribe("bell412_lamp_test", "INT", function(val)
     local state = val or 0
     print("FD1_SI: Lamp Test signal changed to " .. tostring(state))
     lamp_test_active = state
+    update_fd1_leds()
+end)
+
+-- DC Bus (Power Availability)
+fsx_variable_subscribe("L:MasterDcBus", "Number", function(val)
+    dc_bus = (val ~= 0) and 1 or 0
     update_fd1_leds()
 end)
 

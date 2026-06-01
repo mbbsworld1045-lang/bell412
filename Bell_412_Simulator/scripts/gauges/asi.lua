@@ -7,6 +7,10 @@ if user_prop_get(bezel_prop) then
 end
 
 function data_xpl(ASI)
+    if ASI > 150 then
+        ASI = 150
+    end
+
     if ASI >= 50 then
         rotate (img_needle, 220/100 * (ASI - 50) + 122)
     elseif ASI >= 30 and ASI < 50 then

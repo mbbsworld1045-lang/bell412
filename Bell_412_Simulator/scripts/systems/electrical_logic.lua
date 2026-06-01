@@ -61,8 +61,32 @@ local is_starting    = 0
 -- 4. SYSTEM LOGIC FUNCTIONS
 -- =============================================================================
 
+-- HELPER: Update AC Bus states and Voltages (Automatic Bus Tie logic)
+local function update_ac_logic()
+    -- If EITHER inverter is on, the AC system has power (redundancy)
+    local ac_state = (sw_inv1 == 1 or sw_inv2 == 1) and 1 or 0
+    local ac_volts = (ac_state == 1) and 115.0 or 0.0
+    
+    fsx_variable_write("L:ACBus", "Number", ac_state)
+    fsx_variable_write("L:VoltAC1", "Volts", ac_volts)
+    fsx_variable_write("L:VoltAC2", "Volts", ac_volts)
+    
+    update_led_states()
+end
+
 -- HELPER: Update LED states based on calculated logic
 local function update_led_states()
+    -- Power gate: no LEDs without any power source
+    local has_power = (sw_batt1 == 1) or (sw_batt2 == 1) or (gen1_producing == 1) or (gen2_producing == 1) or (ext_power_on == 1)
+    if not has_power then
+        hw_led_set(led_gen1_h, 0.0)
+        hw_led_set(led_gen2_h, 0.0)
+        hw_led_set(led_inv1_h, 0.0)
+        hw_led_set(led_inv2_h, 0.0)
+        hw_led_set(led_batt_h, 0.0)
+        return
+    end
+
     -- Gen Fails: ON if switch is ON but Gen is NOT producing (or switch is OFF)
     -- Simplified: In real 412, Light ON if Bus Voltage < Limit or Gen Offline
     hw_led_set(led_gen1_h, (gen1_producing == 0) and 1.0 or 0.0)
@@ -201,18 +225,13 @@ hw_button_add(PIN_INV1_SW,
         print("ACTION: Inv 1 ON")
         sw_inv1 = 1
         fsx_variable_write("L:Swinva", "Number", 1)
-        -- AC Logic: If either Inv is on, AC bus is powered
-        local ac_state = (sw_inv1 == 1 or sw_inv2 == 1) and 1 or 0
-        fsx_variable_write("L:ACBus", "Number", ac_state)
-        update_led_states()
+        update_ac_logic()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Inv 1 OFF")
         sw_inv1 = 0
         fsx_variable_write("L:Swinva", "Number", 0)
-        local ac_state = (sw_inv1 == 1 or sw_inv2 == 1) and 1 or 0
-        fsx_variable_write("L:ACBus", "Number", ac_state)
-        update_led_states()
+        update_ac_logic()
     end
 )
 
@@ -222,17 +241,13 @@ hw_button_add(PIN_INV2_SW,
         print("ACTION: Inv 2 ON")
         sw_inv2 = 1
         fsx_variable_write("L:Swinvb", "Number", 1)
-        local ac_state = (sw_inv1 == 1 or sw_inv2 == 1) and 1 or 0
-        fsx_variable_write("L:ACBus", "Number", ac_state)
-        update_led_states()
+        update_ac_logic()
     end,
     function() -- RELEASED (OFF)
         print("ACTION: Inv 2 OFF")
         sw_inv2 = 0
         fsx_variable_write("L:Swinvb", "Number", 0)
-        local ac_state = (sw_inv1 == 1 or sw_inv2 == 1) and 1 or 0
-        fsx_variable_write("L:ACBus", "Number", ac_state)
-        update_led_states()
+        update_ac_logic()
     end
 )
 
@@ -301,3 +316,4 @@ end)
 -- =============================================================================
 -- Run logic once at start to set LEDs correctly
 update_electrical_logic()
+update_ac_logic()
